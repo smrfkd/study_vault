@@ -416,51 +416,6 @@ select.form-input { cursor: pointer; }
       <div id="api-key-status" style="font-size:11px;color:#718096"></div>
     </div>
 
-    <!-- データバックアップカード -->
-    <div class="card" style="border-top:4px solid #38a169;margin-bottom:18px">
-      <div class="card-title">💾 データバックアップ</div>
-      <div style="font-size:12px;color:#718096;margin-bottom:14px">
-        別のURLやデバイスにデータを移行したいときに使います。<br>
-        <span style="color:#c53030;font-weight:600">インポートすると現在のデータは上書きされます。</span>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button onclick="exportData()"
-          style="padding:9px 20px;background:#38a169;color:white;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer">
-          ⬇ エクスポート（バックアップ保存）
-        </button>
-        <label style="padding:9px 20px;background:#2b6cb0;color:white;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center">
-          ⬆ インポート（データ復元）
-          <input type="file" accept=".json" onchange="importData(this)" style="display:none">
-        </label>
-      </div>
-    </div>
-
-    <!-- デバイス連携カード -->
-    <div class="card" style="border-top:4px solid #4a5568;margin-bottom:18px" id="sync-card">
-      <div class="card-title">☁️ デバイス連携・クラウド同期</div>
-      <div style="font-size:12px;color:#718096;margin-bottom:12px">同じIDをスマホで入力すると、データが共有されます。</div>
-      <div style="margin-bottom:14px">
-        <div style="font-size:11px;font-weight:700;color:#4a5568;margin-bottom:4px">あなたのデバイスID</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <code id="my-uid-display" style="font-size:11px;background:#edf2f7;padding:6px 10px;border-radius:6px;flex:1;word-break:break-all;color:#2d3748">取得中...</code>
-          <button onclick="copyMyUid()" style="font-size:11px;padding:6px 12px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer;white-space:nowrap">コピー</button>
-        </div>
-      </div>
-      <div>
-        <div style="font-size:11px;font-weight:700;color:#4a5568;margin-bottom:4px">別デバイスのIDで同期する</div>
-        <div style="display:flex;gap:8px">
-          <input id="link-uid-input" type="text" placeholder="他のデバイスのIDを貼り付け"
-            style="flex:1;font-size:11px;padding:6px 10px;border:1px solid #cbd5e0;border-radius:8px;outline:none">
-          <button onclick="linkToDevice(document.getElementById('link-uid-input').value)"
-            style="font-size:11px;padding:6px 14px;background:#553c9a;color:white;border:none;border-radius:8px;cursor:pointer;white-space:nowrap">連携</button>
-        </div>
-      </div>
-      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-        <button onclick="syncFromCloud()" style="font-size:11px;padding:6px 14px;border:1px solid #4a5568;border-radius:8px;background:white;cursor:pointer">🔄 今すぐ同期</button>
-        <span id="sync-status-card" style="font-size:11px;color:#718096"></span>
-      </div>
-    </div>
-
   </div>
 
   <!-- ==================== ADD QUESTION ==================== -->
@@ -1197,9 +1152,41 @@ select.form-input { cursor: pointer; }
       <div class="card" style="min-width:0;overflow:hidden">
         <div class="card-title">⚙️ データ管理</div>
         <div class="form-group">
-          <div style="font-size:14px;font-weight:700;margin-bottom:6px">📤 エクスポート</div>
-          <p style="font-size:13px;color:#718096;margin-bottom:10px">全問題データをJSONでバックアップします</p>
-          <button class="btn btn-primary" onclick="exportData()">📤 JSONエクスポート</button>
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px">💾 バックアップ</div>
+          <p style="font-size:13px;color:#718096;margin-bottom:10px">全問題データをJSONでバックアップ・復元します。<br><span style="color:#c53030;font-weight:600">インポートすると現在のデータは上書きされます。</span></p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-success" onclick="exportData()">⬇ エクスポート</button>
+            <label class="btn btn-primary" style="cursor:pointer;display:inline-flex;align-items:center">
+              ⬆ インポート
+              <input type="file" accept=".json" onchange="importData(this)" style="display:none">
+            </label>
+          </div>
+        </div>
+        <hr class="divider">
+        <!-- デバイス連携 -->
+        <div class="form-group" id="sync-card">
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px">☁️ デバイス連携・クラウド同期</div>
+          <p style="font-size:13px;color:#718096;margin-bottom:10px">同じIDをスマホで入力すると、データが共有されます。</p>
+          <div style="margin-bottom:10px">
+            <div style="font-size:11px;font-weight:700;color:#4a5568;margin-bottom:4px">あなたのデバイスID</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <code id="my-uid-display" style="font-size:11px;background:#edf2f7;padding:6px 10px;border-radius:6px;flex:1;word-break:break-all;color:#2d3748">取得中...</code>
+              <button onclick="copyMyUid()" style="font-size:11px;padding:6px 12px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer;white-space:nowrap">コピー</button>
+            </div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:11px;font-weight:700;color:#4a5568;margin-bottom:4px">別デバイスのIDで同期する</div>
+            <div style="display:flex;gap:8px">
+              <input id="link-uid-input" type="text" placeholder="他のデバイスのIDを貼り付け"
+                style="flex:1;font-size:11px;padding:6px 10px;border:1px solid #cbd5e0;border-radius:8px;outline:none">
+              <button onclick="linkToDevice(document.getElementById('link-uid-input').value)"
+                style="font-size:11px;padding:6px 14px;background:#553c9a;color:white;border:none;border-radius:8px;cursor:pointer;white-space:nowrap">連携</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button onclick="syncFromCloud()" style="font-size:11px;padding:6px 14px;border:1px solid #4a5568;border-radius:8px;background:white;cursor:pointer">🔄 今すぐ同期</button>
+            <span id="sync-status-card" style="font-size:11px;color:#718096"></span>
+          </div>
         </div>
         <hr class="divider">
         <div class="form-group">
@@ -1212,15 +1199,6 @@ select.form-input { cursor: pointer; }
           <div style="font-size:14px;font-weight:700;margin-bottom:6px;color:#e53e3e">⚠️ 全データ削除</div>
           <p style="font-size:13px;color:#718096;margin-bottom:10px">全問題・全学習記録を完全に削除します</p>
           <button class="btn btn-danger" onclick="clearAll()">🗑️ 全データ削除</button>
-        </div>
-        <hr class="divider">
-        <div style="font-size:13px;color:#a0aec0;line-height:1.7">
-          <strong>使い方のヒント</strong><br>
-          • まず問題追加タブで問題を登録<br>
-          • 学習モードで解いて正解/不正解を記録<br>
-          • 弱点分析タブで弱点を確認<br>
-          • まとめノートで試験直前の確認に活用<br>
-          • 定期的にエクスポートしてバックアップを
         </div>
       </div>
     </div>
@@ -2778,10 +2756,15 @@ const SUGGESTED_TAGS = [
   '病理','末梢血塗抹','骨髄像','血清蛋白分画','免疫電気泳動','皮膚所見画像',
   // ── 学習概念タグ ──
   '統計','薬理','解剖','生理','生化学','内科','マイナー',
+  // ── 手技・検査タグ ──
+  '頭位とコルポスコピー',
 ];
 
 // 現在タグ編集中の問題（study mode: queue[qIdx]、それ以外: null）
 let _tagEditingQ = null;
+
+// ユーザーが手動追加したタグを永続保存
+let _customUserTags = JSON.parse(localStorage.getItem('kokushi_custom_tags') || '[]');
 
 function getAllUsedTags() {
   const set = new Set();
@@ -2806,9 +2789,9 @@ function renderQuestionTags(q) {
       </span>`).join('')
     : '<span style="font-size:11px;color:#a0aec0">タグなし</span>';
 
-  // suggestions: show SUGGESTED_TAGS not already on question, plus any custom used tags
+  // suggestions: SUGGESTED_TAGS + ユーザー定義タグ + 既存問題のタグ（重複排除）
   const allUsed = getAllUsedTags();
-  const suggestions = [...new Set([...SUGGESTED_TAGS, ...allUsed])].filter(t => !tags.includes(t)).slice(0, 30);
+  const suggestions = [...new Set([...SUGGESTED_TAGS, ..._customUserTags, ...allUsed])].filter(t => !tags.includes(t)).slice(0, 30);
   const sugg = document.getElementById('tag-suggestions');
   if (sugg) sugg.innerHTML = suggestions.map(t =>
     `<button onclick="addTag('${t.replace(/'/g,"\\'")}',event)"
@@ -2830,6 +2813,11 @@ function addTagFromInput() {
   if (!input) return;
   const val = input.value.trim();
   if (!val) return;
+  // カスタムタグとしてlocalStorageに永続保存
+  if (!_customUserTags.includes(val)) {
+    _customUserTags.push(val);
+    localStorage.setItem('kokushi_custom_tags', JSON.stringify(_customUserTags));
+  }
   addTag(val, null);
   input.value = '';
 }
