@@ -706,9 +706,16 @@ select.form-input { cursor: pointer; }
 
           </div>
 
+          <!-- 検索結果一覧 -->
+          <div id="filter-result-list" style="display:none;margin-bottom:12px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;max-height:280px;overflow-y:auto;background:white"></div>
+
           <!-- 一致件数 + 開始ボタン -->
           <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-            <span id="filter-match-count" style="font-size:13px;font-weight:600;color:#718096"></span>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <span id="filter-match-count" style="font-size:13px;font-weight:600;color:#718096"></span>
+              <button id="filter-select-all-btn" onclick="_filterSelectAll(true)" style="display:none;font-size:11px;padding:3px 10px;border:1px solid #bee3f8;border-radius:8px;background:white;color:#2b6cb0;cursor:pointer">全選択</button>
+              <button id="filter-deselect-all-btn" onclick="_filterSelectAll(false)" style="display:none;font-size:11px;padding:3px 10px;border:1px solid #e2e8f0;border-radius:8px;background:white;color:#718096;cursor:pointer">全解除</button>
+            </div>
             <button onclick="startStudy('filter')"
               style="padding:9px 26px;background:#2b6cb0;color:white;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;transition:background 0.15s"
               onmouseover="this.style.background='#2c5282'" onmouseout="this.style.background='#2b6cb0'">
@@ -2889,10 +2896,9 @@ const SUGGESTED_TAGS = [
   // ── 画像・検査種別 ──
   '心電図','レントゲン','CT','MRI','MRA','エコー','内視鏡','CTG',
   '病理','末梢血塗抹','骨髄像','血清蛋白分画','免疫電気泳動','皮膚所見画像',
+  '頭位','コルポスコピー',
   // ── 学習概念タグ ──
   '統計','薬理','解剖','生理','生化学','内科','マイナー',
-  // ── 手技・検査タグ ──
-  '頭位とコルポスコピー',
 ];
 
 // 現在タグ編集中の問題（study mode: queue[qIdx]、それ以外: null）
@@ -3136,12 +3142,74 @@ function _toggleFilterTag(tag, btn) {
   _updateFilterMatchCount();
 }
 
+let _filterExcludedIds = new Set();
+
 function _updateFilterMatchCount() {
   const el = document.getElementById('filter-match-count');
   if (!el) return;
-  const count = _buildFilterPool().length;
+  const pool = _buildFilterPool();
+  // フィルター条件が変わったら除外リセット
+  _filterExcludedIds = new Set();
+  _renderFilterResultList(pool);
+  const count = pool.length;
   el.textContent = `該当: ${count}問`;
   el.style.color = count > 0 ? '#2b6cb0' : '#e53e3e';
+}
+
+function _renderFilterResultList(pool) {
+  const list = document.getElementById('filter-result-list');
+  const allBtn = document.getElementById('filter-select-all-btn');
+  const deselBtn = document.getElementById('filter-deselect-all-btn');
+  if (!list) return;
+  if (pool.length === 0) { list.style.display = 'none'; if(allBtn) allBtn.style.display='none'; if(deselBtn) deselBtn.style.display='none'; return; }
+  list.style.display = 'block';
+  if(allBtn) allBtn.style.display='inline-block';
+  if(deselBtn) deselBtn.style.display='inline-block';
+  list.innerHTML = pool.map(q => {
+    const acc = q.attempts.length
+      ? Math.round(q.attempts.filter(a=>a.ok).length / q.attempts.length * 100) + '%'
+      : '未';
+    const accColor = q.attempts.length === 0 ? '#a0aec0'
+      : q.attempts.filter(a=>a.ok).length / q.attempts.length >= 0.8 ? '#276749'
+      : q.attempts.filter(a=>a.ok).length / q.attempts.length >= 0.5 ? '#b7791f' : '#c53030';
+    const qText = (q.question || '').replace(/\s+/g,' ').slice(0, 60);
+    return `<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid #f0f4f8;cursor:pointer;background:white" onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background='white'">
+      <input type="checkbox" checked data-qid="${q.id}" onchange="_filterToggleQ('${q.id}', this.checked)" style="accent-color:#2b6cb0;width:14px;height:14px;flex-shrink:0">
+      <span style="font-size:12px;font-weight:700;color:#2b6cb0;min-width:58px;flex-shrink:0">${escapeHtml(q.number||'')}</span>
+      <span style="font-size:11px;color:#4a5568;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(qText)}</span>
+      <span style="font-size:10px;color:#718096;white-space:nowrap;flex-shrink:0">${escapeHtml(q.category||'')}</span>
+      <span style="font-size:10px;font-weight:700;color:${accColor};min-width:26px;text-align:right;flex-shrink:0">${acc}</span>
+    </label>`;
+  }).join('');
+}
+
+function _filterToggleQ(id, checked) {
+  if (checked) {
+    _filterExcludedIds.delete(id);
+  } else {
+    _filterExcludedIds.add(id);
+  }
+  // カウント更新
+  const pool = _buildFilterPool().filter(q => !_filterExcludedIds.has(q.id));
+  const el = document.getElementById('filter-match-count');
+  if (el) {
+    el.textContent = `該当: ${pool.length}問（${_filterExcludedIds.size > 0 ? _filterExcludedIds.size + '問除外' : '全選択'}）`;
+    el.style.color = pool.length > 0 ? '#2b6cb0' : '#e53e3e';
+  }
+}
+
+function _filterSelectAll(checked) {
+  _filterExcludedIds = new Set();
+  document.querySelectorAll('#filter-result-list input[type="checkbox"]').forEach(cb => {
+    cb.checked = checked;
+    if (!checked) _filterExcludedIds.add(cb.dataset.qid);
+  });
+  const pool = _buildFilterPool().filter(q => !_filterExcludedIds.has(q.id));
+  const el = document.getElementById('filter-match-count');
+  if (el) {
+    el.textContent = `該当: ${pool.length}問${!checked ? '（全解除）' : ''}`;
+    el.style.color = pool.length > 0 ? '#2b6cb0' : '#e53e3e';
+  }
 }
 
 function _buildFilterPool() {
@@ -3217,7 +3285,7 @@ function startStudy(mode, cat='') {
     pool = questions.filter(q => (q.tags||[]).includes(cat));
   }
   else if (mode==='filter') {
-    pool = _buildFilterPool();
+    pool = _buildFilterPool().filter(q => !_filterExcludedIds.has(q.id));
   }
 
   if (!pool.length) {
