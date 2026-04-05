@@ -1141,7 +1141,7 @@ select.form-input { cursor: pointer; }
             <option value="">SRS全て</option>
             <option value="due">復習期限あり</option>
             <option value="1d">前日誤答（1日）</option>
-            <option value="long">長期SRS（3日+）</option>
+            <option value="long">長期SRS（3日以上）</option>
             <option value="none">SRS未登録</option>
           </select>
         </div>
@@ -2237,9 +2237,12 @@ function scheduleReview(q, ok, fuzzy) {
   } else if (q.nextReview) {
     // 復習で正解 → インターバルを延長またはカード卒業
     const interval = q.srInterval || 1;
-    if (interval >= 7) {
-      q.nextReview = null; // 卒業
+    if (interval >= 30) {
+      q.nextReview = null; // 卒業（30日インターバルを正解→長期記憶確立）
       q.srInterval = null;
+    } else if (interval >= 7) {
+      q.nextReview = addDays(t, 30); // 7日→30日（長期記憶チェック）
+      q.srInterval = 30;
     } else if (interval >= 3) {
       q.nextReview = addDays(t, 7);
       q.srInterval = 7;
@@ -2791,7 +2794,7 @@ function renderQuestionTags(q) {
 
   // suggestions: SUGGESTED_TAGS + ユーザー定義タグ + 既存問題のタグ（重複排除）
   const allUsed = getAllUsedTags();
-  const suggestions = [...new Set([...SUGGESTED_TAGS, ..._customUserTags, ...allUsed])].filter(t => !tags.includes(t)).slice(0, 30);
+  const suggestions = [...new Set([...SUGGESTED_TAGS, ..._customUserTags, ...allUsed])].filter(t => !tags.includes(t));
   const sugg = document.getElementById('tag-suggestions');
   if (sugg) sugg.innerHTML = suggestions.map(t =>
     `<button onclick="addTag('${t.replace(/'/g,"\\'")}',event)"
@@ -3125,7 +3128,7 @@ function showQ() {
   if (q.seriesNote) meta += `<span class="badge" style="background:#e9d8fd;color:#553c9a;font-size:10px">🔗 連問</span> `;
   if (q.flagged) meta += `<span class="badge badge-yellow">🚩 フラグ</span> `;
   if (_isReviewMode && q.srInterval) {
-    const srLabel = q.srInterval >= 7 ? '7日インターバル' : q.srInterval >= 3 ? '3日インターバル' : '1日インターバル';
+    const srLabel = q.srInterval >= 30 ? '30日インターバル' : q.srInterval >= 7 ? '7日インターバル' : q.srInterval >= 3 ? '3日インターバル' : '1日インターバル';
     meta += `<span class="badge" style="background:#f3e8ff;color:#553c9a">🧠 復習 ${srLabel}</span> `;
   }
   const acc = accuracy(q.attempts);
@@ -3928,7 +3931,7 @@ function autoJudge() {
 
   if (isCorrect) {
     const reviewSRLabel = _isReviewMode && queue[qIdx] && queue[qIdx].srInterval
-      ? ` (+${queue[qIdx].srInterval >= 7 ? '卒業🎓' : (queue[qIdx].srInterval >= 3 ? '7日後' : '3日後')})`
+      ? ` (+${queue[qIdx].srInterval >= 30 ? '卒業🎓' : (queue[qIdx].srInterval >= 7 ? '30日後' : (queue[qIdx].srInterval >= 3 ? '7日後' : '3日後'))})`
       : '';
     el.innerHTML = `
       <div style="padding:16px 0 12px;border-top:2px solid #e2e8f0;margin-top:16px">
