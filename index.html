@@ -158,6 +158,15 @@ select.form-input { cursor: pointer; }
 .answer-reveal { background: #f0fff4; border: 2px solid #9ae6b4; border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-size: 15px; }
 .answer-buttons { display: flex; gap: 14px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
 .note-input-area { background: #fffff0; border: 2px solid #fefcbf; border-radius: 10px; padding: 14px; margin-top: 14px; }
+
+/* ANKI CARDS */
+.anki-section-header { display:flex;align-items:center;justify-content:space-between;background:#faf5ff;border:1px solid #e9d8fd;border-radius:10px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:700;color:#553c9a;user-select:none; }
+.anki-section-header:hover { background:#f3e8ff; }
+.anki-cards-body { padding:10px 4px 4px 4px;display:flex;flex-direction:column;gap:10px; }
+.anki-card-item { background:white;border:1px solid #e9d8fd;border-radius:10px;padding:12px 14px;position:relative; }
+.anki-card-front { font-size:13px;line-height:1.7;color:#2d3748; }
+.anki-card-full { font-size:13px;line-height:1.7;color:#2d3748; }
+.anki-relevance { font-size:11px;color:#718096;font-style:italic;flex:1; }
 .session-header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; background: white; padding: 14px 18px; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 .session-counts { display: flex; gap: 16px; font-size: 14px; font-weight: 700; }
 
@@ -843,6 +852,15 @@ select.form-input { cursor: pointer; }
             <div id="ai-draft-loading" style="display:none;text-align:center;padding:16px;color:#718096;font-size:12px">
               ⏳ 解説を生成中...
             </div>
+          </div>
+
+          <!-- 関連Ankiカード -->
+          <div id="anki-cards-area" style="display:none;margin-top:14px">
+            <div class="anki-section-header" onclick="toggleAnkiSection()">
+              <span>📇 関連Ankiカード <span id="anki-count-badge" style="background:#e9d8fd;color:#553c9a;border-radius:10px;padding:1px 8px;font-size:11px;margin-left:4px"></span></span>
+              <span id="anki-chevron" style="font-size:11px">▼</span>
+            </div>
+            <div id="anki-cards-body" class="anki-cards-body" style="display:none"></div>
           </div>
 
           <!-- 前回の理解メモ（解説確認後に表示） -->
@@ -2744,6 +2762,112 @@ function _renderOriginalExp(q) {
   }
 }
 
+// ========== ANKI CARDS ==========
+
+// 関連AnkiカードDB（バッチ処理で生成・拡張していく）
+const ANKI_LINKS = {
+  'mngwgovqlgstz': [ // 116D3: Forrester分類
+    {
+      deck: 'Pathoma',
+      plain: 'Heart failure is a clinical syndrome of cardiac pump dysfunction which causes {{c1::congestion}} and {{c1::low perfusion}}',
+      relevance: 'Forrester分類の2軸「うっ血（高PCWP）」と「低灌流（低CO）」の概念的基盤'
+    },
+    {
+      deck: 'Pathoma',
+      plain: 'Clinical features of left heart failure are due to {{c1::decreased forward perfusion}} with consequent {{c2::pulmonary congestion}}',
+      relevance: 'Forrester縦軸（心係数↓）と横軸（肺動脈楔入圧↑）の臨床的意味を直接表す'
+    },
+    {
+      deck: 'Pathoma',
+      plain: 'One complication that may occur during the first 4 hours post-MI is {{c1::cardiogenic shock}}, which occurs due to lack of blood flow to vital organs',
+      relevance: 'Forrester Zone IV（高PCWP・低CO）に相当。MI後の心原性ショックは国試頻出'
+    },
+    {
+      deck: 'Sketchy Pharm',
+      plain: 'What sympathomimetic is used to treat cardiogenic shock?   {{c1::Dobutamine}}',
+      relevance: 'Forrester Zone IV（低CO優位）の治療薬。β1作用で心収縮力↑→心係数を改善'
+    },
+    {
+      deck: 'Sketchy Pharm',
+      plain: 'Loop diuretics may be used to treat the symptoms of {{c1::pulmonary edema}} in an acute heart failure exacerbation',
+      relevance: 'Forrester Zone II（高PCWP・正常CO）の治療。利尿でPCWPを低下させる'
+    }
+  ]
+};
+
+// 削除済みカードの管理（localStorageで永続化）
+let _ankiDismissed = JSON.parse(localStorage.getItem('kokushi_anki_dismissed') || '{}');
+
+function renderAnkiCards(q) {
+  const area = document.getElementById('anki-cards-area');
+  if (!area || !q) return;
+  const cards = ANKI_LINKS[q.id];
+  if (!cards || cards.length === 0) { area.style.display = 'none'; return; }
+  const dismissed = _ankiDismissed[q.id] || [];
+  const visible = cards.map((c, i) => ({...c, origIdx: i})).filter(c => !dismissed.includes(c.origIdx));
+  if (visible.length === 0) { area.style.display = 'none'; return; }
+  area.style.display = 'block';
+  document.getElementById('anki-count-badge').textContent = visible.length;
+  const body = document.getElementById('anki-cards-body');
+  body.style.display = 'none'; // デフォルト折り畳み
+  document.getElementById('anki-chevron').textContent = '▼';
+  body.innerHTML = visible.map(card => {
+    const front = card.plain.replace(/\{\{c\d+::([^:}]+)(?:::[^}]*)?\}\}/g, '<span style="background:#e9d8fd;border-radius:4px;padding:0 6px;color:#553c9a;font-weight:700">▢▢▢</span>');
+    const full  = card.plain.replace(/\{\{c\d+::([^:}]+)(?:::[^}]*)?\}\}/g, '<strong style="color:#553c9a;background:#f3e8ff;border-radius:4px;padding:0 4px">$1</strong>');
+    const deckColor = card.deck === 'Pathoma' ? '#ebf8ff' : card.deck === 'Sketchy Pharm' ? '#f0fff4' : '#fefcbf';
+    const deckText  = card.deck === 'Pathoma' ? '#2b6cb0' : card.deck === 'Sketchy Pharm' ? '#276749' : '#744210';
+    return `<div class="anki-card-item" id="ankicard-${card.origIdx}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:10px;font-weight:700;background:${deckColor};color:${deckText};border-radius:8px;padding:2px 9px">${escapeHtml(card.deck)}</span>
+        <button onclick="dismissAnkiCard('${q.id}',${card.origIdx})" title="このカードを非表示" style="border:none;background:none;color:#a0aec0;cursor:pointer;font-size:16px;padding:0;line-height:1;margin-left:8px">×</button>
+      </div>
+      <div class="anki-card-front">${front}</div>
+      <div class="anki-card-full" style="display:none">${full}</div>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:flex-start;flex-wrap:wrap">
+        <button onclick="toggleAnkiReveal(this)" style="font-size:10px;padding:3px 10px;border:1px solid #9f7aea;border-radius:8px;background:white;color:#553c9a;cursor:pointer;white-space:nowrap;flex-shrink:0">答えを見る</button>
+        <span class="anki-relevance">🔗 ${escapeHtml(card.relevance)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function dismissAnkiCard(qId, origIdx) {
+  if (!_ankiDismissed[qId]) _ankiDismissed[qId] = [];
+  if (!_ankiDismissed[qId].includes(origIdx)) {
+    _ankiDismissed[qId].push(origIdx);
+    localStorage.setItem('kokushi_anki_dismissed', JSON.stringify(_ankiDismissed));
+  }
+  const el = document.getElementById('ankicard-' + origIdx);
+  if (el) el.remove();
+  // バッジ件数を更新
+  const remaining = document.querySelectorAll('#anki-cards-body .anki-card-item').length;
+  const badge = document.getElementById('anki-count-badge');
+  if (badge) badge.textContent = remaining;
+  if (remaining === 0) {
+    const area = document.getElementById('anki-cards-area');
+    if (area) area.style.display = 'none';
+  }
+}
+
+function toggleAnkiSection() {
+  const body = document.getElementById('anki-cards-body');
+  const chevron = document.getElementById('anki-chevron');
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (chevron) chevron.textContent = open ? '▼' : '▲';
+}
+
+function toggleAnkiReveal(btn) {
+  const item = btn.closest('.anki-card-item');
+  const front = item.querySelector('.anki-card-front');
+  const full  = item.querySelector('.anki-card-full');
+  const showing = full.style.display !== 'none';
+  front.style.display = showing ? 'block' : 'none';
+  full.style.display  = showing ? 'none'  : 'block';
+  btn.textContent = showing ? '答えを見る' : '隠す';
+}
+
 // ========== TAGS ==========
 // SUGGESTED_TAGS：大分野（全カテゴリ） + 画像・検査種別 + 学習概念タグ
 // ※ 大分野タグは migrateTagNames() で自動付与されるため手動追加不要だが、
@@ -2757,9 +2881,10 @@ const SUGGESTED_TAGS = [
   // ── 画像・検査種別 ──
   '心電図','レントゲン','CT','MRI','MRA','エコー','内視鏡','CTG',
   '病理','末梢血塗抹','骨髄像','血清蛋白分画','免疫電気泳動','皮膚所見画像',
-  '頭位','コルポスコピー',
   // ── 学習概念タグ ──
   '統計','薬理','解剖','生理','生化学','内科','マイナー',
+  // ── 手技・検査タグ ──
+  '頭位とコルポスコピー',
 ];
 
 // 現在タグ編集中の問題（study mode: queue[qIdx]、それ以外: null）
@@ -3893,6 +4018,7 @@ function revealAnswer() {
   highlightExplanationChoices(); // 解説内の選択肢考察もハイライト
   renderQuestionTags(queue[qIdx]); // タグ表示を更新（study mode: queue[qIdx]を渡す）
   _renderOriginalExp(queue[qIdx]); // オリジナル解説があれば表示
+  renderAnkiCards(queue[qIdx]);   // 関連Ankiカードを表示
   // AIドラフトエディタをリセット
   document.getElementById('ai-draft-editor').style.display = 'none';
   document.getElementById('ai-draft-loading').style.display = 'none';
