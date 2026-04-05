@@ -621,6 +621,14 @@ select.form-input { cursor: pointer; }
           </div>
           <div style="font-size:11px;color:#718096;margin-bottom:14px">複数の条件をANDで組み合わせて絞り込む</div>
 
+          <!-- テキスト検索 -->
+          <div style="margin-bottom:14px">
+            <input type="text" id="filter-text-search"
+              placeholder="🔍 問題番号・問題文で検索（例：116D3、Forrester）"
+              oninput="_updateFilterMatchCount()"
+              style="width:100%;box-sizing:border-box;padding:9px 13px;border:1.5px solid #bee3f8;border-radius:9px;font-size:13px;outline:none;background:white;font-family:inherit">
+          </div>
+
           <!-- タグ選択（グループ別） -->
           <div style="margin-bottom:16px">
             <div style="font-size:11px;font-weight:700;color:#2b6cb0;margin-bottom:7px">🏷 タグ（複数選択可 → すべて含む問題）</div>
@@ -3142,8 +3150,16 @@ function _buildFilterPool() {
   const accVal     = (document.querySelector('input[name="filter-acc"]:checked')     || {}).value || 'all';
   const flagVal    = (document.querySelector('input[name="filter-flag"]:checked')    || {}).value || 'all';
   const lastVal    = (document.querySelector('input[name="filter-last"]:checked')    || {}).value || 'all';
+  const textSearch = (document.getElementById('filter-text-search')?.value || '').trim().toLowerCase();
 
   return questions.filter(q => {
+    // テキスト検索（問題番号 or 問題文）
+    if (textSearch) {
+      const inNumber = (q.number || '').toLowerCase().includes(textSearch);
+      const inQuestion = (q.question || '').toLowerCase().includes(textSearch);
+      if (!inNumber && !inQuestion) return false;
+    }
+
     // タグ（AND）
     if (tags.length > 0 && !tags.every(t => (q.tags||[]).includes(t))) return false;
 
