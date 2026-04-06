@@ -2791,9 +2791,9 @@ async function loadAnkiLinks() {
     const res = await fetch('./anki_links.json');
     if (res.ok) {
       const data = await res.json();
-      // data[qid] = { number, cards: [{deck, plain, relevance}, ...] }
+      // data[qid] = { number, cards: [{deck, plain, raw, relevance}, ...] }
       for (const [qid, info] of Object.entries(data)) {
-        ANKI_LINKS[qid] = info.cards;
+        ANKI_LINKS[qid] = info.cards; // cards配列をそのまま格納（raw/plain/relevance含む）
       }
       _ankiLinksLoaded = true;
     }
@@ -2824,8 +2824,10 @@ async function renderAnkiCards(q) {
   body.style.display = 'none'; // デフォルト折り畳み
   document.getElementById('anki-chevron').textContent = '▼';
   body.innerHTML = visible.map(card => {
-    const front = card.plain.replace(/\{\{c\d+::([^:}]+)(?:::[^}]*)?\}\}/g, '<span style="background:#e9d8fd;border-radius:4px;padding:0 6px;color:#553c9a;font-weight:700">▢▢▢</span>');
-    const full  = card.plain.replace(/\{\{c\d+::([^:}]+)(?:::[^}]*)?\}\}/g, '<strong style="color:#553c9a;background:#f3e8ff;border-radius:4px;padding:0 4px">$1</strong>');
+    // rawフィールド（cloze記法あり）を優先。なければplainで代替
+    const src = (card.raw && card.raw.includes('{{c')) ? card.raw : card.plain;
+    const front = src.replace(/\{\{c\d+::([^:}]+)(?:::[^}]*)?\}\}/g, '<span style="background:#e9d8fd;border-radius:4px;padding:0 6px;color:#553c9a;font-weight:700">▢▢▢</span>');
+    const full  = src.replace(/\{\{c\d+::([^:}]+)(?:::[^}]*)?\}\}/g, '<strong style="color:#553c9a;background:#f3e8ff;border-radius:4px;padding:0 4px">$1</strong>');
     const deckColor = card.deck === 'Pathoma' ? '#ebf8ff' : card.deck === 'Sketchy Pharm' ? '#f0fff4' : '#fefcbf';
     const deckText  = card.deck === 'Pathoma' ? '#2b6cb0' : card.deck === 'Sketchy Pharm' ? '#276749' : '#744210';
     return `<div class="anki-card-item" id="ankicard-${card.origIdx}">
@@ -2896,9 +2898,10 @@ const SUGGESTED_TAGS = [
   // ── 画像・検査種別 ──
   '心電図','レントゲン','CT','MRI','MRA','エコー','内視鏡','CTG',
   '病理','末梢血塗抹','骨髄像','血清蛋白分画','免疫電気泳動','皮膚所見画像',
-  '頭位','コルポスコピー',
   // ── 学習概念タグ ──
   '統計','薬理','解剖','生理','生化学','内科','マイナー',
+  // ── 手技・検査タグ ──
+  '頭位とコルポスコピー',
 ];
 
 // 現在タグ編集中の問題（study mode: queue[qIdx]、それ以外: null）
@@ -3733,15 +3736,21 @@ function extractChoicesFromExplanation(expText) {
     const prefix = line.slice(0, line.indexOf(m[1]));
     // 最後のマーカー文字を取る（△～×e なら × が最後）
     let correct = null;
+    let origMarker = null;
     for (const ch of [...prefix].reverse()) {
-      if (RIGHT_CHARS.includes(ch)) { correct = true; break; }
-      if (WRONG_CHARS.includes(ch)) { correct = false; break; }
+      if (RIGHT_CHARS.includes(ch)) { correct = true; origMarker = ch; break; }
+      if (WRONG_CHARS.includes(ch)) { correct = false; origMarker = ch; break; }
+    }
+    // △/▲/～/〜 のみが付いている場合（× なし）は「不正解寄り」として扱う
+    if (correct === null && /[△▲]/.test(prefix)) {
+      correct = false;
+      origMarker = /[△▲]/.exec(prefix)[0]; // △ or ▲
     }
     if (correct === null) continue; // マーカーなし → スキップ（正誤不明）
 
     const text = m[2].trim();
     if (text.length > 0) {
-      choiceMap[key] = { text, correct };
+      choiceMap[key] = { text, correct, marker: origMarker };
     }
   }
 
@@ -5369,12 +5378,15 @@ function renderChoiceEditor(choices) {
     return;
   }
   container.innerHTML = choices.map(c => {
-    const markerVal = c.correct ? '○' : '×';
+    // オリジナルマーカーを優先して表示（△が元の場合は△を選択中に）
+    const markerVal = c.marker || (c.correct ? '○' : '×');
+    const isCircle   = markerVal === '○' || markerVal === '◯';
+    const isTriangle = markerVal === '△' || markerVal === '▲';
     return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px" data-choice-key="${c.key}">
       <select class="ed-choice-marker" style="width:52px;padding:5px 4px;border:1px solid #e2e8f0;border-radius:6px;font-size:15px;text-align:center;cursor:pointer">
-        <option value="○" ${c.correct ? 'selected' : ''}>○</option>
-        <option value="×" ${!c.correct ? 'selected' : ''}>×</option>
-        <option value="△">△</option>
+        <option value="○" ${isCircle ? 'selected' : ''}>○</option>
+        <option value="×" ${(!isCircle && !isTriangle) ? 'selected' : ''}>×</option>
+        <option value="△" ${isTriangle ? 'selected' : ''}>△</option>
       </select>
       <span style="font-weight:800;color:#553c9a;font-size:15px;min-width:18px">${c.key}</span>
       <input type="text" value="${escapeHtml(c.text)}" class="ed-choice-text form-input"
@@ -5423,8 +5435,9 @@ function applyChoiceEdits(expText) {
 
   const WRONG = '×✕☓✗';
   const RIGHT  = '○◯✓✔';
+  // △/▲ を単独マーカーとしても認識（例: △c　テキスト）
   const MATCH_RE = new RegExp(
-    '^(\\*{0,2})[△▲～〜]*[' + WRONG + RIGHT + ']([a-jA-J])[\\s　.．:：]*(.+?)(\\*{0,2})$'
+    '^(\\*{0,2})(?:[△▲～〜]*[' + WRONG + RIGHT + ']|[△▲])([a-jA-J])[\\s　.．:：]*(.+?)(\\*{0,2})$'
   );
 
   const handledKeys = new Set();
