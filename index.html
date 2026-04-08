@@ -933,17 +933,6 @@ select.form-input { cursor: pointer; }
           <!-- 前回の理解メモ（解説確認後に表示） -->
           <div id="prev-feynman-memo" style="display:none;margin-top:14px;padding:10px 14px;background:#f0fff4;border-radius:8px;border-left:3px solid #38a169;font-size:12px;color:#276749"></div>
 
-          <!-- 前回のなぜ？メモ（復習モードで解説確認後に表示） -->
-          <div id="prev-why-memo" style="display:none;margin-top:10px;padding:10px 14px;background:#faf5ff;border-radius:8px;border-left:3px solid #9f7aea;font-size:12px;color:#553c9a"></div>
-
-          <!-- 今回のなぜ？メモ入力（復習モードのみ、解説確認後に表示） -->
-          <div id="why-memo-area" style="display:none;margin-top:10px">
-            <div style="font-size:11px;font-weight:700;color:#553c9a;margin-bottom:4px">💡 なぜ？メモ（次回の復習に表示）</div>
-            <textarea id="why-memo-input" rows="2" placeholder="例：この疾患ではALTが上昇する理由→肝細胞が壊れてALTが血中に漏れる"
-              style="width:100%;box-sizing:border-box;resize:vertical;border:1px solid #d6bcfa;border-radius:6px;padding:6px 8px;font-size:12px;outline:none;background:white"
-              onkeydown="if(event.isComposing||event.keyCode===229)return;"></textarea>
-          </div>
-
           <div class="note-input-area" style="margin-top:14px">
             <label style="font-size:12px;font-weight:700;color:#744210;display:block;margin-bottom:6px">✏️ この問題のメモ（保存されます）</label>
             <div class="rte-wrap">
@@ -979,25 +968,6 @@ select.form-input { cursor: pointer; }
               ></div>
             </div>
             <button class="btn btn-sm btn-warning" style="margin-top:6px" onclick="saveCurrentNote()">メモ保存</button>
-          </div>
-
-          <!-- 共通ノートエリア（正解・不正解問わず常時表示） -->
-          <div id="shared-notes-area" style="display:none;margin-top:14px">
-            <div style="display:flex;flex-direction:column;gap:8px;max-width:600px">
-              <div style="background:#f0fff4;border:1px solid #9ae6b4;border-radius:8px;padding:10px 12px">
-                <label style="font-size:11px;font-weight:700;color:#276749;display:block;margin-bottom:4px">疑問点・気になった点（任意）</label>
-                <textarea id="question-note-input" rows="2" placeholder="例：aとcの違いは？なぜこの数値？Ubuddyプロンプトにも反映"
-                  style="width:100%;box-sizing:border-box;resize:vertical;border:1px solid #9ae6b4;border-radius:6px;padding:6px 8px;font-size:12px;outline:none;background:white"
-                  oninput="onQuestionNoteInput()"
-                  onkeydown="if(event.isComposing||event.keyCode===229)return;"></textarea>
-              </div>
-              <div style="background:#ebf8ff;border:1px solid #90cdf4;border-radius:8px;padding:10px 12px">
-                <label style="font-size:11px;font-weight:700;color:#2b6cb0;display:block;margin-bottom:4px">一言まとめ・ファインマンメモ（任意）</label>
-                <textarea id="feynman-note-input" rows="2" placeholder="例：ANPは右房圧上昇で分泌→腎でNa排泄増加→利尿"
-                  style="width:100%;box-sizing:border-box;resize:vertical;border:1px solid #90cdf4;border-radius:6px;padding:6px 8px;font-size:12px;outline:none;background:white"
-                  onkeydown="if(event.isComposing||event.keyCode===229)return;"></textarea>
-              </div>
-            </div>
           </div>
 
           <!-- タグ設定 -->
@@ -1059,20 +1029,6 @@ select.form-input { cursor: pointer; }
               </button>
             </div>
 
-            <!-- Ubuddy プロンプト（手動判定専用・常時表示） -->
-            <div id="ubuddy-manual-section" style="display:none;margin-top:14px;padding-top:12px;border-top:1px solid #e2e8f0">
-              <div style="background:#faf5ff;border:1px solid #d6bcfa;border-radius:10px;padding:12px">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-                  <div style="font-size:12px;font-weight:800;color:#553c9a">📋 Ubuddy用プロンプト</div>
-                  <button class="btn btn-sm" onclick="copyUbuddyPrompt()"
-                    style="background:#553c9a;color:white;font-size:12px;padding:6px 12px;border-radius:7px;display:inline-flex;align-items:center;gap:5px;border:none">
-                    📋 ワンクリックでコピー
-                  </button>
-                </div>
-                <pre id="ubuddy-preview-text" style="font-size:11px;color:#44337a;white-space:pre-wrap;word-break:break-word;font-family:inherit;margin:0;max-height:200px;overflow-y:auto;line-height:1.6;background:#fff;border:1px solid #e9d8fd;border-radius:6px;padding:8px"></pre>
-                <div style="font-size:10px;color:#a0aec0;margin-top:6px">理由を選択するとプロンプトに追記されます。コピーしてUbuddyへ。</div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -1100,32 +1056,6 @@ select.form-input { cursor: pointer; }
 
   <!-- ==================== ANALYSIS ==================== -->
   <div id="tab-analysis" class="tab-content">
-
-    <!-- Ubuddy 夜間一括処理 -->
-    <div class="card" style="border-top:4px solid #553c9a">
-      <div class="card-title">🌙 Ubuddy 夜間一括解説</div>
-      <div style="font-size:13px;color:#4a5568;margin-bottom:14px;line-height:1.7">
-        就寝前に「<strong>今日の誤答を出力</strong>」→ スケジュールタスクが夜中に自動処理 → 翌朝「<strong>解説をインポート</strong>」で各問題のメモに反映されます。<br>
-        <span style="font-size:11px;color:#a0aec0">※ 同じ問題を2回以上間違えた場合は出力から除外されます（初回のみ解説が必要なため）</span><br>
-        <span style="font-size:11px;color:#b7791f">⚠️ 「自信なし（あやふや）」とマークした正解問題も一緒に出力されます</span>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">
-        <div>
-          <button class="btn btn-lg" onclick="exportUbuddyBatch()"
-            style="background:#553c9a;color:white;border:none;display:flex;align-items:center;gap:6px">
-            📦 今日の誤答を出力
-          </button>
-          <div id="ubuddy-export-status" style="font-size:11px;color:#a0aec0;margin-top:6px"></div>
-        </div>
-        <div>
-          <label class="btn btn-lg btn-outline" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px">
-            📥 解説をインポート
-            <input type="file" accept=".json" style="display:none" onchange="importUbuddyAnswers(this)">
-          </label>
-          <div id="ubuddy-import-status" style="font-size:11px;color:#a0aec0;margin-top:6px"></div>
-        </div>
-      </div>
-    </div>
 
     <!-- 弱点分析：母集団比較 -->
     <div class="card" style="border-top:4px solid #805ad5">
@@ -1942,19 +1872,31 @@ function migrateTagNames() {
     '救急':   '救急・集中治療',
     '皮膚':   '皮膚所見画像',   // 皮膚科（大分野）と区別するため改名
   };
+  // 旧タグ → 複数の新タグに分割するマッピング
+  const SPLIT_MAP = {
+    '頭位とコルポスコピー': ['頭位', 'コルポスコピー'],
+  };
 
   // 連問ノート行パターン（問題文に混入した場合に除去）
   const SERIES_LINE_RE = /\n?\*{0,2}本問は[，,][^\n]*(連問|一部)[^\n]*\*{0,2}\n?/g;
   let changed = false;
 
   questions.forEach(q => {
-    // ① タグ名マイグレーション（旧名→新名）
+    // ① タグ名マイグレーション（旧名→新名、分割対応）
     if (!q.tags) q.tags = [];
-    const newTags = q.tags
-      .map(t => TAG_MAP.hasOwnProperty(t) ? TAG_MAP[t] : t)
-      .filter(t => t !== null);
-    if (JSON.stringify(newTags) !== JSON.stringify(q.tags)) {
-      q.tags = newTags;
+    const newTags = [];
+    for (const t of q.tags) {
+      if (SPLIT_MAP[t]) {
+        newTags.push(...SPLIT_MAP[t]);
+      } else if (TAG_MAP.hasOwnProperty(t)) {
+        if (TAG_MAP[t] !== null) newTags.push(TAG_MAP[t]);
+      } else {
+        newTags.push(t);
+      }
+    }
+    const dedupedTags = [...new Set(newTags)];
+    if (JSON.stringify(dedupedTags) !== JSON.stringify(q.tags)) {
+      q.tags = dedupedTags;
       changed = true;
     }
 
@@ -3302,13 +3244,15 @@ const SUGGESTED_TAGS = [
   '精神科','皮膚科','眼科','耳鼻咽喉科','整形外科','救急・集中治療',
   '公衆衛生','医学総論',
   // ── 画像・検査種別 ──
-  '心電図','レントゲン','CT','MRI','MRA','血管造影','エコー','内視鏡','CTG',
+  '心電図','レントゲン','CT','MRI','MRA','血管造影','DSA','エコー','内視鏡','CTG',
   '病理','末梢血塗抹','骨髄像','血清蛋白分画','免疫電気泳動','皮膚所見画像',
   '左右心室圧波形','酸素飽和度','心音','Gram染色',
   // ── 学習概念タグ ──
   '統計','薬理','解剖','生理','生化学','内科','マイナー',
   // ── 手技・検査タグ ──
-  '頭位とコルポスコピー',
+  '頭位','コルポスコピー',
+  // ── 管理タグ ──
+  'バグ',
 ];
 
 // 現在タグ編集中の問題（study mode: queue[qIdx]、それ以外: null）
@@ -3510,7 +3454,7 @@ function _renderFilterTagPicker() {
 
   // グループ定義（SUGGESTED_TAGS に準拠）
   const GROUP_CATS  = ['循環器','呼吸器','消化器','腎・泌尿器','内分泌・代謝','神経','血液','膠原病・免疫','感染症','外科','小児科','産婦人科','精神科','皮膚科','眼科','耳鼻咽喉科','整形外科','救急・集中治療','公衆衛生','医学総論'];
-  const GROUP_IMAGE = ['心電図','レントゲン','CT','MRI','MRA','血管造影','エコー','内視鏡','CTG','病理','末梢血塗抹','骨髄像','血清蛋白分画','免疫電気泳動','皮膚所見画像','左右心室圧波形','酸素飽和度','心音','Gram染色'];
+  const GROUP_IMAGE = ['心電図','レントゲン','CT','MRI','MRA','血管造影','DSA','エコー','内視鏡','CTG','病理','末梢血塗抹','骨髄像','血清蛋白分画','免疫電気泳動','皮膚所見画像','左右心室圧波形','酸素飽和度','心音','Gram染色'];
   const GROUP_CONC  = ['統計','薬理','解剖','生理','生化学','内科','マイナー'];
   const knownAll    = [...GROUP_CATS, ...GROUP_IMAGE, ...GROUP_CONC];
 
@@ -3788,11 +3732,8 @@ function showQ() {
   document.getElementById('reason-picker').style.display = 'none';
   // 理由選択ステートをリセット
   _pendingReason = null;
-  _ubuddyContext = null;
   const rNextBtn = document.getElementById('reason-next-btn');
   if (rNextBtn) rNextBtn.style.display = 'none';
-  const manualSec = document.getElementById('ubuddy-manual-section');
-  if (manualSec) manualSec.style.display = 'none';
   document.querySelectorAll('.reason-btn').forEach(btn => { btn.style.opacity = ''; btn.style.transform = ''; btn.style.boxShadow = ''; });
 
   // フラグボタンの色をこの問題のフラグ状態に合わせる
@@ -4161,6 +4102,56 @@ function extractChoicesFromExplanation(expText) {
     }
   }
 
+  // ===== Strategy C: グループ化マーカー行の補完 =====
+  // 例1: **×a，○b**        → 次行 a：テキスト / b：テキスト
+  // 例2: **×a，○b，×c，×d，×e**  インラインテキスト
+  // 例3: **×d，e**          → e は直前マーカー(×)を継承
+  // 例4: **×b，×c，×d，×e** → 次行 b：テキスト / c：テキスト ...
+  {
+    const ALL_MARKERS = WRONG_CHARS + RIGHT_CHARS;
+    for (let i = 0; i < lines.length; i++) {
+      const raw = lines[i].trim().replace(/\*\*/g, '').trim();
+      // グループ行はマーカー文字で始まる
+      if (!new RegExp('^[' + ALL_MARKERS + ']').test(raw)) continue;
+
+      // 文字を走査してマーカー+キーのペアを抽出（マーカーなしキーは直前マーカーを継承）
+      const groupEntries = [];
+      let lastMarker = null;
+      for (let ci = 0; ci < raw.length; ci++) {
+        const ch = raw[ci];
+        if (WRONG_CHARS.includes(ch) || RIGHT_CHARS.includes(ch)) {
+          lastMarker = ch;
+        } else if (/[a-jA-J]/.test(ch)) {
+          const effectiveMarker = lastMarker ||
+            (groupEntries.length > 0 ? groupEntries[groupEntries.length - 1].marker : null);
+          if (effectiveMarker) groupEntries.push({ key: ch.toLowerCase(), marker: effectiveMarker });
+          lastMarker = null;
+        }
+      }
+      // 2個以上のキーがある場合のみグループ行として処理
+      if (groupEntries.length < 2) continue;
+
+      // 直後の行から key：テキスト 形式のテキストを収集
+      const localTextMap = {};
+      for (let j = i + 1; j < Math.min(i + groupEntries.length + 4, lines.length); j++) {
+        const tl = lines[j].trim().replace(/\*\*/g, '').trim();
+        const tm = tl.match(/^[　\s]*([a-jA-J])[：:]\s*(.+)$/);
+        if (tm) localTextMap[tm[1].toLowerCase()] = tm[2].trim();
+      }
+
+      // choiceMapに未登録のキーを追加
+      for (const entry of groupEntries) {
+        if (!choiceMap[entry.key]) {
+          choiceMap[entry.key] = {
+            text: localTextMap[entry.key] || '（解説参照）',
+            correct: RIGHT_SET.has(entry.marker),
+            marker: entry.marker
+          };
+        }
+      }
+    }
+  }
+
   const choices1 = Object.keys(choiceMap).sort().map(k => ({ key: k, ...choiceMap[k] }));
   if (choices1.length >= 2) return choices1;
 
@@ -4268,23 +4259,8 @@ function _getFeynmanNote() {
   return el ? el.value.trim() : '';
 }
 
-function _refreshUbuddyPreview() {
-  const pre = document.getElementById('ubuddy-preview-text');
-  if (pre && _ubuddyContext) {
-    const { q, selectedLabels, correctLabels, reason } = _ubuddyContext;
-    pre.textContent = generateUbuddyPrompt(q, selectedLabels, correctLabels, reason, _getQuestionNote());
-  }
-}
-
-function onQuestionNoteInput() {
-  if (_ubuddyContext) _ubuddyContext.questionNote = _getQuestionNote();
-  _refreshUbuddyPreview();
-}
-
 function selectReason(reason) {
   _pendingReason = reason;
-  if (_ubuddyContext) _ubuddyContext.reason = reason;
-  _refreshUbuddyPreview();
   // 選択ボタンをハイライト
   document.querySelectorAll('.reason-btn').forEach(btn => {
     const isSelected = btn.getAttribute('onclick').includes(`'${reason}'`);
@@ -4297,10 +4273,7 @@ function selectReason(reason) {
 }
 
 function commitReason() {
-  const qNote = _getQuestionNote();
-  const fNote = _getFeynmanNote();
-  if (qNote && _ubuddyContext) _ubuddyContext.questionNote = qNote;
-  recordAnswer(false, _pendingReason || 'other', false, qNote, fNote);
+  recordAnswer(false, _pendingReason || 'other', false);
 }
 
 function renderChoices(choices) {
@@ -4404,20 +4377,6 @@ function resetChoices() {
   // オリジナル解説エリアをリセット
   const origArea = document.getElementById('original-exp-area');
   if (origArea) origArea.style.display = 'none';
-  // なぜ？メモエリアをリセット・非表示
-  const prevWhy = document.getElementById('prev-why-memo');
-  if (prevWhy) { prevWhy.style.display = 'none'; prevWhy.innerHTML = ''; }
-  const whyArea = document.getElementById('why-memo-area');
-  if (whyArea) whyArea.style.display = 'none';
-  const whyInp = document.getElementById('why-memo-input');
-  if (whyInp) whyInp.value = '';
-  // 共通ノートエリアをリセット・非表示
-  const qni = document.getElementById('question-note-input');
-  if (qni) qni.value = '';
-  const fni = document.getElementById('feynman-note-input');
-  if (fni) fni.value = '';
-  const sna = document.getElementById('shared-notes-area');
-  if (sna) sna.style.display = 'none';
   // 前回の理解メモも非表示にリセット
   const prevMemo = document.getElementById('prev-feynman-memo');
   if (prevMemo) { prevMemo.style.display = 'none'; prevMemo.innerHTML = ''; }
@@ -4499,21 +4458,6 @@ function revealAnswer() {
     prevMemo.innerHTML = `<strong>前回の理解メモ：</strong>${escapeHtml(q.feynmanNote)}`;
     prevMemo.style.display = 'block';
   }
-  // 前回のなぜ？メモを表示（復習モード）
-  const prevWhy = document.getElementById('prev-why-memo');
-  const whyArea = document.getElementById('why-memo-area');
-  if (prevWhy) {
-    if (q && q.whyMemo) {
-      prevWhy.innerHTML = `<strong>💡 前回のなぜ？メモ：</strong>${escapeHtml(q.whyMemo)}`;
-      prevWhy.style.display = 'block';
-    } else {
-      prevWhy.style.display = 'none';
-    }
-  }
-  if (whyArea) whyArea.style.display = _isReviewMode ? 'block' : 'none';
-  // 共通ノートエリアを表示（正解・不正解問わず）
-  const sna = document.getElementById('shared-notes-area');
-  if (sna) sna.style.display = 'block';
   highlightChoices();
   highlightExplanationChoices(); // 解説内の選択肢考察もハイライト
   renderQuestionTags(queue[qIdx]); // タグ表示を更新（study mode: queue[qIdx]を渡す）
@@ -4526,7 +4470,6 @@ function revealAnswer() {
   document.getElementById('ai-draft-text').value = '';
   // キューボタンの状態を更新（この問題がすでにキューにあるか）
   _updateAiQueueBtn(queue[qIdx]);
-
   if (_currentChoices.length > 0) {
     // 選択肢あり → 自動判定
     document.getElementById('judge-buttons').style.display = 'none';
@@ -4567,16 +4510,15 @@ function autoJudge() {
           <div style="font-size:20px;font-weight:800;color:#276749">正解！${reviewSRLabel ? `<span style="font-size:13px;color:#553c9a;font-weight:600;margin-left:8px">${reviewSRLabel}</span>` : ''}</div>
         </div>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px">
-          <button class="btn btn-success btn-xl" onclick="${_isReviewMode ? 'saveWhyMemo();' : ''}recordAnswer(true)" style="min-width:180px">
+          <button class="btn btn-success btn-xl" onclick="recordAnswer(true)" style="min-width:180px">
             次の問題へ →
           </button>
-          <button class="btn btn-xl" onclick="${_isReviewMode ? 'saveWhyMemo();' : ''}recordAnswer(true, null, true)"
+          <button class="btn btn-xl" onclick="recordAnswer(true, null, true)"
             style="min-width:180px;background:#fff8e1;color:#b7791f;border:2px solid #f6e05e;font-weight:700">
             自信なし（あやふや）
           </button>
         </div>
       </div>`;
-    setTimeout(() => { const inp = document.getElementById('question-note-input'); if(inp) inp.focus(); }, 50);
   } else {
     const correctLabels = [...answerKeys].sort().join('・');
     const selectedLabels = _selectedChoices.size > 0
@@ -4643,10 +4585,6 @@ function autoJudge() {
       </div>`;
     }
 
-    // Ubuddy コンテキストをセット
-    _ubuddyContext = { q: queue[qIdx], selectedLabels, correctLabels };
-    const promptText = generateUbuddyPrompt(queue[qIdx], selectedLabels, correctLabels);
-
     el.innerHTML = `
       <div style="padding:16px 0 4px;border-top:2px solid #e2e8f0;margin-top:16px">
 
@@ -4696,19 +4634,6 @@ function autoJudge() {
         <!-- ③ 母集団との比較 -->
         ${popHTML}
 
-        <!-- ④ Ubuddy プロンプト（常時表示） -->
-        <div style="margin-top:14px;background:#faf5ff;border:1px solid #d6bcfa;border-radius:10px;padding:14px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-            <div style="font-size:12px;font-weight:800;color:#553c9a">📋 Ubuddy用プロンプト</div>
-            <button class="btn btn-sm" onclick="copyUbuddyPrompt()"
-              style="background:#553c9a;color:white;font-size:12px;padding:7px 14px;border-radius:8px;display:inline-flex;align-items:center;gap:5px;border:none">
-              📋 ワンクリックでコピー
-            </button>
-          </div>
-          <pre id="ubuddy-preview-text" style="font-size:11px;color:#44337a;white-space:pre-wrap;word-break:break-word;font-family:inherit;margin:0;max-height:240px;overflow-y:auto;line-height:1.6;background:#fff;border:1px solid #e9d8fd;border-radius:7px;padding:10px">${escapeHtml(promptText)}</pre>
-          <div style="font-size:10px;color:#a0aec0;margin-top:6px">理由を選択すると自動的にプロンプトに追記されます。コピーしてUbuddyに貼り付けてください。</div>
-        </div>
-
       </div>`;
 
     // 既存の reason-picker は非表示にする（インラインに含めたため）
@@ -4717,26 +4642,13 @@ function autoJudge() {
 }
 
 function showReasonPicker() {
-  // 手動判定（選択肢なし問題）のとき Ubuddy コンテキストをセット
-  const q = queue[qIdx];
-  if (q) {
-    _ubuddyContext = { q, selectedLabels: '（手動）', correctLabels: q.answer || '—' };
-    // プロンプトを生成して表示
-    const promptText = generateUbuddyPrompt(q, '（手動）', q.answer || '—');
-    const pre = document.getElementById('ubuddy-preview-text');
-    if (pre) pre.textContent = promptText;
-    const sec = document.getElementById('ubuddy-manual-section');
-    if (sec) sec.style.display = 'block';
-  }
   document.getElementById('judge-buttons').style.display = 'none';
   document.getElementById('reason-picker').style.display = 'block';
 }
 
 // reason: undefined(正解) | 'knowledge'|'concept'|'count'|'misread'|'careless'|'calc'|'other'
 // fuzzy: true → 正解だがあやふや（自信なし）
-// questionNote: 疑問点テキスト（不正解時のみ保存）
-// feynmanNote: ファインマンメモ（不正解時のみ保存）
-function recordAnswer(ok, reason, fuzzy, questionNote, feynmanNote) {
+function recordAnswer(ok, reason, fuzzy) {
   const q = queue[qIdx];
   const attempt = {date:today(), ok};
   // 解答秒数を記録（新規 vs 反復の時間分析用）
@@ -4746,10 +4658,6 @@ function recordAnswer(ok, reason, fuzzy, questionNote, feynmanNote) {
   }
   if (!ok && reason) attempt.reason = reason;
   if (ok && fuzzy) attempt.fuzzy = true;
-  const note = questionNote || _getQuestionNote();
-  if (note) attempt.questionNote = note; // 正解でも疑問点を保存
-  const fNote = feynmanNote || _getFeynmanNote();
-  if (fNote) { attempt.feynmanNote = fNote; q.feynmanNote = fNote; } // 正解でも保存
   // 不正解時：選んだ選択肢と母集団データを保存（弱点分析用）
   if (!ok && _selectedChoices.size > 0) {
     attempt.selectedChoices = [..._selectedChoices].sort();
@@ -4768,10 +4676,8 @@ function recordAnswer(ok, reason, fuzzy, questionNote, feynmanNote) {
   // 間隔反復スケジュール更新
   scheduleReview(q, ok, fuzzy);
   if (mq && mq !== q) {
-    // mqにも同じスケジュールを適用
     mq.nextReview = q.nextReview;
     mq.srInterval = q.srInterval;
-    if (fNote) mq.feynmanNote = q.feynmanNote;
   }
 
   save();
@@ -4779,17 +4685,6 @@ function recordAnswer(ok, reason, fuzzy, questionNote, feynmanNote) {
   resetChoices();
   qIdx++;
   showQ();
-}
-
-function saveWhyMemo() {
-  const inp = document.getElementById('why-memo-input');
-  if (!inp || !inp.value.trim()) return;
-  const q = queue[qIdx];
-  if (!q) return;
-  q.whyMemo = inp.value.trim();
-  const mq = questions.find(x=>x.id===q.id);
-  if (mq) mq.whyMemo = q.whyMemo;
-  save();
 }
 
 function saveCurrentNote() {
