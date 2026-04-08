@@ -313,6 +313,19 @@ select.form-input { cursor: pointer; }
 </head>
 <body>
 
+<!-- クラウド読み込みオーバーレイ（Firebase接続中に表示） -->
+<div id="cloud-loading-overlay" style="
+  position:fixed;inset:0;z-index:99999;
+  background:rgba(255,255,255,0.97);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+  font-family:'Noto Sans JP',sans-serif;
+">
+  <div style="font-size:36px;animation:spin 1.5s linear infinite">☁️</div>
+  <div style="font-size:15px;font-weight:700;color:#2d3748">データを読み込み中...</div>
+  <div id="cloud-loading-sub" style="font-size:12px;color:#718096">Firestoreに接続しています</div>
+  <style>@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}</style>
+</div>
+
 <!-- LIGHTBOX -->
 <div id="lightbox" onclick="closeLightbox()">
   <img id="lightbox-img" src="" alt="">
@@ -405,6 +418,30 @@ select.form-input { cursor: pointer; }
     <div class="card" style="border-top:4px solid #2c7a7b;margin-bottom:18px" id="moshi-card">
       <div class="card-title">📝 模試・自己採点記録</div>
       <div id="moshi-content">読み込み中...</div>
+    </div>
+
+    <!-- AI夜間バッチ状態カード -->
+    <div class="card" style="border-top:4px solid #553c9a;margin-bottom:18px" id="ai-batch-card">
+      <div class="card-title">🌙 AI解説 夜間バッチ</div>
+      <div style="font-size:12px;color:#718096;margin-bottom:10px">問題解答後に「キューに追加」すると、翌02:00頃に自動で解説を生成してメモに保存します。</div>
+      <div id="ai-batch-status-area" style="font-size:12px"></div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="processAiQueueNow()" id="ai-batch-run-btn"
+          style="font-size:12px;padding:7px 16px;background:#553c9a;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;display:none">
+          ▶ 今すぐ一括生成
+        </button>
+        <button onclick="exportAiQueueFile()"
+          style="font-size:12px;padding:7px 14px;background:#2b6cb0;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
+          💾 ai_queue.json を保存
+        </button>
+        <button onclick="clearAiQueue()"
+          style="font-size:12px;padding:7px 14px;border:1px solid #e2e8f0;border-radius:8px;background:white;cursor:pointer;color:#718096">
+          🗑 キューをクリア
+        </button>
+      </div>
+      <div style="font-size:10px;color:#a0aec0;margin-top:8px">
+        💡 夜間自動処理はアプリが開いている場合02:00に実行。閉じている場合は「ai_queue.jsonを保存」→ 国試問題フォルダに置くと翌02:00に自動生成されます。
+      </div>
     </div>
 
     <!-- AI解説設定カード -->
@@ -836,16 +873,31 @@ select.form-input { cursor: pointer; }
           <!-- AIドラフト生成ボタン＆エディタ -->
           <div id="ai-draft-area" style="margin-top:14px;background:#f7fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-              <div style="font-size:12px;font-weight:800;color:#2d3748">🤖 AI解説ドラフト生成</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="font-size:12px;font-weight:800;color:#2d3748">🤖 AI解説自動生成</div>
+                <span id="ai-queue-badge" style="display:none;font-size:10px;font-weight:700;background:#ebf8ff;color:#2b6cb0;border:1px solid #bee3f8;border-radius:10px;padding:2px 8px"></span>
+              </div>
               <div style="display:flex;gap:6px;flex-wrap:wrap">
-                <button id="ai-draft-btn" onclick="generateAiDraft()"
+                <button id="ai-queue-btn" onclick="queueForAiExplanation()"
+                  style="font-size:12px;padding:6px 14px;background:#553c9a;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
+                  📋 夜間キューに追加
+                </button>
+                <button id="ai-draft-btn" onclick="generateAiDraftNow()"
                   style="font-size:12px;padding:6px 14px;background:#2b6cb0;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
-                  ✨ ドラフト生成
+                  ✨ 今すぐ生成
                 </button>
                 <button onclick="toggleAiDraftEditor()" style="font-size:11px;padding:6px 10px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer">
                   手動入力
                 </button>
               </div>
+            </div>
+
+            <!-- キュー状態バナー -->
+            <div id="ai-queue-banner" style="display:none;font-size:11px;padding:7px 10px;background:#ebf8ff;border-radius:8px;border:1px solid #bee3f8;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+              <span id="ai-queue-banner-text"></span>
+              <button onclick="processAiQueueNow()" style="font-size:11px;padding:4px 10px;background:#2b6cb0;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;white-space:nowrap;margin-left:8px">
+                今すぐ一括処理
+              </button>
             </div>
 
             <!-- 生成結果・編集エリア -->
@@ -865,7 +917,7 @@ select.form-input { cursor: pointer; }
             </div>
 
             <div id="ai-draft-loading" style="display:none;text-align:center;padding:16px;color:#718096;font-size:12px">
-              ⏳ 解説を生成中...
+              <span id="ai-draft-loading-text">⏳ 解説を生成中...</span>
             </div>
           </div>
 
@@ -1620,8 +1672,9 @@ let _unsubscribeSnapshot = null; // リアルタイム監視の解除関数
 
 async function initFirebase() {
   if (typeof firebase === 'undefined') {
-    console.warn('[Firebase] SDKが読み込まれていません（オフラインまたはCDNブロック）。ローカル保存で動作します。');
+    console.warn('[Firebase] SDKが読み込まれていません（オフラインまたはCDNブロック）。');
     _updateSyncStatus('オフライン', '#a0aec0');
+    _showCloudLoadingError('オフライン — Firebase SDK未接続');
     return;
   }
   try {
@@ -1644,12 +1697,45 @@ async function initFirebase() {
     _updateSyncStatus('接続済み ☁️', '#276749');
     console.log('[Firebase] signed in:', _userId);
 
-    // 初回はデータ取得してからリアルタイム監視を開始
+    // 旧localStorage残存データの一回限り移行（他端末でlocalStorageを使っていた場合）
+    const legacyData = localStorage.getItem('kokushi_v2');
+    if (legacyData) {
+      try {
+        const legacyQ = JSON.parse(legacyData);
+        if (legacyQ && legacyQ.length > 0) {
+          // Firestoreにデータがない場合のみアップロード
+          const metaDoc = await _db.collection('users').doc(_userId).collection('data').doc('meta').get();
+          if (!metaDoc.exists) {
+            console.log('[Firebase] 旧localStorageデータをFirestoreに移行します（', legacyQ.length, '問）');
+            questions = legacyQ;
+            await saveToCloudNow();
+            toast('旧データをクラウドに移行しました ✅', 'success');
+          }
+          // 移行完了後はlocalStorageから削除
+          localStorage.removeItem('kokushi_v2');
+        }
+      } catch(e) { console.warn('[Firebase] 移行エラー:', e); }
+    }
+    const legacyMoshi = localStorage.getItem('kokushi_moshi');
+    if (legacyMoshi) {
+      try {
+        const legacyM = JSON.parse(legacyMoshi);
+        if (legacyM && legacyM.length > 0) {
+          const moshiDoc = await _db.collection('users').doc(_userId).collection('data').doc('moshi').get();
+          if (!moshiDoc.exists) { moshiExams = legacyM; await saveMoshiToCloud(); }
+          localStorage.removeItem('kokushi_moshi');
+        }
+      } catch(e) {}
+    }
+
+    // クラウドからデータ取得してからオーバーレイを消す
     await syncFromCloud();
     startRealtimeSync();
+    _hideCloudLoadingOverlay();
   } catch(e) {
     console.warn('[Firebase] 初期化失敗:', e);
     _updateSyncStatus('オフライン', '#a0aec0');
+    _showCloudLoadingError('接続エラー — ' + e.message);
   }
 }
 
@@ -1686,7 +1772,6 @@ function startRealtimeSync() {
       if (cloudQ.length === questions.length &&
           cloudQ.every((q,i) => q.nextReview === questions[i]?.nextReview && q.attempts?.length === questions[i]?.attempts?.length)) return;
       questions = cloudQ;
-      localStorage.setItem('kokushi_v2', JSON.stringify(questions));
       deduplicateAttempts();
       migrateTagNames();
       updateHeader();
@@ -1719,7 +1804,6 @@ async function syncFromCloud() {
       const cloudQ = chunkDocs.flatMap(d => d.exists ? (d.data().questions || []) : []);
       if (cloudQ.length > 0) {
         questions = cloudQ;
-        localStorage.setItem('kokushi_v2', JSON.stringify(questions));
         deduplicateAttempts();
         migrateTagNames();
         updateHeader();
@@ -1741,7 +1825,7 @@ async function syncFromCloud() {
       const md = moshiDoc.data();
       if (md.moshiExams) {
         moshiExams = md.moshiExams;
-        localStorage.setItem('kokushi_moshi', JSON.stringify(moshiExams));
+        // moshiExams loaded from Firestore (no localStorage write)
       }
     }
     _updateSyncStatus('同期済み ☁️', '#276749');
@@ -1820,15 +1904,29 @@ async function linkToDevice(uid) {
 
 // ========== LOAD ==========
 function load() {
+  // 問題データはFirestore一元管理。ローカルは読まない
+  // （旧localStorage残存データを持つ端末からの移行用に、一度だけアップロード処理をinitFirebase内で行う）
+  questions = [];
   try {
-    const d = localStorage.getItem('kokushi_v2');
-    if (d) questions = JSON.parse(d);
     const n = localStorage.getItem('kokushi_notes');
     if (n) document.getElementById('personal-notes').value = n;
-  } catch(e) { questions = []; }
+  } catch(e) {}
   loadMoshi();
-  // タグ名マイグレーション（旧タグ → 新タグ）
   migrateTagNames();
+}
+
+function _hideCloudLoadingOverlay() {
+  const el = document.getElementById('cloud-loading-overlay');
+  if (el) el.style.display = 'none';
+}
+function _showCloudLoadingError(msg) {
+  const sub = document.getElementById('cloud-loading-sub');
+  const overlay = document.getElementById('cloud-loading-overlay');
+  if (sub) sub.textContent = msg;
+  if (overlay) {
+    overlay.querySelector('div').textContent = '⚠️';
+    setTimeout(_hideCloudLoadingOverlay, 2500); // エラーでも2.5秒後に消す
+  }
 }
 
 function migrateTagNames() {
@@ -1880,7 +1978,7 @@ function migrateTagNames() {
   if (changed) save();
 }
 function save() {
-  localStorage.setItem('kokushi_v2', JSON.stringify(questions));
+  // localStorage保存を廃止 → Firestoreのみに保存
   _updateSyncStatus('未保存 ●', '#b7791f');
   saveToCloud();
 }
@@ -1897,14 +1995,10 @@ const MOSHI_CATALOG = [
 ];
 
 function loadMoshi() {
-  try {
-    const d = localStorage.getItem('kokushi_moshi');
-    if (d) moshiExams = JSON.parse(d);
-  } catch(e) { moshiExams = []; }
+  moshiExams = []; // Firestoreから取得するため空で初期化
 }
 function saveMoshi() {
-  localStorage.setItem('kokushi_moshi', JSON.stringify(moshiExams));
-  saveMoshiToCloud();
+  saveMoshiToCloud(); // localStorageを廃止、Firestoreのみ
 }
 
 function renderLapCard() {
@@ -2513,13 +2607,12 @@ function importData(input) {
         toast(`新しい問題を${newOnly.length}問追加しました ✅（既存${questions.length - newOnly.length}問の履歴は保持）`, 'success');
       }
 
-      localStorage.setItem('kokushi_v2', JSON.stringify(questions));
       deduplicateAttempts();
       migrateTagNames();
       updateHeader();
       renderDashboard();
       updateStudyModes();
-      saveToCloud(); // クラウドにも同期
+      saveToCloud();
     } catch(err) {
       toast('インポート失敗：正しいバックアップファイルか確認してください', 'error');
     }
@@ -2555,7 +2648,6 @@ function importMdFile(input) {
         `新しい${newOnly.length}問を追加しますか？`
       )) { input.value = ''; return; }
       questions = questions.concat(newOnly);
-      localStorage.setItem('kokushi_v2', JSON.stringify(questions));
       deduplicateAttempts();
       migrateTagNames();
       updateHeader();
@@ -2657,60 +2749,369 @@ function _updateApiKeyStatus() {
   el.style.color = key ? '#276749' : '#a0aec0';
 }
 
-async function generateAiDraft() {
+// ========== AI EXPLANATION QUEUE ==========
+// キューはlocalStorageに永続保存。構造: [{id, number, queuedAt}]
+const AI_QUEUE_KEY = 'kokushi_ai_queue';
+let _aiQueueProcessing = false; // 重複実行防止
+
+function getAiQueue() {
+  try { return JSON.parse(localStorage.getItem(AI_QUEUE_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function setAiQueue(arr) {
+  localStorage.setItem(AI_QUEUE_KEY, JSON.stringify(arr));
+  _refreshAiQueueUI();
+  // Firestoreへも同期（クラウドSync有効時）
+  if (_cloudSyncEnabled && _db && _userId) {
+    _db.collection('users').doc(_userId).collection('data').doc('ai_queue')
+      .set({ items: arr, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
+      .catch(e => console.warn('[AI Queue] Firestore sync failed:', e));
+  }
+}
+
+// キューUIを更新（バッジ・バナー・ダッシュボードカード）
+function _refreshAiQueueUI() {
+  const q = getAiQueue();
+  const count = q.length;
+
+  // スタディモード内バッジ
+  const badge = document.getElementById('ai-queue-badge');
+  if (badge) {
+    badge.textContent = count > 0 ? `${count}件待機中` : '';
+    badge.style.display = count > 0 ? 'inline' : 'none';
+  }
+
+  // スタディモード内バナー
+  const banner = document.getElementById('ai-queue-banner');
+  const bannerText = document.getElementById('ai-queue-banner-text');
+  if (banner && bannerText) {
+    if (count > 0) {
+      const oldest = new Date(q[0].queuedAt);
+      const fmt = `${oldest.getMonth()+1}/${oldest.getDate()} ${oldest.getHours()}:${String(oldest.getMinutes()).padStart(2,'0')}`;
+      bannerText.textContent = `📋 ${count}問が解説生成待ち（最古: ${fmt}〜）`;
+      banner.style.display = 'flex';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  // ダッシュボードカード
+  const statusArea = document.getElementById('ai-batch-status-area');
+  const runBtn = document.getElementById('ai-batch-run-btn');
+  if (statusArea) {
+    if (_aiQueueProcessing) {
+      statusArea.innerHTML = '<span style="color:#553c9a;font-weight:700">⚙️ 解説を生成中...</span>';
+    } else if (count > 0) {
+      const nextRun = _nextBatchTimeLabel();
+      statusArea.innerHTML = `<span style="color:#553c9a;font-weight:700">${count}問が待機中</span>` +
+        `<span style="color:#718096"> — 次回自動処理: <strong>${nextRun}</strong></span>`;
+    } else {
+      statusArea.innerHTML = '<span style="color:#a0aec0">キューは空です</span>';
+    }
+    if (runBtn) runBtn.style.display = count > 0 && !_aiQueueProcessing ? 'inline-block' : 'none';
+  }
+}
+
+function _nextBatchTimeLabel() {
+  const now = new Date();
+  const next = new Date(now);
+  if (now.getHours() >= 2) next.setDate(next.getDate() + 1);
+  next.setHours(2, 0, 0, 0);
+  const diffH = Math.round((next - now) / 3600000);
+  return diffH <= 1 ? '約1時間以内' : `${next.getMonth()+1}/${next.getDate()} 02:00 (約${diffH}時間後)`;
+}
+
+// 現在の問題をキューに追加
+function queueForAiExplanation() {
   const q = queue[qIdx];
   if (!q) return;
+  const apiKey = getClaudeApiKey();
+  if (!apiKey) {
+    toast('Claude APIキーが未設定です。ダッシュボードで設定してください', 'error');
+    return;
+  }
+  const arr = getAiQueue();
+  if (arr.find(x => x.id === q.id)) {
+    toast('すでにキューに追加されています', 'info');
+    return;
+  }
+  arr.push({ id: q.id, number: q.number || q.id, queuedAt: new Date().toISOString() });
+  setAiQueue(arr);
+  toast(`📋 キューに追加しました（合計${arr.length}問）`, 'success');
+  // ボタンを「追加済み」に変える
+  const btn = document.getElementById('ai-queue-btn');
+  if (btn) { btn.textContent = '✓ 追加済み'; btn.disabled = true; btn.style.background = '#276749'; }
+}
 
+function clearAiQueue() {
+  if (!confirm('解説生成キューをすべてクリアしますか？')) return;
+  setAiQueue([]);
+  toast('キューをクリアしました', 'info');
+}
+
+// キューをai_queue.jsonとしてダウンロード（夜間バッチ用）
+function exportAiQueueFile() {
+  const arr = getAiQueue();
+  if (!arr.length) { toast('キューは空です', 'info'); return; }
+  const blob = new Blob([JSON.stringify(arr, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ai_queue.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast(`ai_queue.json を保存しました（${arr.length}問）— 国試問題フォルダに置いてください`, 'success');
+}
+
+// 起動時にai_results.jsonをチェックして自動適用
+async function checkAndApplyAiResults() {
+  try {
+    const res = await fetch('./ai_results.json');
+    if (!res.ok) return;
+    const results = await res.json();
+    const entries = Object.entries(results);
+    if (!entries.length) return;
+    let applied = 0;
+    for (const [qid, data] of entries) {
+      // ★ IDで厳密に照合
+      const targetQ = questions.find(x => x.id === qid);
+      if (!targetQ || targetQ.id !== qid) continue;
+      if (!data.explanation) continue;
+      const prefix = `【AI解説・夜間バッチ】${data.generatedAt ? new Date(data.generatedAt).toLocaleDateString('ja-JP') : ''} (問題ID: ${qid})\n`;
+      const newNote = targetQ.personalNote
+        ? targetQ.personalNote.trimEnd() + '\n\n---\n' + prefix + data.explanation
+        : prefix + data.explanation;
+      targetQ.personalNote = newNote;
+      queue.forEach(x => { if (x.id === qid) x.personalNote = newNote; });
+      applied++;
+    }
+    if (applied > 0) {
+      save();
+      if (_cloudSyncEnabled && _db && _userId) saveToCloud();
+      toast(`🌙 夜間バッチ: ${applied}問の解説をメモに自動反映しました`, 'success');
+      console.log(`[AI Results] ${applied}問のai_results.jsonを適用しました`);
+    }
+  } catch(e) {
+    // ai_results.jsonが存在しない場合は正常（エラーではない）
+  }
+}
+
+// 「今すぐ一括処理」ボタン / 自動トリガーから呼ばれる
+async function processAiQueueNow() {
+  if (_aiQueueProcessing) { toast('すでに処理中です', 'info'); return; }
+  const apiKey = getClaudeApiKey();
+  if (!apiKey) { toast('Claude APIキーが未設定です', 'error'); return; }
+  const items = getAiQueue();
+  if (!items.length) { toast('キューは空です', 'info'); return; }
+
+  _aiQueueProcessing = true;
+  _refreshAiQueueUI();
+  const loadingEl = document.getElementById('ai-draft-loading');
+  const loadingText = document.getElementById('ai-draft-loading-text');
+  if (loadingEl) loadingEl.style.display = 'block';
+
+  let successCount = 0, failCount = 0;
+  const remaining = [...items];
+
+  for (let i = 0; i < remaining.length; i++) {
+    const item = remaining[i];
+    const targetQ = questions.find(x => x.id === item.id);
+    if (!targetQ) { failCount++; continue; }
+
+    if (loadingText) loadingText.textContent = `⚙️ 解説生成中 (${i+1}/${remaining.length}) — ${targetQ.number || ''}`;
+
+    try {
+      const explanation = await _callClaudeForExplanation(targetQ, apiKey);
+      if (explanation) {
+        // ★ 書き込み前にIDを再確認（誤った問題に書かれないよう二重チェック）
+        const verifyQ = questions.find(x => x.id === item.id);
+        if (!verifyQ || verifyQ.id !== item.id) {
+          console.error('[AI Queue] ID mismatch, skipping write for', item.id);
+          failCount++;
+          continue;
+        }
+        // personalNoteに追記（既存内容がある場合は区切り線を挟む）
+        const prefix = `【AI解説】${new Date().toLocaleDateString('ja-JP')} (問題ID: ${item.id})\n`;
+        const newNote = verifyQ.personalNote
+          ? verifyQ.personalNote.trimEnd() + '\n\n---\n' + prefix + explanation
+          : prefix + explanation;
+        verifyQ.personalNote = newNote;
+        // メモリ上のstudyキューにも反映（同じIDのもののみ）
+        queue.forEach(x => { if (x.id === item.id) x.personalNote = newNote; });
+        save();
+        successCount++;
+        // このアイテムだけキューから削除
+        const arr = getAiQueue().filter(x => x.id !== item.id);
+        localStorage.setItem(AI_QUEUE_KEY, JSON.stringify(arr));
+        // Firestoreへも同期
+        if (_cloudSyncEnabled && _db && _userId) saveToCloud();
+        console.log(`[AI Queue] ✓ 問題 ${item.id} (${verifyQ.number||''}) にメモを書き込みました`);
+      }
+    } catch(e) {
+      console.error('[AI Queue] failed for', item.id, e);
+      failCount++;
+    }
+    // API rate limit対策：0.5秒待つ
+    if (i < remaining.length - 1) await new Promise(r => setTimeout(r, 500));
+  }
+
+  // 最後にFirestore側キューも更新
+  setAiQueue(getAiQueue());
+  _aiQueueProcessing = false;
+  _refreshAiQueueUI();
+  if (loadingEl) loadingEl.style.display = 'none';
+
+  const msg = `解説生成完了 ✅ 成功:${successCount}問` + (failCount ? ` 失敗:${failCount}問` : '');
+  toast(msg, successCount > 0 ? 'success' : 'error');
+  // 現在表示中の問題のメモ欄を再描画
+  if (queue[qIdx]) _updateMemoDisplay(queue[qIdx]);
+}
+
+// 1問分のClaude API呼び出し（新フォーマット）
+async function _callClaudeForExplanation(q, apiKey) {
+  // 選択肢を取得
+  const choices = extractChoicesFromExplanation(q.explanation || '');
+  let choicesText = '';
+  if (choices.length > 0) {
+    choicesText = choices.map(c =>
+      `${c.key}. ${c.text}（${c.correct ? '正解' : c.marker === '△' ? '条件付き正解/不正解' : '不正解'}）`
+    ).join('\n');
+  }
+
+  const prompt = `あなたは医師国家試験の解説を作成する医学教育の専門家です。
+以下の国試問題について、医学生の理解を深めるオリジナルの解説を日本語で作成してください。
+
+【問題文】
+${q.question}
+
+【選択肢】
+${choicesText || '（選択肢情報なし）'}
+
+【正解】
+${q.answer}
+
+【解説の構成（必ずこの順で書く）】
+
+**1. 各選択肢の医学的解説**
+各選択肢について、以下の形式で書いてください：
+　[選択肢記号] [選択肢テキスト]
+　→ 医学的背景: （その選択肢に関連する医学知識を1〜2文で説明）
+　→ 正誤の理由: （この問題においてなぜ正解/不正解なのか具体的に）
+
+**2. この問題の解き方**
+正解を選ぶための考え方・鑑別ポイントを2〜3文で。
+
+**3. 国試的ポイント**
+試験で押さえるべき要点・語呂合わせ・類似問題への応用を箇条書きで。
+
+著作権に問題のない完全オリジナルの文章で書いてください。`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-opus-4-6',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${res.status}`);
+  }
+  const data = await res.json();
+  return data.content?.[0]?.text || '';
+}
+
+// メモ表示を更新（スタディモードのメモ欄）
+function _updateMemoDisplay(q) {
+  const noteEl = document.getElementById('add-note');
+  if (noteEl && queue[qIdx]?.id === q.id) {
+    noteEl.value = q.personalNote || '';
+  }
+  // quickMemo欄
+  const qmEl = document.getElementById('qm-note');
+  if (qmEl && queue[qIdx]?.id === q.id) {
+    qmEl.innerHTML = q.personalNote || '';
+  }
+}
+
+// キューボタンの状態を現在の問題に合わせて更新
+function _updateAiQueueBtn(q) {
+  const btn = document.getElementById('ai-queue-btn');
+  if (!btn || !q) return;
+  const inQueue = getAiQueue().some(x => x.id === q.id);
+  if (inQueue) {
+    btn.textContent = '✓ 追加済み';
+    btn.disabled = true;
+    btn.style.background = '#276749';
+  } else {
+    btn.textContent = '📋 夜間キューに追加';
+    btn.disabled = false;
+    btn.style.background = '#553c9a';
+  }
+}
+
+// ページロード時に自動処理をチェック
+function checkAiQueueAutoTrigger() {
+  const items = getAiQueue();
+  if (!items.length) return;
+  const now = new Date();
+  const hour = now.getHours();
+  // 02:00〜05:59 の間にキューがあれば自動処理
+  if (hour >= 2 && hour < 6) {
+    console.log('[AI Queue] 夜間バッチ自動起動');
+    toast('🌙 夜間バッチ: AI解説の自動生成を開始します', 'info');
+    setTimeout(processAiQueueNow, 2000);
+    return;
+  }
+  // 前日以前にキューに追加された問題がある場合も自動処理
+  const oldest = new Date(items[0].queuedAt);
+  const ageHours = (now - oldest) / 3600000;
+  if (ageHours >= 20) {
+    console.log('[AI Queue] 前日キュー検出 → 自動処理開始');
+    toast('🌙 昨日分の解説生成を自動で開始します', 'info');
+    setTimeout(processAiQueueNow, 2000);
+  }
+}
+
+// setIntervalで02:00を監視（アプリが開いている場合）
+setInterval(() => {
+  const now = new Date();
+  if (now.getHours() === 2 && now.getMinutes() < 5) {
+    const items = getAiQueue();
+    if (items.length && !_aiQueueProcessing) {
+      console.log('[AI Queue] 02:00 バッチ起動');
+      processAiQueueNow();
+    }
+  }
+}, 5 * 60 * 1000); // 5分ごとにチェック
+
+// ========== AI DRAFT（既存機能 + 今すぐ生成 wrapper） ==========
+
+// 「今すぐ生成」ボタン → 即時生成してエディタに表示（プレビュー用）
+async function generateAiDraftNow() {
+  const q = queue[qIdx];
+  if (!q) return;
   const apiKey = getClaudeApiKey();
   if (!apiKey) {
     toast('Claude APIキーが設定されていません。ダッシュボードの「AI解説設定」から入力してください', 'error');
     return;
   }
-
   document.getElementById('ai-draft-loading').style.display = 'block';
   document.getElementById('ai-draft-editor').style.display = 'none';
   document.getElementById('ai-draft-btn').disabled = true;
-
-  const prompt = `あなたは医師国家試験の解説を作成する医学教育の専門家です。
-以下の国試問題について、完全にオリジナルの解説を日本語で作成してください。
-
-【問題文】
-${q.question}
-
-【正解】
-${q.answer}
-
-【要求する解説の構成】
-1. **なぜこれが正解か**（正解の根拠を簡潔に）
-2. **各選択肢の解説**（なぜ正解/不正解か）
-3. **覚え方のポイント**（国試に出やすい要点、語呂合わせ等）
-
-著作権に問題のない完全オリジナルの文章で、医学生が理解しやすい解説を書いてください。既存の参考書の文章をそのまま使わず、自分の言葉で説明してください。`;
-
+  const loadingText = document.getElementById('ai-draft-loading-text');
+  if (loadingText) loadingText.textContent = '⏳ 解説を生成中...';
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-opus-4-6',
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || `HTTP ${res.status}`);
-    }
-
-    const data = await res.json();
-    const draft = data.content?.[0]?.text || '';
-
+    const draft = await _callClaudeForExplanation(q, apiKey);
     document.getElementById('ai-draft-text').value = draft;
     document.getElementById('ai-draft-editor').style.display = 'block';
     document.getElementById('ai-draft-status').textContent = '生成完了 ✓';
@@ -2722,6 +3123,11 @@ ${q.answer}
     document.getElementById('ai-draft-loading').style.display = 'none';
     document.getElementById('ai-draft-btn').disabled = false;
   }
+}
+
+// 後方互換（旧コードから呼ばれる場合）
+async function generateAiDraft() {
+  return generateAiDraftNow();
 }
 
 function toggleAiDraftEditor() {
@@ -2896,8 +3302,9 @@ const SUGGESTED_TAGS = [
   '精神科','皮膚科','眼科','耳鼻咽喉科','整形外科','救急・集中治療',
   '公衆衛生','医学総論',
   // ── 画像・検査種別 ──
-  '心電図','レントゲン','CT','MRI','MRA','エコー','内視鏡','CTG',
+  '心電図','レントゲン','CT','MRI','MRA','血管造影','エコー','内視鏡','CTG',
   '病理','末梢血塗抹','骨髄像','血清蛋白分画','免疫電気泳動','皮膚所見画像',
+  '左右心室圧波形','酸素飽和度','心音','Gram染色',
   // ── 学習概念タグ ──
   '統計','薬理','解剖','生理','生化学','内科','マイナー',
   // ── 手技・検査タグ ──
@@ -3103,7 +3510,7 @@ function _renderFilterTagPicker() {
 
   // グループ定義（SUGGESTED_TAGS に準拠）
   const GROUP_CATS  = ['循環器','呼吸器','消化器','腎・泌尿器','内分泌・代謝','神経','血液','膠原病・免疫','感染症','外科','小児科','産婦人科','精神科','皮膚科','眼科','耳鼻咽喉科','整形外科','救急・集中治療','公衆衛生','医学総論'];
-  const GROUP_IMAGE = ['心電図','レントゲン','CT','MRI','MRA','エコー','内視鏡','CTG','病理','末梢血塗抹','骨髄像','血清蛋白分画','免疫電気泳動','皮膚所見画像'];
+  const GROUP_IMAGE = ['心電図','レントゲン','CT','MRI','MRA','血管造影','エコー','内視鏡','CTG','病理','末梢血塗抹','骨髄像','血清蛋白分画','免疫電気泳動','皮膚所見画像','左右心室圧波形','酸素飽和度','心音','Gram染色'];
   const GROUP_CONC  = ['統計','薬理','解剖','生理','生化学','内科','マイナー'];
   const knownAll    = [...GROUP_CATS, ...GROUP_IMAGE, ...GROUP_CONC];
 
@@ -4117,6 +4524,8 @@ function revealAnswer() {
   document.getElementById('ai-draft-loading').style.display = 'none';
   document.getElementById('ai-draft-status').textContent = '';
   document.getElementById('ai-draft-text').value = '';
+  // キューボタンの状態を更新（この問題がすでにキューにあるか）
+  _updateAiQueueBtn(queue[qIdx]);
 
   if (_currentChoices.length > 0) {
     // 選択肢あり → 自動判定
@@ -6023,6 +6432,11 @@ loadAnkiLinks();
 // Firebase 非同期初期化（画面描画後に実行）
 initFirebase().then(() => { _updateUidDisplay(); });
 _updateApiKeyStatus();
+// AIキューUIを更新、夜間バッチの自動トリガーをチェック
+_refreshAiQueueUI();
+setTimeout(checkAiQueueAutoTrigger, 3000); // ページ読み込み3秒後にチェック
+// 夜間バッチが生成したai_results.jsonがあれば自動適用
+setTimeout(checkAndApplyAiResults, 1500);
 
 // Keyboard shortcut for study mode
 document.addEventListener('keydown', e => {
