@@ -2782,25 +2782,76 @@ function clearAiQueue() {
   toast('キューをクリアしました', 'info');
 }
 
-// Firebaseのリフレッシュトークンを取得（Firebase SDKのcurrentUserから直接）
-function _getFirebaseRefreshToken() {
-  try {
-    const user = firebase.auth().currentUser;
-    return user ? (user.refreshToken || null) : null;
-  } catch(e) {
-    return null;
-  }
-}
-
 // ai_config.jsonをダウンロード（スケジュールタスク連携の初回設定）
-function downloadAiConfig() {
-  if (!_userId) { toast('Firebase未接続です。しばらく待ってから再試行してください', 'error'); return; }
-  const refreshToken = _getFirebaseRefreshToken();
-  if (!refreshToken) { toast('認証情報の取得に失敗しました。ページを再読み込みしてください', 'error'); return; }
+async function downloadAiConfig() {
+  if (!_cloudSyncEnabled) {
+    toast('Firebase未接続です。しばらく待ってから再試行してください', 'error');
+    return;
+  }
+
+  // onAuthStateChanged で確実に認証完了を待つ
+  const user = await new Promise(resolve => {
+    const unsubscribe = firebase.auth().onAuthStateChanged(u => {
+      unsubscribe();
+      resolve(u);
+    });
+  });
+
+  if (!user) {
+    toast('認証セッションが見つかりません。ページを再読み込みしてください', 'error');
+    return;
+  }
+
+  // refreshToken を複数の方法で取得を試みる
+  let refreshToken = user.refreshToken;
+
+  // 方法2: user.toJSON() → stsTokenManager.refreshToken
+  if (!refreshToken) {
+    try {
+      const userJson = user.toJSON();
+      refreshToken = userJson?.stsTokenManager?.refreshToken || null;
+    } catch(e) {}
+  }
+
+  // 方法3: 内部プロパティ stsTokenManager
+  if (!refreshToken) {
+    try {
+      refreshToken = user.stsTokenManager?.refreshToken || null;
+    } catch(e) {}
+  }
+
+  // 方法4: IndexedDB から直接読み取り（Firebase compat v10 はIndexedDB優先）
+  if (!refreshToken) {
+    try {
+      const dbKey = `firebase:authUser:${FIREBASE_CONFIG.apiKey}:[DEFAULT]`;
+      refreshToken = await new Promise((resolve) => {
+        const req = indexedDB.open('firebaseLocalStorageDb');
+        req.onsuccess = (e) => {
+          const idb = e.target.result;
+          try {
+            const tx = idb.transaction(['firebaseLocalStorage'], 'readonly');
+            const store = tx.objectStore('firebaseLocalStorage');
+            const get = store.get(dbKey);
+            get.onsuccess = (ev) => {
+              resolve(ev.target.result?.value?.stsTokenManager?.refreshToken || null);
+            };
+            get.onerror = () => resolve(null);
+          } catch(ex) { resolve(null); }
+        };
+        req.onerror = () => resolve(null);
+      });
+    } catch(e) {}
+  }
+
+  if (!refreshToken) {
+    toast('リフレッシュトークンを取得できませんでした（uid: ' + (user.uid || '?') + '）', 'error');
+    return;
+  }
+
   const config = {
     projectId: FIREBASE_CONFIG.projectId,
     webApiKey: FIREBASE_CONFIG.apiKey,
-    userId: _userId,
+    userId: _userId || user.uid,
     refreshToken
   };
   const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
