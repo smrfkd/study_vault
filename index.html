@@ -2782,18 +2782,14 @@ function clearAiQueue() {
   toast('キューをクリアしました', 'info');
 }
 
-// Firebaseのリフレッシュトークンを取得（localStorageのFirebase authから）
+// Firebaseのリフレッシュトークンを取得（Firebase SDKのcurrentUserから直接）
 function _getFirebaseRefreshToken() {
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith('firebase:authUser:')) {
-      try {
-        const data = JSON.parse(localStorage.getItem(key));
-        return data?.stsTokenManager?.refreshToken || null;
-      } catch(e) {}
-    }
+  try {
+    const user = firebase.auth().currentUser;
+    return user ? (user.refreshToken || null) : null;
+  } catch(e) {
+    return null;
   }
-  return null;
 }
 
 // ai_config.jsonをダウンロード（スケジュールタスク連携の初回設定）
