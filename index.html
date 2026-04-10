@@ -423,20 +423,20 @@ select.form-input { cursor: pointer; }
     <!-- AI夜間バッチ状態カード -->
     <div class="card" style="border-top:4px solid #553c9a;margin-bottom:18px" id="ai-batch-card">
       <div class="card-title">🌙 AI解説 夜間バッチ</div>
-      <div style="font-size:12px;color:#718096;margin-bottom:10px">問題解答後に「夜間キューに追加」すると、Coworkスケジュールタスクが翌02:00頃に自動で解説を生成してメモに保存します。APIキー不要（Maxプラン内で動作）。</div>
+      <div style="font-size:12px;color:#718096;margin-bottom:10px">問題解答後に「夜間キューに追加」すると、Coworkスケジュールタスクが翌02:00頃に自動で解説を生成してメモに保存します。APIキー不要・外部API不要（Maxプラン内で動作）。</div>
       <div id="ai-batch-status-area" style="font-size:12px"></div>
       <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="downloadAiConfig()"
+        <button onclick="setupWorkspaceFolder()"
           style="font-size:12px;padding:7px 14px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
-          🔑 初回設定（ai_config.json）
+          🔗 フォルダ連携設定
         </button>
         <button onclick="clearAiQueue()"
           style="font-size:12px;padding:7px 14px;border:1px solid #e2e8f0;border-radius:8px;background:white;cursor:pointer;color:#718096">
           🗑 キューをクリア
         </button>
       </div>
-      <div style="font-size:10px;color:#a0aec0;margin-top:8px">
-        💡 初回のみ「🔑 初回設定」→ ダウンロードした <code>ai_config.json</code> を「国試問題」フォルダに移動してください。以降は毎日02:00に自動実行されます。
+      <div id="ai-fs-status" style="font-size:10px;color:#a0aec0;margin-top:8px">
+        💡 初回のみ「🔗 フォルダ連携設定」→「国試問題」フォルダを選択してください。以降はキュー追加時に自動でファイル書き出し、毎日02:00に自動解説生成されます。
       </div>
     </div>
 
@@ -2691,6 +2691,8 @@ function setAiQueue(arr) {
       .set({ items: arr, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
       .catch(e => console.warn('[AI Queue] Firestore sync failed:', e));
   }
+  // ワークスペースフォルダにai_queue.jsonを書き出し（File System Access API）
+  if (_fsDirHandle) _writeQueueToFS();
 }
 
 // キューUIを更新（バッジ・バナー・ダッシュボードカード）
@@ -2782,88 +2784,103 @@ function clearAiQueue() {
   toast('キューをクリアしました', 'info');
 }
 
-// ai_config.jsonをダウンロード（スケジュールタスク連携の初回設定）
-async function downloadAiConfig() {
-  if (!_cloudSyncEnabled) {
-    toast('Firebase未接続です。しばらく待ってから再試行してください', 'error');
-    return;
-  }
+// ========== File System Access API（ワークスペースフォルダ連携）==========
+let _fsDirHandle = null;
 
-  // onAuthStateChanged で確実に認証完了を待つ
-  const user = await new Promise(resolve => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(u => {
-      unsubscribe();
-      resolve(u);
-    });
+async function _idbOpenKokushiFs() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('kokushi-fs', 1);
+    req.onupgradeneeded = (e) => { e.target.result.createObjectStore('handles'); };
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror = () => reject(req.error);
   });
+}
 
-  if (!user) {
-    toast('認証セッションが見つかりません。ページを再読み込みしてください', 'error');
+async function _saveDirHandle(handle) {
+  try {
+    const db = await _idbOpenKokushiFs();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(['handles'], 'readwrite');
+      tx.objectStore('handles').put(handle, 'workspace');
+      tx.oncomplete = () => { db.close(); resolve(); };
+      tx.onerror = () => { db.close(); reject(tx.error); };
+    });
+  } catch(e) {}
+}
+
+async function _loadDirHandle() {
+  try {
+    const db = await _idbOpenKokushiFs();
+    return await new Promise((resolve) => {
+      const tx = db.transaction(['handles'], 'readonly');
+      const get = tx.objectStore('handles').get('workspace');
+      get.onsuccess = () => { db.close(); resolve(get.result || null); };
+      get.onerror = () => { db.close(); resolve(null); };
+    });
+  } catch(e) { return null; }
+}
+
+// 起動時にIndexedDBから保存済みハンドルを復元
+async function _initFsDirHandle() {
+  const handle = await _loadDirHandle();
+  if (!handle) return;
+  try {
+    const perm = await handle.queryPermission({ mode: 'readwrite' });
+    if (perm === 'granted' || perm === 'prompt') {
+      _fsDirHandle = handle;
+    }
+  } catch(e) {}
+}
+
+// フォルダにai_queue.jsonを書き込む
+async function _writeQueueToFS() {
+  if (!_fsDirHandle) return;
+  try {
+    const perm = await _fsDirHandle.requestPermission({ mode: 'readwrite' });
+    if (perm !== 'granted') return;
+    const json = JSON.stringify(getAiQueue(), null, 2);
+    const fileHandle = await _fsDirHandle.getFileHandle('ai_queue.json', { create: true });
+    const writable = await fileHandle.createWritable();
+    await writable.write(json);
+    await writable.close();
+    console.log('[FS] ai_queue.json を書き込みました');
+  } catch(e) {
+    console.warn('[FS] ai_queue.json 書き込み失敗:', e);
+  }
+}
+
+// フォルダ連携状態をUIに反映
+function _updateFsStatus() {
+  const el = document.getElementById('ai-fs-status');
+  if (!el) return;
+  if (_fsDirHandle) {
+    el.innerHTML = `✅ 連携中: <strong>${_fsDirHandle.name}</strong> — キュー追加時に自動で ai_queue.json を書き出します。毎日02:00に解説が自動生成されます。`;
+    el.style.color = '#276749';
+  } else {
+    el.innerHTML = '💡 初回のみ「🔗 フォルダ連携設定」→「国試問題」フォルダを選択してください。以降はキュー追加時に自動でファイル書き出し、毎日02:00に自動解説生成されます。';
+    el.style.color = '#a0aec0';
+  }
+}
+
+// 「フォルダ連携設定」ボタン
+async function setupWorkspaceFolder() {
+  if (!('showDirectoryPicker' in window)) {
+    toast('このブラウザはFile System Access APIに未対応です（Chrome/Edgeを使用してください）', 'error');
     return;
   }
-
-  // refreshToken を複数の方法で取得を試みる
-  let refreshToken = user.refreshToken;
-
-  // 方法2: user.toJSON() → stsTokenManager.refreshToken
-  if (!refreshToken) {
-    try {
-      const userJson = user.toJSON();
-      refreshToken = userJson?.stsTokenManager?.refreshToken || null;
-    } catch(e) {}
+  try {
+    const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+    _fsDirHandle = handle;
+    await _saveDirHandle(handle);
+    // 現在のキューを即書き出し
+    await _writeQueueToFS();
+    const arr = getAiQueue();
+    toast(`✅ フォルダ「${handle.name}」を連携しました。キュー${arr.length}問を書き出しました。`, 'success');
+    _refreshAiQueueUI();
+    _updateFsStatus();
+  } catch(e) {
+    if (e.name !== 'AbortError') toast('フォルダの選択に失敗しました: ' + e.message, 'error');
   }
-
-  // 方法3: 内部プロパティ stsTokenManager
-  if (!refreshToken) {
-    try {
-      refreshToken = user.stsTokenManager?.refreshToken || null;
-    } catch(e) {}
-  }
-
-  // 方法4: IndexedDB から直接読み取り（Firebase compat v10 はIndexedDB優先）
-  if (!refreshToken) {
-    try {
-      const dbKey = `firebase:authUser:${FIREBASE_CONFIG.apiKey}:[DEFAULT]`;
-      refreshToken = await new Promise((resolve) => {
-        const req = indexedDB.open('firebaseLocalStorageDb');
-        req.onsuccess = (e) => {
-          const idb = e.target.result;
-          try {
-            const tx = idb.transaction(['firebaseLocalStorage'], 'readonly');
-            const store = tx.objectStore('firebaseLocalStorage');
-            const get = store.get(dbKey);
-            get.onsuccess = (ev) => {
-              resolve(ev.target.result?.value?.stsTokenManager?.refreshToken || null);
-            };
-            get.onerror = () => resolve(null);
-          } catch(ex) { resolve(null); }
-        };
-        req.onerror = () => resolve(null);
-      });
-    } catch(e) {}
-  }
-
-  if (!refreshToken) {
-    toast('リフレッシュトークンを取得できませんでした（uid: ' + (user.uid || '?') + '）', 'error');
-    return;
-  }
-
-  const config = {
-    projectId: FIREBASE_CONFIG.projectId,
-    webApiKey: FIREBASE_CONFIG.apiKey,
-    userId: _userId || user.uid,
-    refreshToken
-  };
-  const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'ai_config.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  toast('ai_config.json を保存しました — 「国試問題」フォルダに移動してください', 'success');
 }
 
 // キューをai_queue.jsonとしてダウンロード（夜間バッチ用）
@@ -6422,6 +6439,8 @@ _refreshAiQueueUI();
 setTimeout(checkAiQueueAutoTrigger, 3000); // ページ読み込み3秒後にチェック
 // 夜間バッチが生成したai_results.jsonがあれば自動適用
 setTimeout(checkAndApplyAiResults, 1500);
+// ワークスペースフォルダの連携状態を復元（File System Access API）
+_initFsDirHandle().then(() => { _updateFsStatus(); });
 
 // Keyboard shortcut for study mode
 document.addEventListener('keydown', e => {
