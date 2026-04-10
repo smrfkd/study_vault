@@ -423,16 +423,12 @@ select.form-input { cursor: pointer; }
     <!-- AI夜間バッチ状態カード -->
     <div class="card" style="border-top:4px solid #553c9a;margin-bottom:18px" id="ai-batch-card">
       <div class="card-title">🌙 AI解説 夜間バッチ</div>
-      <div style="font-size:12px;color:#718096;margin-bottom:10px">問題解答後に「キューに追加」すると、翌02:00頃に自動で解説を生成してメモに保存します。</div>
+      <div style="font-size:12px;color:#718096;margin-bottom:10px">問題解答後に「夜間キューに追加」すると、Coworkスケジュールタスクが翌02:00頃に自動で解説を生成してメモに保存します。APIキー不要（Maxプラン内で動作）。</div>
       <div id="ai-batch-status-area" style="font-size:12px"></div>
       <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="processAiQueueNow()" id="ai-batch-run-btn"
-          style="font-size:12px;padding:7px 16px;background:#553c9a;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;display:none">
-          ▶ 今すぐ一括生成
-        </button>
-        <button onclick="exportAiQueueFile()"
-          style="font-size:12px;padding:7px 14px;background:#2b6cb0;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
-          💾 ai_queue.json を保存
+        <button onclick="downloadAiConfig()"
+          style="font-size:12px;padding:7px 14px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
+          🔑 初回設定（ai_config.json）
         </button>
         <button onclick="clearAiQueue()"
           style="font-size:12px;padding:7px 14px;border:1px solid #e2e8f0;border-radius:8px;background:white;cursor:pointer;color:#718096">
@@ -440,27 +436,10 @@ select.form-input { cursor: pointer; }
         </button>
       </div>
       <div style="font-size:10px;color:#a0aec0;margin-top:8px">
-        💡 夜間自動処理はアプリが開いている場合02:00に実行。閉じている場合は「ai_queue.jsonを保存」→ 国試問題フォルダに置くと翌02:00に自動生成されます。
+        💡 初回のみ「🔑 初回設定」→ ダウンロードした <code>ai_config.json</code> を「国試問題」フォルダに移動してください。以降は毎日02:00に自動実行されます。
       </div>
     </div>
 
-    <!-- AI解説設定カード -->
-    <div class="card" style="border-top:4px solid #2b6cb0;margin-bottom:18px" id="ai-settings-card">
-      <div class="card-title">🤖 AI解説設定（Claude API）</div>
-      <div style="font-size:12px;color:#718096;margin-bottom:12px">問題の解説をAIが自動生成します。APIキーは端末内のみに保存されます。</div>
-      <div style="margin-bottom:10px">
-        <div style="font-size:11px;font-weight:700;color:#2b6cb0;margin-bottom:4px">Claude APIキー</div>
-        <div style="display:flex;gap:8px">
-          <input id="claude-api-key-input" type="password" placeholder="sk-ant-api..."
-            style="flex:1;font-size:12px;padding:7px 10px;border:1px solid #bee3f8;border-radius:8px;outline:none">
-          <button onclick="saveClaudeApiKey()" style="font-size:12px;padding:7px 16px;background:#2b6cb0;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">保存</button>
-        </div>
-        <div style="font-size:10px;color:#a0aec0;margin-top:4px">
-          APIキーは <a href="https://console.anthropic.com/" target="_blank" style="color:#2b6cb0">console.anthropic.com</a> で取得できます
-        </div>
-      </div>
-      <div id="api-key-status" style="font-size:11px;color:#718096"></div>
-    </div>
 
   </div>
 
@@ -874,7 +853,7 @@ select.form-input { cursor: pointer; }
           <div id="ai-draft-area" style="margin-top:14px;background:#f7fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px">
             <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
               <div style="display:flex;align-items:center;gap:8px">
-                <div style="font-size:12px;font-weight:800;color:#2d3748">🤖 AI解説自動生成</div>
+                <div style="font-size:12px;font-weight:800;color:#2d3748">🤖 AI解説</div>
                 <span id="ai-queue-badge" style="display:none;font-size:10px;font-weight:700;background:#ebf8ff;color:#2b6cb0;border:1px solid #bee3f8;border-radius:10px;padding:2px 8px"></span>
               </div>
               <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -882,12 +861,12 @@ select.form-input { cursor: pointer; }
                   style="font-size:12px;padding:6px 14px;background:#553c9a;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
                   📋 夜間キューに追加
                 </button>
-                <button id="ai-draft-btn" onclick="generateAiDraftNow()"
+                <button onclick="copyAiPrompt()"
                   style="font-size:12px;padding:6px 14px;background:#2b6cb0;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
-                  ✨ 今すぐ生成
+                  📎 プロンプトをコピー
                 </button>
                 <button onclick="toggleAiDraftEditor()" style="font-size:11px;padding:6px 10px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer">
-                  手動入力
+                  貼り付け入力
                 </button>
               </div>
             </div>
@@ -895,29 +874,32 @@ select.form-input { cursor: pointer; }
             <!-- キュー状態バナー -->
             <div id="ai-queue-banner" style="display:none;font-size:11px;padding:7px 10px;background:#ebf8ff;border-radius:8px;border:1px solid #bee3f8;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
               <span id="ai-queue-banner-text"></span>
-              <button onclick="processAiQueueNow()" style="font-size:11px;padding:4px 10px;background:#2b6cb0;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700;white-space:nowrap;margin-left:8px">
-                今すぐ一括処理
-              </button>
             </div>
 
-            <!-- 生成結果・編集エリア -->
+            <!-- コピー完了ヒント -->
+            <div id="ai-copy-hint" style="display:none;font-size:11px;padding:8px 10px;background:#f0fff4;border-radius:8px;border:1px solid #9ae6b4;margin-bottom:8px;color:#276749">
+              ✅ プロンプトをコピーしました！<a href="https://claude.ai" target="_blank" style="color:#2b6cb0;font-weight:700">claude.ai</a> に貼り付けて解説を取得 → 「貼り付け入力」で保存してください。
+            </div>
+
+            <!-- 貼り付け入力エリア（claude.aiからの解説を貼り付け） -->
             <div id="ai-draft-editor" style="display:none">
+              <div style="font-size:11px;color:#718096;margin-bottom:4px">Claude（claude.ai）の返答をここに貼り付けてください：</div>
               <textarea id="ai-draft-text" rows="8"
                 style="width:100%;box-sizing:border-box;resize:vertical;border:1px solid #bee3f8;border-radius:8px;padding:10px;font-size:12px;line-height:1.8;outline:none;background:white;font-family:inherit"
-                placeholder="AIが生成した解説がここに表示されます。自由に編集できます。"></textarea>
+                placeholder="claude.ai で生成した解説をここに貼り付け..."></textarea>
               <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
                 <button onclick="saveOriginalExp()" style="font-size:12px;padding:7px 18px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
                   💾 オリジナル解説として保存
                 </button>
-                <button onclick="document.getElementById('ai-draft-editor').style.display='none'" style="font-size:11px;padding:7px 12px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer">
-                  キャンセル
+                <button onclick="document.getElementById('ai-draft-editor').style.display='none';document.getElementById('ai-copy-hint').style.display='none'" style="font-size:11px;padding:7px 12px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer">
+                  閉じる
                 </button>
                 <span id="ai-draft-status" style="font-size:11px;color:#718096;margin-left:4px"></span>
               </div>
             </div>
 
             <div id="ai-draft-loading" style="display:none;text-align:center;padding:16px;color:#718096;font-size:12px">
-              <span id="ai-draft-loading-text">⏳ 解説を生成中...</span>
+              <span id="ai-draft-loading-text">⏳ 処理中...</span>
             </div>
           </div>
 
@@ -2763,24 +2745,33 @@ function _nextBatchTimeLabel() {
   return diffH <= 1 ? '約1時間以内' : `${next.getMonth()+1}/${next.getDate()} 02:00 (約${diffH}時間後)`;
 }
 
-// 現在の問題をキューに追加
+// 現在の問題をキューに追加（APIキー不要・スケジュールタスクが処理）
 function queueForAiExplanation() {
   const q = queue[qIdx];
   if (!q) return;
-  const apiKey = getClaudeApiKey();
-  if (!apiKey) {
-    toast('Claude APIキーが未設定です。ダッシュボードで設定してください', 'error');
-    return;
-  }
   const arr = getAiQueue();
   if (arr.find(x => x.id === q.id)) {
     toast('すでにキューに追加されています', 'info');
     return;
   }
-  arr.push({ id: q.id, number: q.number || q.id, queuedAt: new Date().toISOString() });
+  // questionDataを埋め込む（スケジュールタスクがFirestore再取得不要になる）
+  const choices = extractChoicesFromExplanation(q.explanation || '');
+  const choicesText = choices.length > 0
+    ? choices.map(c => `${c.key}. ${c.text}（${c.correct ? '正解' : '不正解'}）`).join('\n')
+    : '';
+  arr.push({
+    id: q.id,
+    number: q.number || q.id,
+    queuedAt: new Date().toISOString(),
+    questionData: {
+      question: q.question || '',
+      choicesText,
+      answer: q.answer || '',
+      category: q.category || ''
+    }
+  });
   setAiQueue(arr);
   toast(`📋 キューに追加しました（合計${arr.length}問）`, 'success');
-  // ボタンを「追加済み」に変える
   const btn = document.getElementById('ai-queue-btn');
   if (btn) { btn.textContent = '✓ 追加済み'; btn.disabled = true; btn.style.background = '#276749'; }
 }
@@ -2789,6 +2780,43 @@ function clearAiQueue() {
   if (!confirm('解説生成キューをすべてクリアしますか？')) return;
   setAiQueue([]);
   toast('キューをクリアしました', 'info');
+}
+
+// Firebaseのリフレッシュトークンを取得（localStorageのFirebase authから）
+function _getFirebaseRefreshToken() {
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('firebase:authUser:')) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key));
+        return data?.stsTokenManager?.refreshToken || null;
+      } catch(e) {}
+    }
+  }
+  return null;
+}
+
+// ai_config.jsonをダウンロード（スケジュールタスク連携の初回設定）
+function downloadAiConfig() {
+  if (!_userId) { toast('Firebase未接続です。しばらく待ってから再試行してください', 'error'); return; }
+  const refreshToken = _getFirebaseRefreshToken();
+  if (!refreshToken) { toast('認証情報の取得に失敗しました。ページを再読み込みしてください', 'error'); return; }
+  const config = {
+    projectId: FIREBASE_CONFIG.projectId,
+    webApiKey: FIREBASE_CONFIG.apiKey,
+    userId: _userId,
+    refreshToken
+  };
+  const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ai_config.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('ai_config.json を保存しました — 「国試問題」フォルダに移動してください', 'success');
 }
 
 // キューをai_queue.jsonとしてダウンロード（夜間バッチ用）
@@ -2841,10 +2869,9 @@ async function checkAndApplyAiResults() {
 }
 
 // 「今すぐ一括処理」ボタン / 自動トリガーから呼ばれる
+// ※ 処理はCoworkスケジュールタスク（02:00）が担当。APIキー不要。
 async function processAiQueueNow() {
   if (_aiQueueProcessing) { toast('すでに処理中です', 'info'); return; }
-  const apiKey = getClaudeApiKey();
-  if (!apiKey) { toast('Claude APIキーが未設定です', 'error'); return; }
   const items = getAiQueue();
   if (!items.length) { toast('キューは空です', 'info'); return; }
 
@@ -3038,38 +3065,54 @@ setInterval(() => {
 
 // ========== AI DRAFT（既存機能 + 今すぐ生成 wrapper） ==========
 
-// 「今すぐ生成」ボタン → 即時生成してエディタに表示（プレビュー用）
-async function generateAiDraftNow() {
+// 「📎 プロンプトをコピー」ボタン → claude.ai に貼り付けて使う
+function copyAiPrompt() {
   const q = queue[qIdx];
   if (!q) return;
-  const apiKey = getClaudeApiKey();
-  if (!apiKey) {
-    toast('Claude APIキーが設定されていません。ダッシュボードの「AI解説設定」から入力してください', 'error');
-    return;
+  const choices = extractChoicesFromExplanation(q.explanation || '');
+  let choicesText = '';
+  if (choices.length > 0) {
+    choicesText = choices.map(c =>
+      `${c.key}. ${c.text}（${c.correct ? '正解' : c.marker === '△' ? '条件付き正解/不正解' : '不正解'}）`
+    ).join('\n');
   }
-  document.getElementById('ai-draft-loading').style.display = 'block';
-  document.getElementById('ai-draft-editor').style.display = 'none';
-  document.getElementById('ai-draft-btn').disabled = true;
-  const loadingText = document.getElementById('ai-draft-loading-text');
-  if (loadingText) loadingText.textContent = '⏳ 解説を生成中...';
-  try {
-    const draft = await _callClaudeForExplanation(q, apiKey);
-    document.getElementById('ai-draft-text').value = draft;
-    document.getElementById('ai-draft-editor').style.display = 'block';
-    document.getElementById('ai-draft-status').textContent = '生成完了 ✓';
-    toast('ドラフトを生成しました', 'success');
-  } catch(e) {
-    console.error('[AI Draft]', e);
-    toast('生成に失敗しました: ' + e.message, 'error');
-  } finally {
-    document.getElementById('ai-draft-loading').style.display = 'none';
-    document.getElementById('ai-draft-btn').disabled = false;
-  }
-}
+  const prompt = `あなたは医師国家試験の解説を作成する医学教育の専門家です。
+以下の国試問題について、医学生の理解を深めるオリジナルの解説を日本語で作成してください。
 
-// 後方互換（旧コードから呼ばれる場合）
-async function generateAiDraft() {
-  return generateAiDraftNow();
+【問題文】
+${q.question}
+
+【選択肢】
+${choicesText || '（選択肢情報なし）'}
+
+【正解】
+${q.answer}
+
+【解説の構成（必ずこの順で書く）】
+
+**1. 各選択肢の医学的解説**
+各選択肢について、以下の形式で書いてください：
+　[選択肢記号] [選択肢テキスト]
+　→ 医学的背景: （その選択肢に関連する医学知識を1〜2文で説明）
+　→ 正誤の理由: （この問題においてなぜ正解/不正解なのか具体的に）
+
+**2. この問題の解き方**
+正解を選ぶための考え方・鑑別ポイントを2〜3文で。
+
+**3. 国試的ポイント**
+試験で押さえるべき要点・語呂合わせ・類似問題への応用を箇条書きで。
+
+著作権に問題のない完全オリジナルの文章で書いてください。`;
+
+  navigator.clipboard.writeText(prompt).then(() => {
+    const hint = document.getElementById('ai-copy-hint');
+    if (hint) { hint.style.display = 'block'; }
+    const ed = document.getElementById('ai-draft-editor');
+    if (ed) { ed.style.display = 'block'; }
+    toast('プロンプトをコピーしました！claude.ai に貼り付けてください', 'success');
+  }).catch(() => {
+    toast('コピーに失敗しました。手動でコピーしてください', 'error');
+  });
 }
 
 function toggleAiDraftEditor() {
