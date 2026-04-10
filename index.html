@@ -836,7 +836,33 @@ select.form-input { cursor: pointer; }
           </div>
           <!-- 既存解説（モントレ等） -->
           <div id="qm-exp-wrap">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:11px;font-weight:700;color:#718096">📖 解説</span>
+              <button id="exp-edit-btn" onclick="toggleExpEdit()"
+                style="font-size:11px;padding:2px 10px;border:1px solid #cbd5e0;border-radius:8px;background:white;color:#4a5568;cursor:pointer">
+                ✏️ 編集
+              </button>
+            </div>
+            <!-- 通常表示 -->
             <div class="explanation-box" id="qm-exp"></div>
+            <!-- 編集モード（Markdown直編集） -->
+            <div id="qm-exp-edit-wrap" style="display:none">
+              <textarea id="qm-exp-textarea"
+                style="width:100%;box-sizing:border-box;resize:vertical;min-height:260px;border:2px solid #4299e1;border-radius:8px;padding:12px;font-size:12px;line-height:1.8;font-family:monospace;outline:none;background:#f7faff"
+                placeholder="解説テキスト（Markdown形式）を編集..."
+                onkeydown="event.stopPropagation()"></textarea>
+              <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
+                <button onclick="saveExpEdit()"
+                  style="font-size:12px;padding:6px 18px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
+                  💾 保存
+                </button>
+                <button onclick="cancelExpEdit()"
+                  style="font-size:12px;padding:6px 14px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer;color:#718096">
+                  キャンセル
+                </button>
+                <span style="font-size:11px;color:#718096">選択肢考察・Assessment・ポイントなどを直接編集できます</span>
+              </div>
+            </div>
           </div>
 
           <!-- オリジナル解説エリア（AI生成 or 手動） -->
@@ -945,7 +971,7 @@ select.form-input { cursor: pointer; }
               <!-- 編集エリア -->
               <div id="qm-note" class="rte-body" contenteditable="true"
                 data-placeholder="ポイント、語呂合わせ、関連事項など..."
-                onkeydown="if(event.isComposing||event.keyCode===229)return;"
+                onkeydown="event.stopPropagation();if(event.isComposing||event.keyCode===229)return;"
                 oninput="_rteUnsaved=true"
               ></div>
             </div>
@@ -960,7 +986,7 @@ select.form-input { cursor: pointer; }
               <div id="tag-suggestions" style="display:flex;gap:4px;flex-wrap:wrap"></div>
               <input id="tag-custom-input" type="text" placeholder="自由入力..."
                 style="font-size:11px;padding:3px 8px;border:1px solid #d6bcfa;border-radius:12px;outline:none;width:90px"
-                onkeydown="if(event.key==='Enter'&&!event.isComposing){addTagFromInput();event.preventDefault()}">
+                onkeydown="event.stopPropagation();if(event.key==='Enter'&&!event.isComposing){addTagFromInput();event.preventDefault()}">
               <button onclick="addTagFromInput()" style="font-size:11px;padding:3px 8px;border:1px solid #805ad5;border-radius:12px;background:transparent;color:#805ad5;cursor:pointer">追加</button>
             </div>
           </div>
@@ -1184,6 +1210,16 @@ select.form-input { cursor: pointer; }
             <button onclick="syncFromCloud()" style="font-size:11px;padding:6px 14px;border:1px solid #4a5568;border-radius:8px;background:white;cursor:pointer">🔄 今すぐ同期</button>
             <span id="sync-status-card" style="font-size:11px;color:#718096"></span>
           </div>
+        </div>
+        <hr class="divider">
+        <div class="form-group" id="bug-repair-card">
+          <div style="font-size:14px;font-weight:700;margin-bottom:6px;color:#c53030">🔧 バグタグ問題の修復</div>
+          <p id="bug-repair-desc" style="font-size:13px;color:#718096;margin-bottom:10px">「バグ」タグ付き問題のメモ削除・データ品質の診断を行います。</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <button class="btn btn-danger" onclick="repairBugTaggedQuestions()" id="bug-repair-btn">🔧 バグ修復を実行</button>
+            <button style="font-size:12px;padding:6px 12px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer;color:#4a5568" onclick="scanDataQuality()">🔍 品質診断のみ</button>
+          </div>
+          <div id="bug-repair-result" style="font-size:12px;margin-top:10px;display:none"></div>
         </div>
         <hr class="divider">
         <div class="form-group">
@@ -2480,6 +2516,157 @@ function getClaudeApiKey() {
   return localStorage.getItem('claude_api_key') || '';
 }
 
+// ========== データ品質チェック・バグ修復 ==========
+
+/**
+ * 全問題データをスキャンして品質問題を検出する
+ * 返り値: [{id, number, issues:[]}]
+ */
+function scanDataQuality() {
+  const report = [];
+  for (const q of questions) {
+    const issues = [];
+    const choices = extractChoicesFromExplanation(q.explanation || '');
+
+    // 選択肢数チェック（10個超は誤検知の可能性が高い）
+    if (choices.length > 10) {
+      issues.push(`選択肢${choices.length}個検出（異常に多い）`);
+    }
+    if (choices.length === 0 && (q.explanation || '').length > 50 && q.answer) {
+      issues.push('選択肢が検出されない（フォーマット問題の可能性）');
+    }
+    // 問題文チェック
+    if (!q.question || q.question.length < 5) {
+      issues.push(`問題文が極端に短い（${(q.question||'').length}文字）`);
+    }
+    // 問題文に解説マーカーが含まれている
+    if (q.question && (/\*\*[×○]/.test(q.question) || /\*\*選択肢考察/.test(q.question) || /\*\*ポイント/.test(q.question))) {
+      issues.push('問題文に解説マーカーが混入している可能性');
+    }
+    if (issues.length > 0) {
+      report.push({ id: q.id, number: q.number || q.id, issues });
+    }
+  }
+
+  // UI表示
+  const el = document.getElementById('bug-repair-result');
+  const desc = document.getElementById('bug-repair-desc');
+  if (el) {
+    el.style.display = 'block';
+    if (report.length === 0) {
+      el.innerHTML = '<span style="color:#276749">✅ データ品質問題は検出されませんでした。</span>';
+    } else {
+      el.innerHTML = `<strong style="color:#c53030">⚠️ ${report.length}件の問題を検出：</strong><br>` +
+        report.map(r => `・${r.number}：${r.issues.join('、')}`).join('<br>');
+    }
+  }
+  console.log('[DataQuality] Report:', report);
+  return report;
+}
+
+/**
+ * 「バグ」タグ付き問題を修復する
+ * - personalNote からバグ関連メモを削除
+ * - バグタグを削除
+ * - データ品質問題のあるものには再度バグタグを付与（再診断）
+ */
+// 起動時サイレント修復（トースト・確認ダイアログなし）
+function _silentRepairBugTagged() {
+  const bugQ = questions.filter(q => (q.tags || []).includes('バグ'));
+  if (!bugQ.length) return;
+  let changed = 0;
+  for (const q of bugQ) {
+    const note = q.personalNote || '';
+    const cleaned = note.split('\n')
+      .filter(l => !/^[\s　]*バグ[\s　]*[：:。]?.*$/.test(l.trim()) && !/^[\s　]*バグ[\s　]*$/.test(l.trim()))
+      .join('\n').trim();
+    if (cleaned !== note.trim()) { q.personalNote = cleaned; changed++; }
+    q.tags = (q.tags || []).filter(t => t !== 'バグ');
+    // 品質問題が残る場合は再タグ付け
+    const ch = extractChoicesFromExplanation(q.explanation || '');
+    if (ch.length > 10 || (q.question||'').length < 5) q.tags.push('バグ');
+    else changed++;
+  }
+  if (changed > 0) {
+    save();
+    if (_cloudSyncEnabled && _db && _userId) saveToCloud();
+    console.log(`[AutoRepair] ${bugQ.length}問のバグタグを処理しました`);
+  }
+}
+
+function repairBugTaggedQuestions() {
+  const bugQ = questions.filter(q => (q.tags || []).includes('バグ'));
+  if (bugQ.length === 0) {
+    toast('「バグ」タグ付き問題はありません', 'info');
+    const el = document.getElementById('bug-repair-result');
+    if (el) { el.style.display = 'block'; el.innerHTML = '✅ 「バグ」タグ付き問題はありませんでした。'; }
+    return;
+  }
+
+  let noteCleared = 0;
+  let tagRemoved = 0;
+  let reTagged = 0;
+  const details = [];
+
+  for (const q of bugQ) {
+    const originalNote = q.personalNote || '';
+    const originalTags = [...(q.tags || [])];
+
+    // 1. personalNote からバグ関連テキストを削除
+    // 「バグ」「bug」を含む行、またはメモ全体がバグ報告のみの場合に削除
+    const noteLines = originalNote.split('\n');
+    const cleanedLines = noteLines.filter(line => {
+      const t = line.trim();
+      // 「バグ」だけ/「bug」だけ/「バグ：...」などの行を除去
+      return !(/^[\s　]*[Bb][Uu][Gg][\s　]*$/i.test(t) ||
+               /^[\s　]*バグ[\s　]*[：:。]?.*$/.test(t) ||
+               /^[\s　]*バグ[\s　]*$/.test(t));
+    });
+    const newNote = cleanedLines.join('\n').trim();
+    if (newNote !== originalNote.trim()) {
+      q.personalNote = newNote;
+      noteCleared++;
+    }
+
+    // 2. バグタグを削除
+    q.tags = (q.tags || []).filter(t => t !== 'バグ');
+    tagRemoved++;
+
+    // 3. データ品質チェックを再実行
+    const choices = extractChoicesFromExplanation(q.explanation || '');
+    const issuesFound = [];
+    if (choices.length > 10) issuesFound.push(`選択肢${choices.length}個（異常に多い）`);
+    if (!q.question || q.question.length < 5) issuesFound.push('問題文短い');
+    if (q.question && /\*\*[×○]/.test(q.question)) issuesFound.push('問題文混入');
+
+    if (issuesFound.length > 0) {
+      // 品質問題が残っている場合は再タグ付け
+      if (!q.tags.includes('バグ')) q.tags.push('バグ');
+      reTagged++;
+      details.push(`${q.number||q.id}：${issuesFound.join('、')}（再バグタグ付与）`);
+    } else {
+      details.push(`${q.number||q.id}：修復完了 ✓`);
+    }
+  }
+
+  save();
+  if (_cloudSyncEnabled && _db && _userId) saveToCloud();
+
+  const el = document.getElementById('bug-repair-result');
+  if (el) {
+    el.style.display = 'block';
+    el.innerHTML = `
+      <strong>修復完了</strong>：${bugQ.length}問処理<br>
+      ・メモ削除：${noteCleared}問<br>
+      ・バグタグ削除：${tagRemoved - reTagged}問<br>
+      ${reTagged > 0 ? `・<span style="color:#c53030">データ品質問題残存（再タグ）：${reTagged}問</span><br>` : ''}
+      <div style="margin-top:6px;color:#4a5568">${details.join('<br>')}</div>
+    `.trim();
+  }
+  toast(`バグ修復完了：${bugQ.length}問処理、${noteCleared}問のメモを削除しました`, 'success');
+  console.log('[BugRepair] Processed:', bugQ.length, 'Re-tagged:', reTagged);
+}
+
 // ========== データバックアップ ==========
 function exportData() {
   const data = {
@@ -3179,6 +3366,54 @@ ${q.answer}
   });
 }
 
+// ========== 解説インライン編集 ==========
+function toggleExpEdit() {
+  const q = queue[qIdx];
+  if (!q) return;
+  const expBox  = document.getElementById('qm-exp');
+  const editWrap = document.getElementById('qm-exp-edit-wrap');
+  const textarea = document.getElementById('qm-exp-textarea');
+  const btn = document.getElementById('exp-edit-btn');
+  const isEditing = editWrap.style.display !== 'none';
+  if (isEditing) {
+    cancelExpEdit();
+  } else {
+    textarea.value = q.explanation || '';
+    expBox.style.display = 'none';
+    editWrap.style.display = 'block';
+    btn.textContent = '✕ 閉じる';
+    btn.style.borderColor = '#fc8181';
+    btn.style.color = '#c53030';
+    textarea.focus();
+  }
+}
+
+function saveExpEdit() {
+  const q = queue[qIdx];
+  if (!q) return;
+  const textarea = document.getElementById('qm-exp-textarea');
+  const newExp = textarea.value;
+  q.explanation = newExp;
+  // queue 内の同じ問題も更新
+  questions.forEach(orig => { if (orig.id === q.id) orig.explanation = newExp; });
+  // 解説表示を再レンダリング
+  document.getElementById('qm-exp').innerHTML = renderExplanationStructured(newExp);
+  // 選択肢も再抽出
+  const choices = extractChoicesFromExplanation(newExp);
+  renderChoices(choices);
+  cancelExpEdit();
+  save();
+  if (_cloudSyncEnabled && _db && _userId) saveToCloud();
+  toast('解説を保存しました', 'success');
+}
+
+function cancelExpEdit() {
+  document.getElementById('qm-exp').style.display = '';
+  document.getElementById('qm-exp-edit-wrap').style.display = 'none';
+  const btn = document.getElementById('exp-edit-btn');
+  if (btn) { btn.textContent = '✏️ 編集'; btn.style.borderColor = '#cbd5e0'; btn.style.color = '#4a5568'; }
+}
+
 function toggleAiDraftEditor() {
   const ed = document.getElementById('ai-draft-editor');
   const isHidden = ed.style.display === 'none';
@@ -3357,7 +3592,7 @@ const SUGGESTED_TAGS = [
   // ── 学習概念タグ ──
   '統計','薬理','解剖','生理','生化学','内科','マイナー',
   // ── 手技・検査タグ ──
-  '頭位','コルポスコピー',
+  '頭位','コルポスコピー','パルトグラム',
   // ── 管理タグ ──
   'バグ',
 ];
@@ -3814,6 +4049,7 @@ function showQ() {
   set('qm-num', `問題 ${qIdx+1} / ${queue.length}`);
   document.getElementById('qm-text').innerHTML = renderTextWithImages(q.question);
   document.getElementById('qm-exp').innerHTML = renderExplanationStructured(q.explanation);
+  cancelExpEdit(); // 問題が変わったら解説編集モードをリセット
   set('qm-answer', q.answer);
   document.getElementById('qm-note').innerHTML = q.personalNote || '';
 
@@ -3978,7 +4214,7 @@ function renderChoiceLines(lines) {
   let cur = null;
   const pre = [];
 
-  // コンパクト形式のマーカー行を検出
+  // コンパクト形式のマーカー行を検出（a-e のみ）
   const MARKER_LINE_RE = /^[\*　\s]*([○◯✓✔×✕☓✗][a-jA-J][\s　,，、]*){2,}[\*\s]*$/;
   const RIGHT_SET = new Set([...'○◯✓✔']);
 
@@ -4179,9 +4415,10 @@ function extractChoicesFromExplanation(expText) {
     if (!line) continue;
 
     // [a-e] が行の「実質的な先頭付近」にあるかチェック
-    // 先頭から最大15文字以内に [a-e] が現れ、その後にテキストが続く行
+    // ★ a-e のみ（f以降は国試5択問題に存在しない）
+    // ★ 全角スペース or 半角スペースのみ許容（:：.などは問題文中の参照表記と判断）
     const m = line.match(
-      /^[^\w\u3040-\u9fff]{0,15}([a-jA-J])[\s　.．:：。、]+(.+)$/
+      /^[^\w\u3040-\u9fff]{0,12}([a-jA-J])[\s　]+(.+)$/
     );
     if (!m) continue;
     const key = m[1].toLowerCase();
@@ -4264,6 +4501,7 @@ function extractChoicesFromExplanation(expText) {
 
   // ===== Strategy B: コンパクト形式（マーカー行 + テキスト行） =====
   // マーカー行: **○a，×b，×c，×d，×e** など
+  // ★ a-e のみ対応（f以降は国試で存在しない）
   const statusMap = {};
   const textMap = {};
   const MARKER_LINE_RE = /^[\s　*]*([○◯✓✔×✕☓✗][a-jA-J][\s　,，、．.]*){2,}[\s　*]*$/;
@@ -5994,6 +6232,27 @@ function parseMdContent(content) {
       if (!parsed.answer) {
         warnings.push(`${qNum}: 正解が自動検出できませんでした（手動で設定してください）`);
       }
+
+      // ===== インポート時データ品質チェック =====
+      const _detectedChoices = extractChoicesFromExplanation(parsed.explanation || '');
+      const _choiceCount = _detectedChoices.length;
+      if (_choiceCount > 10) {
+        // 10個超は誤検知の可能性が高い（国試は通常5択だが6択以上もあり得る）
+        parsed.tags = [...(parsed.tags || []), 'バグ'];
+        warnings.push(`${qNum}: 選択肢が${_choiceCount}個検出されました（異常に多い）→「バグ」タグを付与`);
+      }
+      // 正解が a-e の1文字（= 選択問題）なのに選択肢が取れない場合のみ警告
+      const _isChoiceQuestion = /^[a-jA-J]([・,，]*[a-jA-J])*$/.test((parsed.answer || '').trim());
+      if (_choiceCount === 0 && _isChoiceQuestion && parsed.explanation && parsed.explanation.length > 30) {
+        parsed.tags = [...(parsed.tags || []), 'バグ'];
+        warnings.push(`${qNum}: 選択肢が検出できませんでした（正解=${parsed.answer}）→「バグ」タグを付与`);
+      }
+      // 問題文が極端に短い（5文字未満）かつ解説が長い場合は問題文消失の疑い
+      if (parsed.question.length < 5 && (parsed.explanation || '').length > 100) {
+        parsed.tags = [...(parsed.tags || []), 'バグ'];
+        warnings.push(`${qNum}: 問題文が極端に短いです（${parsed.question.length}文字）→「バグ」タグを付与`);
+      }
+
       results.push(parsed);
     }
   } else {
@@ -6100,7 +6359,9 @@ function parseOneBlock(blockText) {
     }
 
     // 選択肢行（×a, ○b など、**あり/なし・異体字対応）→解説
-    if (/^\*{0,2}[×○✕✓☓◯✗✔][a-jA-J]/.test(trimmed)) {
+    // ★ 全角スペース or カンマ区切りのみ許容（例: ×a　テキスト / ×a，×b）
+    // ★ ×a：のようなコロン区切りは「問題文中の参照表記」と判断してスキップ
+    if (/^\*{0,2}[×○✕✓☓◯✗✔][a-jA-J][\s　,，]/.test(trimmed)) {
       inExplanation = true;
       expLines.push(line);
       continue;
@@ -6441,14 +6702,17 @@ setTimeout(checkAiQueueAutoTrigger, 3000); // ページ読み込み3秒後にチ
 setTimeout(checkAndApplyAiResults, 1500);
 // ワークスペースフォルダの連携状態を復元（File System Access API）
 _initFsDirHandle().then(() => { _updateFsStatus(); });
+// 起動時にバグタグ付き問題をサイレント修復（HTMLファイル更新時に自動適用）
+setTimeout(_silentRepairBugTagged, 2000);
 
 // Keyboard shortcut for study mode
 document.addEventListener('keydown', e => {
   // IME変換中（日本語入力確定のEnter等）は無視する
   if (e.isComposing || e.keyCode === 229) return;
-  // テキスト入力フィールドにフォーカスがある場合もショートカットを無効化
+  // テキスト入力フィールド / contenteditable にフォーカスがある場合はショートカット無効
   const tag = document.activeElement && document.activeElement.tagName;
   if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if (document.activeElement && document.activeElement.isContentEditable) return;
 
   if (document.getElementById('study-session').style.display !== 'none') {
     if (e.key === ' ' || e.key === 'Enter') {
