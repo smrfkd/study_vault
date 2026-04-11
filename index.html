@@ -851,7 +851,7 @@ select.form-input { cursor: pointer; }
                 style="width:100%;box-sizing:border-box;resize:vertical;min-height:260px;border:2px solid #4299e1;border-radius:8px;padding:12px;font-size:12px;line-height:1.8;font-family:monospace;outline:none;background:#f7faff"
                 placeholder="解説テキスト（Markdown形式）を編集..."
                 onkeydown="event.stopPropagation()"></textarea>
-              <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
+              <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap">
                 <button onclick="saveExpEdit()"
                   style="font-size:12px;padding:6px 18px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
                   💾 保存
@@ -860,7 +860,11 @@ select.form-input { cursor: pointer; }
                   style="font-size:12px;padding:6px 14px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer;color:#718096">
                   キャンセル
                 </button>
-                <span style="font-size:11px;color:#718096">選択肢考察・Assessment・ポイントなどを直接編集できます</span>
+                <button onclick="insertExpTemplate()"
+                  style="font-size:12px;padding:6px 14px;border:1px solid #9f7aea;border-radius:8px;background:#faf5ff;cursor:pointer;color:#6b46c1;font-weight:600"
+                  title="各選択肢の考察テンプレートを末尾に挿入">
+                  📋 選択肢テンプレ挿入
+                </button>
               </div>
             </div>
           </div>
@@ -2318,9 +2322,11 @@ function scheduleReview(q, ok, fuzzy) {
     q.nextReview = addDays(t, 1);
     q.srInterval = 1;
   } else if (fuzzy) {
-    // あやふや正解：3日後に再出題
-    q.nextReview  = addDays(t, 3);
-    q.srInterval  = 3;
+    // あやふや正解：現在のインターバルを半分に短縮（最低1日）
+    const curInterval = q.srInterval || 3; // 新規カードは3日を基準
+    const halfInterval = Math.max(1, Math.round(curInterval / 2));
+    q.nextReview = addDays(t, halfInterval);
+    q.srInterval = halfInterval;
   } else if (q.nextReview) {
     // 復習で正解 → インターバルを延長またはカード卒業
     const interval = q.srInterval || 1;
@@ -2570,27 +2576,49 @@ function scanDataQuality() {
  * - バグタグを削除
  * - データ品質問題のあるものには再度バグタグを付与（再診断）
  */
+// 「バグ」行をメモから除去するヘルパー
+function _removeBugFromNote(note) {
+  return note.split('\n')
+    .filter(l => {
+      const t = l.trim();
+      // 「バグ」だけの行、「バグ：...」で始まる行を除去
+      return !/^バグ[\s　：:。]*.*$/.test(t) || t.replace(/^バグ[\s　：:。]*/, '').trim().length > 0
+        ? !/^バグ[\s　]*$/.test(t) && !/^バグ[：:。]/.test(t)
+        : false;
+    })
+    .join('\n').trim();
+}
+
 // 起動時サイレント修復（トースト・確認ダイアログなし）
+// ・全問題のメモから「バグ」行を削除
+// ・バグタグ付き問題のタグも除去
 function _silentRepairBugTagged() {
-  const bugQ = questions.filter(q => (q.tags || []).includes('バグ'));
-  if (!bugQ.length) return;
   let changed = 0;
-  for (const q of bugQ) {
+
+  for (const q of questions) {
     const note = q.personalNote || '';
-    const cleaned = note.split('\n')
-      .filter(l => !/^[\s　]*バグ[\s　]*[：:。]?.*$/.test(l.trim()) && !/^[\s　]*バグ[\s　]*$/.test(l.trim()))
-      .join('\n').trim();
-    if (cleaned !== note.trim()) { q.personalNote = cleaned; changed++; }
+    if (!note) continue;
+    // 全問メモから「バグ」行を除去
+    const cleaned = _removeBugFromNote(note);
+    if (cleaned !== note.trim()) {
+      q.personalNote = cleaned;
+      changed++;
+    }
+  }
+
+  // バグタグ付き問題のタグも除去
+  const bugQ = questions.filter(q => (q.tags || []).includes('バグ'));
+  for (const q of bugQ) {
     q.tags = (q.tags || []).filter(t => t !== 'バグ');
-    // 品質問題が残る場合は再タグ付け
     const ch = extractChoicesFromExplanation(q.explanation || '');
     if (ch.length > 10 || (q.question||'').length < 5) q.tags.push('バグ');
     else changed++;
   }
+
   if (changed > 0) {
     save();
     if (_cloudSyncEnabled && _db && _userId) saveToCloud();
-    console.log(`[AutoRepair] ${bugQ.length}問のバグタグを処理しました`);
+    console.log(`[AutoRepair] ${changed}件のメモ・タグを修復しました`);
   }
 }
 
@@ -2612,17 +2640,8 @@ function repairBugTaggedQuestions() {
     const originalNote = q.personalNote || '';
     const originalTags = [...(q.tags || [])];
 
-    // 1. personalNote からバグ関連テキストを削除
-    // 「バグ」「bug」を含む行、またはメモ全体がバグ報告のみの場合に削除
-    const noteLines = originalNote.split('\n');
-    const cleanedLines = noteLines.filter(line => {
-      const t = line.trim();
-      // 「バグ」だけ/「bug」だけ/「バグ：...」などの行を除去
-      return !(/^[\s　]*[Bb][Uu][Gg][\s　]*$/i.test(t) ||
-               /^[\s　]*バグ[\s　]*[：:。]?.*$/.test(t) ||
-               /^[\s　]*バグ[\s　]*$/.test(t));
-    });
-    const newNote = cleanedLines.join('\n').trim();
+    // 1. personalNote からバグ行を削除（共通ヘルパーを使用）
+    const newNote = _removeBugFromNote(originalNote);
     if (newNote !== originalNote.trim()) {
       q.personalNote = newNote;
       noteCleared++;
@@ -3412,6 +3431,54 @@ function cancelExpEdit() {
   document.getElementById('qm-exp-edit-wrap').style.display = 'none';
   const btn = document.getElementById('exp-edit-btn');
   if (btn) { btn.textContent = '✏️ 編集'; btn.style.borderColor = '#cbd5e0'; btn.style.color = '#4a5568'; }
+}
+
+function insertExpTemplate() {
+  const q = queue[qIdx];
+  if (!q) return;
+  const textarea = document.getElementById('qm-exp-textarea');
+
+  // 選択肢を取得（解説から抽出）
+  let choices = extractChoicesFromExplanation(textarea.value || q.explanation || '');
+
+  // 選択肢が取得できない場合は正解文字列から推定 → fallback a〜e
+  if (choices.length === 0) {
+    const letters = 'abcde';
+    choices = [...letters].map(l => ({ label: l, text: '' }));
+  }
+
+  // 正解肢（複数正解も考慮）
+  const correctLetters = (q.answer || '').toLowerCase().replace(/[^a-j]/g, '');
+
+  let tpl = '';
+  // 既存内容がある場合は末尾に区切り線を挿入
+  if (textarea.value.trim()) {
+    tpl += '\n\n---\n';
+  }
+
+  tpl += '【正解の根拠】\n';
+  tpl += `正解：${q.answer || '?'} ← なぜ正しいか（病態・機序）\n\n`;
+
+  tpl += '【各選択肢の考察】\n';
+  choices.forEach(c => {
+    const lc = c.label.toLowerCase();
+    const isCorrect = correctLetters.includes(lc);
+    const marker = isCorrect ? '✓正解' : '✗不正解';
+    const choiceText = c.text ? `（${c.text.substring(0, 40)}${c.text.length > 40 ? '…' : ''}）` : '';
+    tpl += `${c.label} [${marker}]${choiceText}\n　→ \n`;
+  });
+
+  tpl += '\n【周辺知識・ポイント】\n　→ \n';
+
+  // 末尾に追記
+  textarea.value += tpl;
+  textarea.focus();
+
+  // カーソルを最初の「→ 」の後ろに配置
+  const insertStart = textarea.value.indexOf('　→ \n');
+  const cursorPos = insertStart >= 0 ? insertStart + '　→ '.length : textarea.value.length;
+  textarea.setSelectionRange(cursorPos, cursorPos);
+  textarea.scrollTop = textarea.scrollHeight;
 }
 
 function toggleAiDraftEditor() {
