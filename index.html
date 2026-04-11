@@ -4982,10 +4982,6 @@ function submitNumericAnswer() {
         <div style="font-size:52px;line-height:1;margin-bottom:8px">🎉</div>
         <div style="font-size:20px;font-weight:800;color:#276749;margin-bottom:18px">正解！</div>
         <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-          <button onclick="startChoiceCheck()"
-            style="min-width:180px;padding:10px 18px;background:#553c9a;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
-            📚 選択肢理解チェック
-          </button>
           <button class="btn btn-success btn-xl" onclick="recordAnswer(true)" style="min-width:150px">次の問題へ →</button>
           <button class="btn btn-xl" onclick="recordAnswer(true, null, true)"
             style="min-width:130px;background:#fff8e1;color:#b7791f;border:2px solid #f6e05e;font-weight:700">
@@ -5091,13 +5087,15 @@ function autoJudge() {
           <div style="font-size:48px;line-height:1;margin-bottom:6px">🎉</div>
           <div style="font-size:20px;font-weight:800;color:#276749">正解！${reviewSRLabel ? `<span style="font-size:13px;color:#553c9a;font-weight:600;margin-left:8px">${reviewSRLabel}</span>` : ''}</div>
         </div>
-        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px">
-          <button class="btn btn-success btn-xl" onclick="recordAnswer(true)" style="min-width:180px">
-            次の問題へ →
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px">
+          <button onclick="startChoiceCheck()"
+            style="min-width:180px;padding:10px 18px;background:#553c9a;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
+            📚 選択肢理解チェック
           </button>
+          <button class="btn btn-success btn-xl" onclick="recordAnswer(true)" style="min-width:150px">次の問題へ →</button>
           <button class="btn btn-xl" onclick="recordAnswer(true, null, true)"
-            style="min-width:180px;background:#fff8e1;color:#b7791f;border:2px solid #f6e05e;font-weight:700">
-            自信なし（あやふや）
+            style="min-width:130px;background:#fff8e1;color:#b7791f;border:2px solid #f6e05e;font-weight:700">
+            ⚠️ あやふや
           </button>
         </div>
       </div>`;
@@ -6315,9 +6313,8 @@ function deleteChoiceRow(btn) {
 
 function applyChoiceEdits(expText) {
   const rows = document.querySelectorAll('#ed-choices-list [data-choice-key]');
-  if (!rows.length) return expText;
 
-  // 変更後の選択肢をマップ化
+  // 変更後の選択肢をマップ化（削除された行は含まれない）
   const changes = {};
   rows.forEach(row => {
     const key = row.getAttribute('data-choice-key');
@@ -6326,37 +6323,39 @@ function applyChoiceEdits(expText) {
     if (text) changes[key] = { marker, text };
   });
 
-  const WRONG = '×✕☓✗';
-  const RIGHT  = '○◯✓✔';
-  // △/▲ を単独マーカーとしても認識（例: △c　テキスト）
-  const MATCH_RE = new RegExp(
-    '^(\\*{0,2})(?:[△▲～〜]*[' + WRONG + RIGHT + ']|[△▲])([a-jA-J])[\\s　.．:：]*(.+?)(\\*{0,2})$'
-  );
+  const WRONG_CHARS = '×✕☓✗';
+  const RIGHT_CHARS = '○◯✓✔';
+  const MARKER_CHARS = WRONG_CHARS + RIGHT_CHARS + '△▲';
 
-  // 解説テキストに存在する全選択肢キーを収集（削除判定用）
-  const originalKeys = new Set();
-  expText.split('\n').forEach(line => {
-    const m = line.trim().match(MATCH_RE);
-    if (m) originalKeys.add(m[2].toLowerCase());
-  });
-  // 削除されたキー = 元は存在していたが残りのDOMにないキー
-  const deletedKeys = new Set([...originalKeys].filter(k => !changes[k]));
+  // extractChoicesFromExplanation と同じロジックで「選択肢行かどうか」を判定
+  function detectChoiceKey(rawLine) {
+    const line = rawLine.trim().replace(/^\*+|\*+$/g, '').trim();
+    if (!line) return null;
+    const m = line.match(/^[^\w\u3040-\u9fff]{0,12}([a-jA-J])[\s　]+.+$/);
+    if (!m) return null;
+    const prefix = line.slice(0, line.indexOf(m[1]));
+    // prefixにマーカー文字が含まれていれば選択肢行と判定
+    for (const ch of [...prefix].reverse()) {
+      if (MARKER_CHARS.includes(ch)) return m[1].toLowerCase();
+    }
+    return null;
+  }
 
   const handledKeys = new Set();
   const newLines = expText.split('\n').map(line => {
-    const m = line.trim().match(MATCH_RE);
-    if (!m) return line;
-    const key = m[2].toLowerCase();
-    // 削除済みキーの行はnullを返してあとでフィルタリング
-    if (deletedKeys.has(key)) return null;
-    if (!changes[key] || handledKeys.has(key)) return line;
+    const key = detectChoiceKey(line);
+    if (key === null) return line;                   // 選択肢行でない → そのまま
+    if (handledKeys.has(key)) return line;            // 同一キー2回目 → そのまま
+    if (!changes[key]) return null;                   // 削除済み → 除去
     handledKeys.add(key);
     const { marker, text } = changes[key];
-    // 先頭・末尾のマークダウン記号を保持して再構築
-    return `${m[1]}${marker}${key}　${text}${m[4]}`;
+    // 先頭・末尾のアスタリスク装飾を保持
+    const stars = line.trim().match(/^(\**)/) ? line.trim().match(/^(\*{0,2})/)[1] : '';
+    const starsEnd = line.trim().match(/(\*{0,2})$/) ? line.trim().match(/(\*{0,2})$/)[1] : '';
+    return `${stars}${marker}${key}　${text}${starsEnd}`;
   }).filter(line => line !== null);
 
-  // 新規追加分（explanation に存在しなかったキー）を末尾に追加
+  // 新規追加分（explanationに存在しなかったキー）を末尾に追加
   Object.entries(changes).forEach(([key, {marker, text}]) => {
     if (!handledKeys.has(key)) {
       newLines.push(`${marker}${key}　${text}`);
