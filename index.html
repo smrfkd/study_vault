@@ -654,11 +654,42 @@ select.form-input { cursor: pointer; }
           </div>
         </div>
 
-        <!-- ② カスタムフィルターで学習（統合版） -->
-        <div style="background:#f0f7ff;border:1.5px solid #bee3f8;border-radius:14px;padding:18px;margin-bottom:18px">
-          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px">
-            <div style="font-size:14px;font-weight:800;color:#2b6cb0">🔎 カスタムフィルターで学習</div>
+        <!-- ② クイックモード（2列グリッド） -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+          <div class="mode-card" onclick="startStudy('new')" style="border-color:transparent;padding:14px 10px" onmouseover="this.style.borderColor='#d69e2e'" onmouseout="this.style.borderColor='transparent'">
+            <div class="mode-icon" style="font-size:20px">🆕</div>
+            <div class="mode-count" id="mc-new" style="color:#d69e2e;font-size:22px">0</div>
+            <div class="mode-title" style="color:#d69e2e;font-size:13px">未挑戦</div>
+            <div class="mode-desc">まだ解いていない問題</div>
+            <div id="mc-new-time" style="font-size:10px;color:#b7791f;margin-top:4px"></div>
           </div>
+          <div class="mode-card" onclick="startStudy('weak')" style="border-color:transparent;padding:14px 10px" onmouseover="this.style.borderColor='#e53e3e'" onmouseout="this.style.borderColor='transparent'">
+            <div class="mode-icon" style="font-size:20px">⚠️</div>
+            <div class="mode-count" id="mc-weak" style="color:#e53e3e;font-size:22px">0</div>
+            <div class="mode-title" style="color:#e53e3e;font-size:13px">弱点集中</div>
+            <div class="mode-desc">正答率60%未満</div>
+          </div>
+          <div class="mode-card" onclick="startStudy('recent-wrong')" style="border-color:transparent;padding:14px 10px" onmouseover="this.style.borderColor='#e53e3e'" onmouseout="this.style.borderColor='transparent'">
+            <div class="mode-icon" style="font-size:20px">🔁</div>
+            <div class="mode-count" id="mc-recent-wrong" style="color:#e53e3e;font-size:22px">0</div>
+            <div class="mode-title" style="font-size:13px">直近ミス</div>
+            <div class="mode-desc">直近3回連続不正解</div>
+          </div>
+          <div class="mode-card" onclick="startStudy('flagged')" style="border-color:transparent;padding:14px 10px" onmouseover="this.style.borderColor='#d69e2e'" onmouseout="this.style.borderColor='transparent'">
+            <div class="mode-icon" style="font-size:20px">🚩</div>
+            <div class="mode-count" id="mc-flagged" style="color:#d69e2e;font-size:22px">0</div>
+            <div class="mode-title" style="font-size:13px">フラグ復習</div>
+            <div class="mode-desc">フラグをつけた問題</div>
+          </div>
+        </div>
+
+        <!-- ③ カスタムフィルターで学習（折りたたみ） -->
+        <details style="margin-bottom:18px">
+          <summary style="background:#f0f7ff;border:1.5px solid #bee3f8;border-radius:14px;padding:14px 18px;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:800;color:#2b6cb0;user-select:none">
+            <span>🔎 カスタムフィルターで学習</span>
+            <span style="font-size:11px;font-weight:400;color:#718096">条件を絞り込む ▾</span>
+          </summary>
+          <div style="background:#f0f7ff;border:1.5px solid #bee3f8;border-top:none;border-radius:0 0 14px 14px;padding:16px 18px 18px">
           <div style="font-size:11px;color:#718096;margin-bottom:14px">複数の条件をANDで組み合わせて絞り込む</div>
 
           <!-- テキスト検索 -->
@@ -762,36 +793,8 @@ select.form-input { cursor: pointer; }
               ▶ この条件で学習
             </button>
           </div>
-        </div>
-
-        <!-- ⑥ その他モード（2列グリッド） -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-          <div class="mode-card" onclick="startStudy('new')" style="border-color:transparent;padding:14px 10px" onmouseover="this.style.borderColor='#d69e2e'" onmouseout="this.style.borderColor='transparent'">
-            <div class="mode-icon" style="font-size:20px">🆕</div>
-            <div class="mode-count" id="mc-new" style="color:#d69e2e;font-size:22px">0</div>
-            <div class="mode-title" style="color:#d69e2e;font-size:13px">未挑戦</div>
-            <div class="mode-desc">まだ解いていない問題</div>
-            <div id="mc-new-time" style="font-size:10px;color:#b7791f;margin-top:4px"></div>
           </div>
-          <div class="mode-card" onclick="startStudy('weak')" style="border-color:transparent;padding:14px 10px" onmouseover="this.style.borderColor='#e53e3e'" onmouseout="this.style.borderColor='transparent'">
-            <div class="mode-icon" style="font-size:20px">⚠️</div>
-            <div class="mode-count" id="mc-weak" style="color:#e53e3e;font-size:22px">0</div>
-            <div class="mode-title" style="color:#e53e3e;font-size:13px">弱点集中</div>
-            <div class="mode-desc">正答率60%未満</div>
-          </div>
-          <div class="mode-card" onclick="startStudy('recent-wrong')" style="border-color:transparent;padding:14px 10px" onmouseover="this.style.borderColor='#e53e3e'" onmouseout="this.style.borderColor='transparent'">
-            <div class="mode-icon" style="font-size:20px">🔁</div>
-            <div class="mode-count" id="mc-recent-wrong" style="color:#e53e3e;font-size:22px">0</div>
-            <div class="mode-title" style="font-size:13px">直近ミス</div>
-            <div class="mode-desc">直近3回連続不正解</div>
-          </div>
-          <div class="mode-card" onclick="startStudy('flagged')" style="border-color:transparent;padding:14px 10px" onmouseover="this.style.borderColor='#d69e2e'" onmouseout="this.style.borderColor='transparent'">
-            <div class="mode-icon" style="font-size:20px">🚩</div>
-            <div class="mode-count" id="mc-flagged" style="color:#d69e2e;font-size:22px">0</div>
-            <div class="mode-title" style="font-size:13px">フラグ復習</div>
-            <div class="mode-desc">フラグをつけた問題</div>
-          </div>
-        </div>
+        </details>
         <!-- 全問チャレンジ（最後・小さく） -->
         <div class="mode-card" onclick="startStudy('all')" style="border-color:transparent;padding:10px 14px;display:flex;align-items:center;gap:12px;text-align:left" onmouseover="this.style.borderColor='#cbd5e0'" onmouseout="this.style.borderColor='transparent'">
           <div style="font-size:20px">📚</div>
@@ -823,8 +826,11 @@ select.form-input { cursor: pointer; }
         <div class="question-text" id="qm-text"></div>
         <div class="choices" id="qm-choices"></div>
 
-        <!-- 数値入力エリア（選択肢なし問題） -->
-        <div id="qm-num-answer" style="display:none;margin-bottom:20px">
+        </div><!-- /qpanel-left -->
+        <div class="qpanel-right">
+
+        <!-- 数値入力エリア（選択肢なし問題・右パネルに配置） -->
+        <div id="qm-num-answer" style="display:none;padding:24px">
           <div style="font-size:13px;font-weight:700;color:#4a5568;margin-bottom:10px">✏️ 答えを入力してください</div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
             <input type="text" id="qm-num-input" class="form-input"
@@ -834,13 +840,14 @@ select.form-input { cursor: pointer; }
             <button class="btn btn-primary btn-lg" onclick="submitNumericAnswer()">回答する →</button>
           </div>
         </div>
-
-        <!-- Show answer button -->
-        <div id="show-ans-btn">
-          <button class="btn btn-primary btn-xl" onclick="revealAnswer()" style="width:100%">🔍 答えを確認する</button>
+        <!-- Show answer button（右パネルの中央に配置） -->
+        <div id="show-ans-btn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:220px;gap:16px;padding:24px">
+          <div style="font-size:36px">🩺</div>
+          <div style="font-size:13px;color:#a0aec0;text-align:center;line-height:1.6">選択肢を選んだら<br>答えを確認しましょう</div>
+          <button class="btn btn-primary btn-xl" onclick="revealAnswer()" style="min-width:200px;font-size:16px;padding:14px 28px">
+            🔍 答えを確認する
+          </button>
         </div>
-        </div><!-- /qpanel-left -->
-        <div class="qpanel-right">
         <!-- Answer revealed -->
         <div id="ans-revealed" style="display:none">
           <!-- 大分野・中分野バッジ（解説表示時のみ表示） -->
@@ -4279,7 +4286,7 @@ function showQ() {
   const answerIsChoice = /^[a-jA-J]([・,、・\s]*[a-jA-J])*$/.test((q.answer || '').trim());
   const showNumInput = !hasChoices && !answerIsChoice;
 
-  document.getElementById('show-ans-btn').style.display = showNumInput ? 'none' : 'block';
+  document.getElementById('show-ans-btn').style.display = showNumInput ? 'none' : 'flex';
   const numArea = document.getElementById('qm-num-answer');
   numArea.style.display = showNumInput ? 'block' : 'none';
   document.getElementById('qm-num-input').value = '';
