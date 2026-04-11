@@ -3298,40 +3298,12 @@ function _updateAiQueueBtn(q) {
   }
 }
 
-// ページロード時に自動処理をチェック
+// ページロード時の自動API呼び出しは無効化
+// （ブラウザから api.anthropic.com への直接呼び出しはCORSでブロックされるため）
+// AI解説の生成はCoworkスケジュールタスク（夜間バッチ）が担当する
 function checkAiQueueAutoTrigger() {
-  const items = getAiQueue();
-  if (!items.length) return;
-  const now = new Date();
-  const hour = now.getHours();
-  // 02:00〜05:59 の間にキューがあれば自動処理
-  if (hour >= 2 && hour < 6) {
-    console.log('[AI Queue] 夜間バッチ自動起動');
-    toast('🌙 夜間バッチ: AI解説の自動生成を開始します', 'info');
-    setTimeout(processAiQueueNow, 2000);
-    return;
-  }
-  // 前日以前にキューに追加された問題がある場合も自動処理
-  const oldest = new Date(items[0].queuedAt);
-  const ageHours = (now - oldest) / 3600000;
-  if (ageHours >= 20) {
-    console.log('[AI Queue] 前日キュー検出 → 自動処理開始');
-    toast('🌙 昨日分の解説生成を自動で開始します', 'info');
-    setTimeout(processAiQueueNow, 2000);
-  }
+  // 無効化 — 何もしない
 }
-
-// setIntervalで02:00を監視（アプリが開いている場合）
-setInterval(() => {
-  const now = new Date();
-  if (now.getHours() === 2 && now.getMinutes() < 5) {
-    const items = getAiQueue();
-    if (items.length && !_aiQueueProcessing) {
-      console.log('[AI Queue] 02:00 バッチ起動');
-      processAiQueueNow();
-    }
-  }
-}, 5 * 60 * 1000); // 5分ごとにチェック
 
 // ========== AI DRAFT（既存機能 + 今すぐ生成 wrapper） ==========
 
@@ -3444,7 +3416,7 @@ function insertExpTemplate() {
   // 選択肢が取得できない場合は正解文字列から推定 → fallback a〜e
   if (choices.length === 0) {
     const letters = 'abcde';
-    choices = [...letters].map(l => ({ label: l, text: '' }));
+    choices = [...letters].map(l => ({ key: l, text: '' }));
   }
 
   // 正解肢（複数正解も考慮）
@@ -3461,11 +3433,11 @@ function insertExpTemplate() {
 
   tpl += '【各選択肢の考察】\n';
   choices.forEach(c => {
-    const lc = c.label.toLowerCase();
+    const lc = (c.key || '').toLowerCase();
     const isCorrect = correctLetters.includes(lc);
     const marker = isCorrect ? '✓正解' : '✗不正解';
     const choiceText = c.text ? `（${c.text.substring(0, 40)}${c.text.length > 40 ? '…' : ''}）` : '';
-    tpl += `${c.label} [${marker}]${choiceText}\n　→ \n`;
+    tpl += `${c.key} [${marker}]${choiceText}\n　→ \n`;
   });
 
   tpl += '\n【周辺知識・ポイント】\n　→ \n';
