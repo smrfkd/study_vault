@@ -355,7 +355,7 @@ select.form-input { cursor: pointer; }
     <!-- タイマー -->
     <div id="q-timer" style="display:none;text-align:center;min-width:68px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);transition:background 0.3s">
       <div id="q-timer-display" style="font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;line-height:1.2;color:white">2:00</div>
-      <div id="q-timer-label" style="font-size:9px;color:rgba(255,255,255,0.6);white-space:nowrap">—</div>
+      <div id="q-timer-label" style="font-size:9px;color:#fde68a;white-space:nowrap;font-weight:600">—</div>
     </div>
     <button id="flag-btn" class="btn btn-sm btn-flag-off" onclick="toggleFlagCurrent()" title="フラグ" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3)">🚩</button>
     <button class="btn btn-sm" onclick="editCurrentQuestion()" title="この問題を編集" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3)">✏️</button>
@@ -381,7 +381,7 @@ select.form-input { cursor: pointer; }
 </header>
 
 <!-- NAV -->
-<nav class="nav">
+<nav class="nav" id="main-nav">
   <button class="nav-btn active" onclick="showTab('study')">学習モード</button>
   <button class="nav-btn" onclick="showTab('analysis')">弱点分析</button>
   <button class="nav-btn" onclick="showTab('notes')">まとめノート</button>
@@ -4184,15 +4184,18 @@ function _setStudyHeaderMode(active) {
   const sh = document.getElementById('session-header');
   const ht = document.getElementById('hdr-title');
   const hs = document.getElementById('hdr-stats');
+  const nav = document.getElementById('main-nav');
   if (!sh) return;
   if (active) {
     sh.style.display = 'flex';
     if (ht) ht.style.display = 'none';
     if (hs) hs.style.display = 'none';
+    if (nav) nav.style.display = 'none';
   } else {
     sh.style.display = 'none';
     if (ht) ht.style.display = '';
     if (hs) hs.style.display = '';
+    if (nav) nav.style.display = '';
   }
 }
 
