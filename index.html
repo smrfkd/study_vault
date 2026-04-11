@@ -358,7 +358,6 @@ select.form-input { cursor: pointer; }
       <div id="q-timer-label" style="font-size:9px;color:#fde68a;white-space:nowrap;font-weight:600">—</div>
     </div>
     <button id="flag-btn" class="btn btn-sm btn-flag-off" onclick="toggleFlagCurrent()" title="フラグ" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3)">🚩</button>
-    <button class="btn btn-sm" onclick="editCurrentQuestion()" title="この問題を編集" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3)">✏️</button>
   </div>
 
   <div class="header-stats" id="hdr-stats">
@@ -813,7 +812,13 @@ select.form-input { cursor: pointer; }
 
       <div class="question-card">
         <div class="qpanel-left">
-        <div class="question-meta" id="qm-meta"></div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px">
+          <div class="question-meta" id="qm-meta" style="margin-bottom:0;flex:1"></div>
+          <button onclick="editCurrentQuestion()" title="この問題を編集"
+            style="flex-shrink:0;font-size:11px;padding:3px 9px;border:1px solid #e2e8f0;border-radius:7px;background:white;color:#718096;cursor:pointer;white-space:nowrap;margin-top:2px">
+            ✏️ 編集
+          </button>
+        </div>
         <div class="question-number" id="qm-num"></div>
         <div class="question-text" id="qm-text"></div>
         <div class="choices" id="qm-choices"></div>
@@ -1267,15 +1272,13 @@ select.form-input { cursor: pointer; }
     </div>
     <input type="hidden" id="ed-id">
 
-    <!-- 2カラムレイアウト: 左=編集フォーム, 右=プレビュー -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
-
-      <!-- ── 左カラム: 編集フォーム ── -->
+    <!-- 編集フォーム -->
+    <div>
       <div>
         <div style="display:flex;gap:8px;margin-bottom:10px">
           <div class="form-group" style="flex:1;margin:0">
             <label class="form-label">大分野</label>
-            <select class="form-input" id="ed-cat" oninput="_schedulePreview()">
+            <select class="form-input" id="ed-cat">
               <option>循環器</option><option>呼吸器</option><option>消化器</option>
               <option>腎・泌尿器</option><option>内分泌・代謝</option><option>神経</option>
               <option>血液</option><option>膠原病・免疫</option><option>感染症</option>
@@ -1287,58 +1290,30 @@ select.form-input { cursor: pointer; }
           </div>
           <div class="form-group" style="flex:1;margin:0">
             <label class="form-label">問題番号</label>
-            <input type="text" class="form-input" id="ed-number" placeholder="例: 118F73" oninput="_schedulePreview()">
+            <input type="text" class="form-input" id="ed-number" placeholder="例: 118F73">
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">問題文</label>
-          <textarea class="form-input" id="ed-q" rows="5" oninput="_schedulePreview()" style="resize:vertical"></textarea>
+          <textarea class="form-input" id="ed-q" rows="5" style="resize:vertical"></textarea>
         </div>
         <div class="form-group">
           <label class="form-label">正解</label>
-          <input type="text" class="form-input" id="ed-ans" oninput="_schedulePreview()">
+          <input type="text" class="form-input" id="ed-ans">
         </div>
-        <!-- 解説（デフォルト: 直接編集） -->
-        <div class="form-group" id="ed-exp-raw-group">
-          <label class="form-label" style="display:flex;align-items:center;justify-content:space-between">
-            <span>解説</span>
-            <button type="button" onclick="toggleRawExp()" id="raw-exp-toggle-btn"
-              style="font-size:11px;padding:2px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#f7fafc;color:#718096;cursor:pointer">
-              🎨 選択肢を個別編集
-            </button>
-          </label>
-          <textarea class="form-input" id="ed-exp" rows="10" style="font-size:12px;font-family:monospace;resize:vertical" oninput="_schedulePreview()"></textarea>
-        </div>
-        <!-- 選択肢エディタ（トグル表示） -->
-        <div class="form-group" id="ed-choices-group" style="display:none">
-          <label class="form-label" style="display:flex;align-items:center;justify-content:space-between">
-            <span>選択肢 <span style="font-size:11px;color:#a0aec0;font-weight:400">（解説から自動抽出）</span></span>
-            <button type="button" onclick="toggleRawExp()" id="raw-exp-toggle-btn2"
-              style="font-size:11px;padding:2px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#f7fafc;color:#718096;cursor:pointer">
-              📝 解説を直接編集
-            </button>
+        <!-- 解説（非表示・値保持用） -->
+        <input type="hidden" id="ed-exp">
+        <!-- 選択肢エディタ（デフォルト表示） -->
+        <div class="form-group" id="ed-choices-group">
+          <label class="form-label">
+            選択肢 <span style="font-size:11px;color:#a0aec0;font-weight:400">（解説から自動抽出）</span>
           </label>
           <div id="ed-choices-list"></div>
         </div>
-        <div class="form-group">
-          <label class="form-label">個人メモ</label>
-          <textarea class="form-input" id="ed-note" rows="2" oninput="_schedulePreview()"></textarea>
-        </div>
       </div>
 
-      <!-- ── 右カラム: リアルタイムプレビュー ── -->
-      <div style="position:sticky;top:0">
-        <div style="font-size:12px;font-weight:700;color:#553c9a;margin-bottom:8px;display:flex;align-items:center;gap:6px">
-          👁 プレビュー
-          <span style="font-size:10px;font-weight:400;color:#a0aec0">（実際に解く際の表示）</span>
-        </div>
-        <div id="ed-preview"
-          style="border:2px solid #e9d8fd;border-radius:12px;padding:16px;background:#fafafa;max-height:80vh;overflow-y:auto;font-size:14px">
-          <!-- preview content injected by JS -->
-        </div>
       </div>
-
-    </div><!-- /grid -->
+    </div>
   </div>
 </div>
 
@@ -6183,12 +6158,10 @@ function openEdit(id) {
   document.getElementById('ed-q').value = q.question;
   document.getElementById('ed-ans').value = q.answer;
   document.getElementById('ed-exp').value = q.explanation||'';
-  document.getElementById('ed-note').value = q.personalNote||'';
 
-  // 解説を直接編集モードをデフォルトにする
-  _edRawMode = true;
-  document.getElementById('ed-exp-raw-group').style.display = 'block';
-  document.getElementById('ed-choices-group').style.display = 'none';
+  // 選択肢エディタをデフォルト表示
+  _edRawMode = false;
+  document.getElementById('ed-choices-group').style.display = 'block';
   renderChoiceEditor(extractChoicesFromExplanation(q.explanation || ''));
 
   document.getElementById('edit-modal').classList.add('open');
@@ -6196,12 +6169,9 @@ function openEdit(id) {
   _updateEditPreview();
 }
 
-// ========== 編集モーダル プレビュー ==========
+// ========== 編集モーダル プレビュー（削除済み） ==========
 let _previewTimer = null;
-function _schedulePreview() {
-  clearTimeout(_previewTimer);
-  _previewTimer = setTimeout(_updateEditPreview, 300);
-}
+function _schedulePreview() { /* プレビュー機能削除 */ }
 
 function _updateEditPreview() {
   const el = document.getElementById('ed-preview');
@@ -6298,6 +6268,8 @@ function renderChoiceEditor(choices) {
       <span style="font-weight:800;color:#553c9a;font-size:15px;min-width:18px">${c.key}</span>
       <input type="text" value="${escapeHtml(c.text)}" class="ed-choice-text form-input"
         style="flex:1;padding:6px 10px;font-size:13px">
+      <button type="button" onclick="deleteChoiceRow(this)" title="この選択肢を削除"
+        style="flex-shrink:0;padding:4px 8px;border:1px solid #fed7d7;border-radius:6px;background:#fff5f5;color:#e53e3e;cursor:pointer;font-size:13px">🗑</button>
     </div>`;
   }).join('') + `
     <button type="button" onclick="addChoiceRow()" style="font-size:12px;padding:4px 12px;border:1px dashed #a0aec0;border-radius:6px;background:white;color:#718096;cursor:pointer;margin-top:4px">
@@ -6323,8 +6295,15 @@ function addChoiceRow() {
     </select>
     <span style="font-weight:800;color:#553c9a;font-size:15px;min-width:18px">${nextKey}</span>
     <input type="text" value="" class="ed-choice-text form-input" placeholder="選択肢テキストを入力"
-      style="flex:1;padding:6px 10px;font-size:13px">`;
+      style="flex:1;padding:6px 10px;font-size:13px">
+    <button type="button" onclick="deleteChoiceRow(this)" title="この選択肢を削除"
+      style="flex-shrink:0;padding:4px 8px;border:1px solid #fed7d7;border-radius:6px;background:#fff5f5;color:#e53e3e;cursor:pointer;font-size:13px">🗑</button>`;
   addBtn.before(row);
+}
+
+function deleteChoiceRow(btn) {
+  const row = btn.closest('[data-choice-key]');
+  if (row) row.remove();
 }
 
 function applyChoiceEdits(expText) {
@@ -6376,7 +6355,7 @@ function saveEdit() {
   q.category    = v('ed-cat');
   q.question    = v('ed-q');
   q.answer      = v('ed-ans');
-  q.personalNote = v('ed-note');
+  // personalNote はこのモーダルで編集しない（解説欄から操作）
 
   // 問題番号を更新（入力があれば）
   const numInput = document.getElementById('ed-number');
