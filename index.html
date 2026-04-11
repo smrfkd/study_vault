@@ -6333,17 +6333,28 @@ function applyChoiceEdits(expText) {
     '^(\\*{0,2})(?:[△▲～〜]*[' + WRONG + RIGHT + ']|[△▲])([a-jA-J])[\\s　.．:：]*(.+?)(\\*{0,2})$'
   );
 
+  // 解説テキストに存在する全選択肢キーを収集（削除判定用）
+  const originalKeys = new Set();
+  expText.split('\n').forEach(line => {
+    const m = line.trim().match(MATCH_RE);
+    if (m) originalKeys.add(m[2].toLowerCase());
+  });
+  // 削除されたキー = 元は存在していたが残りのDOMにないキー
+  const deletedKeys = new Set([...originalKeys].filter(k => !changes[k]));
+
   const handledKeys = new Set();
   const newLines = expText.split('\n').map(line => {
     const m = line.trim().match(MATCH_RE);
     if (!m) return line;
     const key = m[2].toLowerCase();
+    // 削除済みキーの行はnullを返してあとでフィルタリング
+    if (deletedKeys.has(key)) return null;
     if (!changes[key] || handledKeys.has(key)) return line;
     handledKeys.add(key);
     const { marker, text } = changes[key];
     // 先頭・末尾のマークダウン記号を保持して再構築
     return `${m[1]}${marker}${key}　${text}${m[4]}`;
-  });
+  }).filter(line => line !== null);
 
   // 新規追加分（explanation に存在しなかったキー）を末尾に追加
   Object.entries(changes).forEach(([key, {marker, text}]) => {
