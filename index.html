@@ -337,10 +337,31 @@ select.form-input { cursor: pointer; }
 
 <!-- HEADER -->
 <header class="header">
-  <h1>📚 医師国試 自己分析ツール</h1>
+  <h1 id="hdr-title">📚 医師国試 自己分析ツール</h1>
 
+  <!-- SESSION HEADER（学習中のみ表示） -->
+  <div id="session-header" style="display:none;flex:1;align-items:center;gap:10px;margin:0;padding:0 8px;background:transparent;box-shadow:none;border-radius:0;">
+    <button class="btn btn-sm" onclick="endStudy()" style="background:rgba(255,255,255,0.18);color:white;border:1px solid rgba(255,255,255,0.35);white-space:nowrap">← 終了</button>
+    <div style="flex:1">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="sp-bar" style="width:0%"></div></div>
+      </div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.7);text-align:center;margin-top:2px" id="sp-text">0 / 0</div>
+    </div>
+    <div class="session-counts" style="color:white">
+      <span style="color:#68d391">✅ <span id="sc-correct">0</span></span>
+      <span style="color:#fc8181">❌ <span id="sc-wrong">0</span></span>
+    </div>
+    <!-- タイマー -->
+    <div id="q-timer" style="display:none;text-align:center;min-width:68px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);transition:background 0.3s">
+      <div id="q-timer-display" style="font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;line-height:1.2;color:white">2:00</div>
+      <div id="q-timer-label" style="font-size:9px;color:rgba(255,255,255,0.6);white-space:nowrap">—</div>
+    </div>
+    <button id="flag-btn" class="btn btn-sm btn-flag-off" onclick="toggleFlagCurrent()" title="フラグ" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3)">🚩</button>
+    <button class="btn btn-sm" onclick="editCurrentQuestion()" title="この問題を編集" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3)">✏️</button>
+  </div>
 
-  <div class="header-stats">
+  <div class="header-stats" id="hdr-stats">
     <div class="hdr-stat">
       <div class="hdr-stat-num" id="hdr-total">0</div>
       <div class="hdr-stat-label">問題数</div>
@@ -789,26 +810,6 @@ select.form-input { cursor: pointer; }
 
     <!-- SESSION -->
     <div id="study-session" style="display:none">
-      <div class="session-header">
-        <button class="btn btn-gray btn-sm" onclick="endStudy()">← 終了</button>
-        <div style="flex:1">
-          <div class="progress-wrap">
-            <div class="progress-bar"><div class="progress-fill" id="sp-bar" style="width:0%"></div></div>
-          </div>
-          <div style="font-size:11px;color:#a0aec0;text-align:center;margin-top:2px" id="sp-text">0 / 0</div>
-        </div>
-        <div class="session-counts">
-          <span style="color:#38a169">✅ <span id="sc-correct">0</span></span>
-          <span style="color:#e53e3e">❌ <span id="sc-wrong">0</span></span>
-        </div>
-        <!-- タイマー -->
-        <div id="q-timer" style="display:none;text-align:center;min-width:72px;padding:2px 8px;border-radius:10px;background:#f7fafc;border:1px solid #e2e8f0;transition:background 0.3s">
-          <div id="q-timer-display" style="font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;line-height:1.2;color:#2d3748">2:00</div>
-          <div id="q-timer-label" style="font-size:9px;color:#a0aec0;white-space:nowrap">—</div>
-        </div>
-        <button id="flag-btn" class="btn btn-sm btn-flag-off" onclick="toggleFlagCurrent()" title="フラグ">🚩</button>
-        <button class="btn btn-secondary btn-sm" onclick="editCurrentQuestion()" title="この問題を編集">✏️</button>
-      </div>
 
       <div class="question-card">
         <div class="qpanel-left">
@@ -837,6 +838,8 @@ select.form-input { cursor: pointer; }
         <div class="qpanel-right">
         <!-- Answer revealed -->
         <div id="ans-revealed" style="display:none">
+          <!-- 大分野・中分野バッジ（解説表示時のみ表示） -->
+          <div id="qm-category-reveal" style="display:none;margin-bottom:10px"></div>
           <div class="answer-reveal">
             <strong>✅ 正解：</strong><span id="qm-answer" style="color:#276749;font-size:15px;font-weight:700"></span>
           </div>
@@ -4177,6 +4180,22 @@ document.addEventListener('change', e => {
   }
 });
 
+function _setStudyHeaderMode(active) {
+  const sh = document.getElementById('session-header');
+  const ht = document.getElementById('hdr-title');
+  const hs = document.getElementById('hdr-stats');
+  if (!sh) return;
+  if (active) {
+    sh.style.display = 'flex';
+    if (ht) ht.style.display = 'none';
+    if (hs) hs.style.display = 'none';
+  } else {
+    sh.style.display = 'none';
+    if (ht) ht.style.display = '';
+    if (hs) hs.style.display = '';
+  }
+}
+
 function startStudy(mode, cat='') {
   let pool = [];
   _isReviewMode = (mode === 'review');
@@ -4217,6 +4236,7 @@ function startStudy(mode, cat='') {
   document.getElementById('study-complete').style.display='none';
   document.getElementById('study-session').style.display='block';
   document.getElementById('category-picker').style.display='none';
+  _setStudyHeaderMode(true);
 
   showQ();
 }
@@ -4242,8 +4262,9 @@ function showQ() {
     const numDisplay = q.number.replace(/[\s　｜|].*/, '').replace(/前回.*/, '').trim();
     if (numDisplay) meta += `<span class="badge badge-gray">${numDisplay}</span> `;
   }
-  meta += `<span class="badge badge-blue">${q.category}</span> `;
-  if (q.subcategory) meta += `<span class="badge badge-purple">${q.subcategory}</span> `;
+  // 大分野・中分野はヒントになるため問題表示時は非表示（解説表示時に追加）
+  // meta += `<span class="badge badge-blue">${q.category}</span> `;
+  // if (q.subcategory) meta += `<span class="badge badge-purple">${q.subcategory}</span> `;
   if (q.seriesNote) meta += `<span class="badge" style="background:#e9d8fd;color:#553c9a;font-size:10px">🔗 連問</span> `;
   if (q.flagged) meta += `<span class="badge badge-yellow">🚩 フラグ</span> `;
   if (_isReviewMode && q.srInterval) {
@@ -4266,6 +4287,8 @@ function showQ() {
   document.getElementById('qm-exp').innerHTML = renderExplanationStructured(q.explanation);
   cancelExpEdit(); // 問題が変わったら解説編集モードをリセット
   _choiceCheckState = {}; _choiceCheckAll = []; // 選択肢理解チェックをリセット
+  const catRevEl = document.getElementById('qm-category-reveal');
+  if (catRevEl) { catRevEl.innerHTML = ''; catRevEl.style.display = 'none'; }
   set('qm-answer', q.answer);
   document.getElementById('qm-note').innerHTML = q.personalNote || '';
 
@@ -5023,6 +5046,15 @@ function revealAnswer() {
     prevMemo.innerHTML = `<strong>前回の理解メモ：</strong>${escapeHtml(q.feynmanNote)}`;
     prevMemo.style.display = 'block';
   }
+  // 大分野・中分野バッジを解説表示時に追加（問題表示時はヒントになるため非表示にしていた）
+  const catBadgeEl = document.getElementById('qm-category-reveal');
+  if (catBadgeEl && q) {
+    let catHtml = '';
+    if (q.category) catHtml += `<span class="badge badge-blue">${q.category}</span> `;
+    if (q.subcategory) catHtml += `<span class="badge badge-purple">${q.subcategory}</span>`;
+    catBadgeEl.innerHTML = catHtml;
+    catBadgeEl.style.display = catHtml ? 'block' : 'none';
+  }
   highlightChoices();
   highlightExplanationChoices(); // 解説内の選択肢考察もハイライト
   renderQuestionTags(queue[qIdx]); // タグ表示を更新（study mode: queue[qIdx]を渡す）
@@ -5303,9 +5335,10 @@ function jumpToQuestion(id) {
   document.getElementById('study-complete').style.display = 'none';
   document.getElementById('study-session').style.display = 'block';
   document.getElementById('category-picker').style.display = 'none';
+  _setStudyHeaderMode(true);
 
   // セッションヘッダーに「← 弱点分析に戻る」を一時表示
-  const endBtn = document.querySelector('#study-session .btn-gray.btn-sm[onclick="endStudy()"]');
+  const endBtn = document.querySelector('#session-header button[onclick="endStudy()"]');
   if (endBtn) {
     endBtn.textContent = '← 分析に戻る';
     endBtn.onclick = () => {
@@ -5324,12 +5357,14 @@ function backToStudySetup() {
   document.getElementById('study-setup').style.display='block';
   document.getElementById('study-session').style.display='none';
   document.getElementById('study-complete').style.display='none';
+  _setStudyHeaderMode(false);
   updateStudyModes();
 }
 
 function finishStudy() {
   document.getElementById('study-session').style.display='none';
   document.getElementById('study-complete').style.display='block';
+  _setStudyHeaderMode(false);
   const tot = sCorrect+sWrong;
   const acc = tot ? Math.round(sCorrect/tot*100) : 0;
   set('res-total', tot);
