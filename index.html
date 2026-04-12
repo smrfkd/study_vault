@@ -3543,20 +3543,14 @@ function _renderChoiceCheckPanel() {
       </div>`
     : '';
 
-  // ===== アクションボタン =====
-  const actionHtml = ctx?.isCorrect
-    ? `<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px">
-        <button class="btn btn-success btn-xl" onclick="recordAnswer(true)" style="min-width:140px">次の問題へ →</button>
-        <button class="btn btn-xl" onclick="recordAnswer(true, null, true)"
-          style="min-width:120px;background:#fff8e1;color:#b7791f;border:2px solid #f6e05e;font-weight:700">
-          ⚠️ あやふや
-        </button>
-      </div>`
-    : `<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px">
-        <button class="btn btn-danger btn-xl" onclick="${_choiceCheckIsWrong ? 'commitReason()' : 'recordAnswer(false)'}" style="min-width:140px">
-          次の問題へ →
-        </button>
-      </div>`;
+  // スキップリンク（全評価完了前のみ表示；完了後は _finalizeChoiceCheck が上書き）
+  const skipAction = _choiceCheckIsWrong ? 'commitReason()' : 'recordAnswer(true)';
+  const skipHtml = `<div style="text-align:center;margin-top:14px">
+    <button onclick="${skipAction}"
+      style="font-size:12px;color:#a0aec0;background:none;border:none;cursor:pointer;text-decoration:underline">
+      スキップして次の問題へ →
+    </button>
+  </div>`;
 
   el.innerHTML = `<div style="border-top:2px solid #e2e8f0;margin-top:16px;padding-top:12px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -3567,7 +3561,7 @@ function _renderChoiceCheckPanel() {
     ${cardsHtml}
     ${pointHtml}
     ${ctx?.popHTML || ''}
-    ${actionHtml}
+    <div id="choice-check-finalize">${ratedCount < total ? skipHtml : ''}</div>
   </div>`;
 }
 
@@ -3604,24 +3598,38 @@ function saveChoiceNote(key) {
 }
 
 function _finalizeChoiceCheck() {
-  const allMatched = Object.values(_choiceCheckState).every(v => v === 'matched');
-  const unmatchedCount = Object.values(_choiceCheckState).filter(v => v === 'unmatched').length;
-  const total = _choiceCheckAll.length;
-  const el = document.getElementById('auto-judge-result');
-  if (!el) return;
-  const msgHtml = allMatched
-    ? `<div style="font-size:15px;font-weight:800;color:#276749">✅ 完全理解！</div>
-       <div style="font-size:11px;color:#718096;margin-top:3px">全 ${total} 選択肢を説明できました → 通常インターバルで次回復習</div>`
-    : `<div style="font-size:15px;font-weight:800;color:#b7791f">⚠️ ${unmatchedCount}個あやふや</div>
-       <div style="font-size:11px;color:#718096;margin-top:3px">インターバル半減で再確認します</div>`;
-  const div = document.createElement('div');
-  div.style.cssText = 'text-align:center;padding:12px;background:#f7faff;border-radius:10px;margin-top:10px;border:1px solid #e2e8f0';
-  div.innerHTML = `${msgHtml}
-    <button onclick="recordAnswer(true, null, ${!allMatched})"
-      style="margin-top:9px;font-size:13px;padding:7px 22px;background:${allMatched ? '#276749' : '#b7791f'};color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
-      ${allMatched ? '次の問題へ →' : '⚠️ あやふやとして記録して次へ'}
-    </button>`;
-  el.querySelector('div').appendChild(div);
+  const finEl = document.getElementById('choice-check-finalize');
+  if (!finEl) return;
+
+  if (_choiceCheckIsWrong) {
+    // 不正解：常にインターバルリセット（選択肢チェックはSRSに影響させない）
+    finEl.innerHTML = `<div style="text-align:center;margin-top:14px">
+      <button onclick="commitReason()"
+        style="font-size:14px;font-weight:700;padding:8px 26px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer">
+        次の問題へ →
+      </button>
+    </div>`;
+  } else {
+    // 正解：全matched → 通常 / 1個でもunmatched → あやふや半減
+    const allMatched = Object.values(_choiceCheckState).every(v => v === 'matched');
+    if (allMatched) {
+      finEl.innerHTML = `<div style="text-align:center;margin-top:14px">
+        <button onclick="recordAnswer(true)"
+          style="font-size:14px;font-weight:700;padding:8px 26px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer">
+          次の問題へ
+        </button>
+        <div style="font-size:11px;color:#a0aec0;margin-top:5px">通常インターバル</div>
+      </div>`;
+    } else {
+      finEl.innerHTML = `<div style="text-align:center;margin-top:14px">
+        <button onclick="recordAnswer(true, null, true)"
+          style="font-size:14px;font-weight:700;padding:8px 26px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer">
+          次の問題へ
+        </button>
+        <div style="font-size:11px;color:#a0aec0;margin-top:5px">あやふや・インターバル半減</div>
+      </div>`;
+    }
+  }
 }
 
 function toggleAiDraftEditor() {
