@@ -846,8 +846,9 @@ select.form-input { cursor: pointer; }
         <div id="ans-revealed" style="display:none">
           <!-- 大分野・中分野バッジ（解説表示時のみ表示） -->
           <div id="qm-category-reveal" style="display:none;margin-bottom:10px"></div>
-          <div class="answer-reveal">
-            <strong>✅ 正解：</strong><span id="qm-answer" style="color:#276749;font-size:15px;font-weight:700"></span>
+          <div class="answer-reveal" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+            <div><strong>✅ 正解：</strong><span id="qm-answer" style="color:#276749;font-size:15px;font-weight:700"></span></div>
+            <div id="answer-result-badge"></div>
           </div>
           <!-- 既存解説（モントレ等） -->
           <div id="qm-exp-wrap">
@@ -883,6 +884,9 @@ select.form-input { cursor: pointer; }
               </div>
             </div>
           </div>
+
+          <!-- 自動判定結果 + 選択肢理解チェック（Assessment直下） -->
+          <div id="auto-judge-result" style="display:none"></div>
 
           <!-- オリジナル解説エリア（AI生成 or 手動） -->
           <div id="original-exp-area" style="display:none;margin-top:12px">
@@ -1010,12 +1014,9 @@ select.form-input { cursor: pointer; }
             </div>
           </div>
 
-          <!-- 自動判定結果（選択肢あり問題） -->
-          <div id="auto-judge-result" style="display:none"></div>
-
           <!-- 手動判定ボタン（選択肢なし問題のみ表示） -->
-          <div id="judge-buttons" style="display:none">
-            <div class="answer-buttons" style="flex-wrap:wrap;margin-top:12px">
+          <div id="judge-buttons" style="display:none;margin-top:12px">
+            <div class="answer-buttons" style="flex-wrap:wrap">
               <button class="btn btn-success btn-xl" onclick="recordAnswer(true)">正解だった！</button>
               <button class="btn btn-xl" onclick="recordAnswer(true, null, true)"
                 style="background:#fff8e1;color:#b7791f;border:2px solid #f6e05e;font-weight:700">自信なし（あやふや）</button>
@@ -3489,28 +3490,6 @@ function _renderChoiceCheckPanel() {
   const total = _choiceCheckAll.length;
   const ctx = _choiceCheckAnswerCtx;
 
-  // ===== ヘッダー（正解 / 不正解） =====
-  let headerHtml = '';
-  if (ctx) {
-    if (ctx.isCorrect) {
-      headerHtml = `
-        <div style="text-align:center;padding:10px 0 14px;border-bottom:2px solid #e2e8f0;margin-bottom:14px">
-          <div style="font-size:40px;line-height:1;margin-bottom:4px">🎉</div>
-          <div style="font-size:20px;font-weight:800;color:#276749">正解！${ctx.srLabel ? `<span style="font-size:13px;color:#553c9a;font-weight:600;margin-left:8px">+${ctx.srLabel}</span>` : ''}</div>
-        </div>`;
-    } else {
-      headerHtml = `
-        <div style="text-align:center;padding:10px 0 14px;border-bottom:2px solid #e2e8f0;margin-bottom:14px">
-          <div style="font-size:40px;line-height:1;margin-bottom:4px">❌</div>
-          <div style="font-size:18px;font-weight:800;color:#c53030;margin-bottom:4px">不正解</div>
-          <div style="font-size:13px;color:#718096">
-            あなたの選択：<strong style="color:#c53030">${ctx.selectedLabels}</strong>　／
-            正解：<strong style="color:#276749">${ctx.correctLabels}</strong>
-          </div>
-        </div>`;
-    }
-  }
-
   // ===== 選択肢カード =====
   const cardsHtml = _choiceCheckAll.map(c => {
     const state = _choiceCheckState[c.key];
@@ -3580,7 +3559,6 @@ function _renderChoiceCheckPanel() {
       </div>`;
 
   el.innerHTML = `<div style="border-top:2px solid #e2e8f0;margin-top:16px;padding-top:12px">
-    ${headerHtml}
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
       <span style="font-size:14px;font-weight:700;color:#553c9a">📚 選択肢理解チェック</span>
       <span style="font-size:12px;color:#718096">${ratedCount} / ${total} 確認済</span>
@@ -4304,6 +4282,7 @@ function showQ() {
   document.getElementById('qm-exp').innerHTML = renderExplanationStructured(q.explanation, { studyMode: true });
   cancelExpEdit(); // 問題が変わったら解説編集モードをリセット
   _choiceCheckState = {}; _choiceCheckAll = []; _choiceCheckPointLines = []; _choiceCheckAnswerCtx = null;
+  const _badge = document.getElementById('answer-result-badge'); if (_badge) _badge.innerHTML = '';
   const catRevEl = document.getElementById('qm-category-reveal');
   if (catRevEl) { catRevEl.innerHTML = ''; catRevEl.style.display = 'none'; }
   set('qm-answer', q.answer);
@@ -5083,13 +5062,7 @@ function revealAnswer() {
     // 選択肢なし → 手動判定ボタンを表示
     document.getElementById('judge-buttons').style.display = 'flex';
   }
-  // 判定エリアが見えるようにスクロール（少し遅延してDOMレンダリング後に実行）
-  setTimeout(() => {
-    const judgeEl = document.getElementById('auto-judge-result');
-    const btnEl = document.getElementById('judge-buttons');
-    const target = (judgeEl && judgeEl.style.display !== 'none') ? judgeEl : btnEl;
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 80);
+  // 解説は常に先頭から読めるよう、自動スクロールなし
 }
 
 // 選択肢チェックに渡すための解答コンテキスト
@@ -5141,6 +5114,16 @@ function autoJudge() {
           ${isMajority?`⚠️ <strong>多くの受験生も同じ選択肢を選んでいます（${userWrongPct.toFixed(1)}%）。</strong>紛らわしい問題です。鑑別ポイントを整理しましょう。`:`💡 <strong>この誤答パターンは少数派です（${userWrongPct>0?userWrongPct.toFixed(1)+'%':'少数'}）。</strong>${diff.msg}`}
         </div>
       </div>`;
+    }
+  }
+
+  // answer-reveal にインラインバッジを設定（コンパクト表示）
+  const badge = document.getElementById('answer-result-badge');
+  if (badge) {
+    if (isCorrect) {
+      badge.innerHTML = `<span style="background:#f0fff4;border:1px solid #9ae6b4;border-radius:8px;padding:3px 10px;font-size:13px;font-weight:700;color:#276749">🎉 正解${srLabel ? ` ＋${srLabel}` : ''}</span>`;
+    } else {
+      badge.innerHTML = `<span style="background:#fff5f5;border:1px solid #feb2b2;border-radius:8px;padding:3px 10px;font-size:13px;font-weight:700;color:#c53030">❌ 不正解 — 選択：${selectedLabels}</span>`;
     }
   }
 
