@@ -6314,27 +6314,29 @@ function deleteChoiceRow(btn) {
 function applyChoiceEdits(expText) {
   const rows = document.querySelectorAll('#ed-choices-list [data-choice-key]');
 
-  // 変更後の選択肢をマップ化（削除された行は含まれない）
+  // 残っているキーと変更内容
+  const keptKeys = new Set();
   const changes = {};
   rows.forEach(row => {
     const key = row.getAttribute('data-choice-key');
     const marker = row.querySelector('.ed-choice-marker').value;
     const text   = row.querySelector('.ed-choice-text').value.trim();
+    keptKeys.add(key);
     if (text) changes[key] = { marker, text };
   });
 
   const WRONG_CHARS = '×✕☓✗';
   const RIGHT_CHARS = '○◯✓✔';
   const MARKER_CHARS = WRONG_CHARS + RIGHT_CHARS + '△▲';
+  const PAIR_RE = new RegExp('[' + WRONG_CHARS + RIGHT_CHARS + '△▲]([a-jA-J])', 'g');
 
-  // extractChoicesFromExplanation と同じロジックで「選択肢行かどうか」を判定
-  function detectChoiceKey(rawLine) {
+  // ── Strategy A: 1行1選択肢形式（×a　テキスト）の検出 ──
+  function detectStrategyAKey(rawLine) {
     const line = rawLine.trim().replace(/^\*+|\*+$/g, '').trim();
     if (!line) return null;
     const m = line.match(/^[^\w\u3040-\u9fff]{0,12}([a-jA-J])[\s　]+.+$/);
     if (!m) return null;
     const prefix = line.slice(0, line.indexOf(m[1]));
-    // prefixにマーカー文字が含まれていれば選択肢行と判定
     for (const ch of [...prefix].reverse()) {
       if (MARKER_CHARS.includes(ch)) return m[1].toLowerCase();
     }
@@ -6343,20 +6345,59 @@ function applyChoiceEdits(expText) {
 
   const handledKeys = new Set();
   const newLines = expText.split('\n').map(line => {
-    const key = detectChoiceKey(line);
-    if (key === null) return line;                   // 選択肢行でない → そのまま
-    if (handledKeys.has(key)) return line;            // 同一キー2回目 → そのまま
-    if (!changes[key]) return null;                   // 削除済み → 除去
-    handledKeys.add(key);
-    const { marker, text } = changes[key];
-    // 先頭・末尾のアスタリスク装飾を保持
-    const stars = line.trim().match(/^(\**)/) ? line.trim().match(/^(\*{0,2})/)[1] : '';
-    const starsEnd = line.trim().match(/(\*{0,2})$/) ? line.trim().match(/(\*{0,2})$/)[1] : '';
-    return `${stars}${marker}${key}　${text}${starsEnd}`;
+    const stripped = line.trim().replace(/^\*+|\*+$/g, '').trim();
+
+    // ── Strategy A 処理 ──
+    const keyA = detectStrategyAKey(line);
+    if (keyA !== null) {
+      if (handledKeys.has(keyA)) return line;
+      if (!keptKeys.has(keyA)) return null;  // 削除済み → 行ごと除去
+      handledKeys.add(keyA);
+      if (!changes[keyA]) return line;       // テキスト未入力 → そのまま
+      const { marker, text } = changes[keyA];
+      const stars    = (line.trim().match(/^(\*{0,2})/) || ['',''])[1];
+      const starsEnd = (line.trim().match(/(\*{0,2})$/)  || ['',''])[1];
+      return `${stars}${marker}${keyA}　${text}${starsEnd}`;
+    }
+
+    // ── Strategy C/B グループマーカー行の処理（例: **×a，○b，×i**）──
+    // マーカー文字で始まり、マーカー+キーのペアが2個以上ある行
+    if (new RegExp('^[' + MARKER_CHARS + ']').test(stripped)) {
+      const pairs = [...stripped.matchAll(PAIR_RE)];
+      if (pairs.length >= 2) {
+        const pairKeys = pairs.map(p => p[1].toLowerCase());
+        const hasDeleted = pairKeys.some(k => !keptKeys.has(k));
+        if (!hasDeleted) {
+          pairKeys.forEach(k => handledKeys.add(k));
+          return line; // 削除なし → そのまま
+        }
+        // 残すキーでグループ行を再構築
+        const keptPairs = pairs.filter(p => keptKeys.has(p[1].toLowerCase()));
+        keptPairs.forEach(p => handledKeys.add(p[1].toLowerCase()));
+        if (keptPairs.length === 0) return null; // 全削除 → 行ごと除去
+        const hasStars = line.trim().startsWith('**');
+        const rebuilt = keptPairs.map(p => {
+          const k = p[1].toLowerCase();
+          const newMarker = changes[k] ? changes[k].marker : p[0][0];
+          return `${newMarker}${k}`;
+        }).join('，');
+        return hasStars ? `**${rebuilt}**` : rebuilt;
+      }
+    }
+
+    // ── Strategy B テキスト行の処理（例: a：心嚢）──
+    // 削除されたキーのテキスト行も除去する
+    const textLineM = stripped.match(/^([a-jA-J])[：:]\s*.+$/);
+    if (textLineM) {
+      const k = textLineM[1].toLowerCase();
+      if (!keptKeys.has(k)) return null; // 削除済みキーのテキスト行 → 除去
+    }
+
+    return line; // その他の行 → そのまま
   }).filter(line => line !== null);
 
-  // 新規追加分（explanationに存在しなかったキー）を末尾に追加
-  Object.entries(changes).forEach(([key, {marker, text}]) => {
+  // 新規追加分（explanationに元々なかったキー）を末尾に追加
+  Object.entries(changes).forEach(([key, { marker, text }]) => {
     if (!handledKeys.has(key)) {
       newLines.push(`${marker}${key}　${text}`);
     }
