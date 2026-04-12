@@ -275,28 +275,7 @@ select.form-input { cursor: pointer; }
 @keyframes pop { 0% { transform: scale(0); } 80% { transform: scale(1.2); } 100% { transform: scale(1); } }
 @keyframes timerPulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
 
-/* REASON PICKER */
-.reason-picker { background: #fff5f5; border: 2px solid #fed7d7; border-radius: 12px; padding: 16px 18px; margin-top: 16px; animation: slideDown 0.2s ease; }
 @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
-.reason-picker-title { font-size: 13px; font-weight: 700; color: #c53030; margin-bottom: 12px; }
-.reason-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-@media (max-width: 600px) { .reason-grid { grid-template-columns: repeat(2, 1fr); } }
-.reason-btn { padding: 10px 8px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; font-size: 12px; font-weight: 600; text-align: center; transition: all 0.15s; line-height: 1.4; }
-.reason-btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,0.12); }
-.reason-btn.r-knowledge { background:#fff5f5; border-color:#fc8181; color:#c53030; }
-.reason-btn.r-knowledge:hover { background:#fed7d7; }
-.reason-btn.r-concept   { background:#fffbeb; border-color:#f6ad55; color:#c05621; }
-.reason-btn.r-concept:hover { background:#feebc8; }
-.reason-btn.r-count     { background:#f0fff4; border-color:#68d391; color:#276749; }
-.reason-btn.r-count:hover { background:#c6f6d5; }
-.reason-btn.r-misread   { background:#ebf8ff; border-color:#63b3ed; color:#2b6cb0; }
-.reason-btn.r-misread:hover { background:#bee3f8; }
-.reason-btn.r-careless  { background:#faf5ff; border-color:#b794f4; color:#553c9a; }
-.reason-btn.r-careless:hover { background:#e9d8fd; }
-.reason-btn.r-calc      { background:#fffff0; border-color:#f6e05e; color:#744210; }
-.reason-btn.r-calc:hover { background:#fefcbf; }
-.reason-btn.r-other     { background:#f7fafc; border-color:#a0aec0; color:#4a5568; }
-.reason-btn.r-other:hover { background:#e2e8f0; }
 
 /* REASON BADGE */
 .reason-badge { display:inline-flex; align-items:center; gap:4px; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; }
@@ -1040,44 +1019,10 @@ select.form-input { cursor: pointer; }
               <button class="btn btn-success btn-xl" onclick="recordAnswer(true)">正解だった！</button>
               <button class="btn btn-xl" onclick="recordAnswer(true, null, true)"
                 style="background:#fff8e1;color:#b7791f;border:2px solid #f6e05e;font-weight:700">自信なし（あやふや）</button>
-              <button class="btn btn-danger btn-xl" onclick="showReasonPicker()">不正解だった</button>
+              <button class="btn btn-danger btn-xl" onclick="recordAnswer(false)">不正解だった</button>
             </div>
           </div>
 
-          <!-- 理由ピッカー（不正解時に展開） -->
-          <div class="reason-picker" id="reason-picker" style="display:none">
-            <div class="reason-picker-title">❌ 間違えた原因を選んでください</div>
-            <div class="reason-grid" id="reason-grid">
-              <button class="reason-btn r-knowledge" onclick="selectReason('knowledge')">
-                📚 知識不足<br><span style="font-size:10px;font-weight:400">知らなかった</span>
-              </button>
-              <button class="reason-btn r-concept" onclick="selectReason('concept')">
-                🌀 理解不足<br><span style="font-size:10px;font-weight:400">概念が曖昧</span>
-              </button>
-              <button class="reason-btn r-count" onclick="selectReason('count')">
-                🔢 個数ミス<br><span style="font-size:10px;font-weight:400">選ぶ数を間違えた</span>
-              </button>
-              <button class="reason-btn r-misread" onclick="selectReason('misread')">
-                👀 読み違え<br><span style="font-size:10px;font-weight:400">問題文の誤読</span>
-              </button>
-              <button class="reason-btn r-careless" onclick="selectReason('careless')">
-                🖱️ うっかり<br><span style="font-size:10px;font-weight:400">クリック・ケアレス</span>
-              </button>
-              <button class="reason-btn r-calc" onclick="selectReason('calc')">
-                🔢 計算ミス<br><span style="font-size:10px;font-weight:400">計算を間違えた</span>
-              </button>
-              <button class="reason-btn r-other" onclick="selectReason('other')" style="grid-column:span 3">
-                💬 その他
-              </button>
-            </div>
-            <!-- 理由選択後に表示する「次へ」ボタン -->
-            <div id="reason-next-btn" style="display:none;margin-top:12px;text-align:center">
-              <button class="btn btn-danger btn-lg" onclick="commitReason()" style="min-width:200px">
-                記録して次の問題へ →
-              </button>
-            </div>
-
-          </div>
         </div>
         </div><!-- /qpanel-right -->
       </div>
@@ -3395,7 +3340,7 @@ function saveExpEdit() {
   // queue 内の同じ問題も更新
   questions.forEach(orig => { if (orig.id === q.id) orig.explanation = newExp; });
   // 解説表示を再レンダリング
-  document.getElementById('qm-exp').innerHTML = renderExplanationStructured(newExp);
+  document.getElementById('qm-exp').innerHTML = renderExplanationStructured(newExp, { studyMode: true });
   // 選択肢も再抽出
   const choices = extractChoicesFromExplanation(newExp);
   renderChoices(choices);
@@ -3462,8 +3407,11 @@ function insertExpTemplate() {
 
 // ========== 選択肢理解チェック ==========
 
+// ポイント・まとめ系セクションのヘッダー行を検出する
+const _POINT_HEADER_RE = /^[\*\s　#【】「」\[\]]*(?:ポイント|KEY\s*POINT|まとめ|周辺知識)[^\n]{0,20}[\*\s　#【】「」\[\]]*$/i;
+
 function extractChoicesWithExplanation(expText) {
-  if (!expText) return [];
+  if (!expText) return { choices: [], pointLines: [] };
   const lines = expText.split('\n');
   const WRONG = '×✕☓✗', RIGHT = '○◯✓✔';
   const positions = [];
@@ -3483,8 +3431,9 @@ function extractChoicesWithExplanation(expText) {
     if (correct === null) continue;
     positions.push({ key, text: m[2].trim(), correct, lineIdx: i });
   }
-  if (positions.length < 2) return [];
-  return positions.map((cp, ci) => {
+  if (positions.length < 2) return { choices: [], pointLines: [] };
+
+  const choices = positions.map((cp, ci) => {
     const nextIdx = ci + 1 < positions.length ? positions[ci + 1].lineIdx : lines.length;
     const expLines = [];
     for (let li = cp.lineIdx + 1; li < nextIdx; li++) {
@@ -3493,20 +3442,38 @@ function extractChoicesWithExplanation(expText) {
     }
     return { key: cp.key, text: cp.text, correct: cp.correct, expLines };
   });
+
+  // 最後の選択肢の expLines からポイントセクションを分離
+  const last = choices[choices.length - 1];
+  let pointLines = [];
+  const pIdx = last.expLines.findIndex(l => _POINT_HEADER_RE.test(l));
+  if (pIdx !== -1) {
+    // ヘッダー行はラベルとして使うので除外し、本文行だけ pointLines に格納
+    pointLines = last.expLines.slice(pIdx + 1);
+    last.expLines = last.expLines.slice(0, pIdx);
+  }
+
+  return { choices, pointLines };
 }
 
-let _choiceCheckState = {};
-let _choiceCheckAll  = [];
+let _choiceCheckState    = {};
+let _choiceCheckAll      = [];
+let _choiceCheckIsWrong  = false;
+let _choiceCheckPointLines = []; // ポイントセクション（分離済み）
 
-function startChoiceCheck() {
+function startChoiceCheck(isWrong = false) {
+  _choiceCheckIsWrong = isWrong;
   const q = queue[qIdx];
   if (!q) return;
-  _choiceCheckAll = extractChoicesWithExplanation(q.explanation || '');
+  const extracted = extractChoicesWithExplanation(q.explanation || '');
+  _choiceCheckAll      = extracted.choices;
+  _choiceCheckPointLines = extracted.pointLines;
   if (_choiceCheckAll.length === 0) {
     // 解説から取れない場合は a〜e のフォールバック
     _choiceCheckAll = 'abcde'.split('').map(k => ({
       key: k, text: '', correct: (q.answer||'').toLowerCase().includes(k), expLines: []
     }));
+    _choiceCheckPointLines = [];
   }
   _choiceCheckState = {};
   _choiceCheckAll.forEach(c => { _choiceCheckState[c.key] = null; });
@@ -3520,59 +3487,109 @@ function _renderChoiceCheckPanel() {
   const choiceNotes = q.choiceNotes || {};
   const ratedCount = Object.values(_choiceCheckState).filter(v => v !== null).length;
   const total = _choiceCheckAll.length;
+  const ctx = _choiceCheckAnswerCtx;
 
+  // ===== ヘッダー（正解 / 不正解） =====
+  let headerHtml = '';
+  if (ctx) {
+    if (ctx.isCorrect) {
+      headerHtml = `
+        <div style="text-align:center;padding:10px 0 14px;border-bottom:2px solid #e2e8f0;margin-bottom:14px">
+          <div style="font-size:40px;line-height:1;margin-bottom:4px">🎉</div>
+          <div style="font-size:20px;font-weight:800;color:#276749">正解！${ctx.srLabel ? `<span style="font-size:13px;color:#553c9a;font-weight:600;margin-left:8px">+${ctx.srLabel}</span>` : ''}</div>
+        </div>`;
+    } else {
+      headerHtml = `
+        <div style="text-align:center;padding:10px 0 14px;border-bottom:2px solid #e2e8f0;margin-bottom:14px">
+          <div style="font-size:40px;line-height:1;margin-bottom:4px">❌</div>
+          <div style="font-size:18px;font-weight:800;color:#c53030;margin-bottom:4px">不正解</div>
+          <div style="font-size:13px;color:#718096">
+            あなたの選択：<strong style="color:#c53030">${ctx.selectedLabels}</strong>　／
+            正解：<strong style="color:#276749">${ctx.correctLabels}</strong>
+          </div>
+        </div>`;
+    }
+  }
+
+  // ===== 選択肢カード =====
   const cardsHtml = _choiceCheckAll.map(c => {
     const state = _choiceCheckState[c.key];
-    const note = choiceNotes[c.key] || '';
+    const note  = choiceNotes[c.key] || '';
     const bg     = state === 'matched' ? '#f0fff4' : state === 'unmatched' ? '#fff5f5' : 'white';
     const border = state === 'matched' ? '#9ae6b4' : state === 'unmatched' ? '#fed7d7' : '#e2e8f0';
     const headerRight = state === 'matched'
-      ? `<span style="color:#276749;font-size:11px;font-weight:700;white-space:nowrap">✓ 説明できた</span>`
+      ? `<span style="color:#276749;font-size:12px;font-weight:700;white-space:nowrap">✓ 説明できた</span>`
       : state === 'unmatched'
-      ? `<span style="color:#c53030;font-size:11px;font-weight:700;white-space:nowrap">✗ できなかった</span>`
-      : `<button onclick="revealChoiceExp('${c.key}')" style="font-size:11px;padding:3px 10px;border:1px solid #a0aec0;border-radius:6px;background:white;cursor:pointer;white-space:nowrap">確認 ▼</button>`;
+      ? `<span style="color:#c53030;font-size:12px;font-weight:700;white-space:nowrap">✗ できなかった</span>`
+      : `<button onclick="revealChoiceExp('${c.key}')" style="font-size:12px;padding:4px 12px;border:1px solid #a0aec0;border-radius:6px;background:white;cursor:pointer;white-space:nowrap">確認 ▼</button>`;
     const expDisplay = state === 'unmatched' ? 'block' : 'none';
     const correctMark = c.correct
-      ? `<span style="color:#276749;font-weight:700">✓ 正解</span>`
-      : `<span style="color:#c53030;font-weight:700">✗ 不正解</span>`;
+      ? `<span style="color:#276749;font-weight:700">✓ 正解選択肢</span>`
+      : `<span style="color:#c53030;font-weight:700">✗ 不正解選択肢</span>`;
     const expContent = c.expLines.length > 0
       ? c.expLines.map(l => escapeHtml(l)).join('<br>')
       : `<span style="color:#a0aec0">（説明文なし — ✏️編集で追記できます）</span>`;
     const actionButtons = state === 'unmatched'
-      ? `<button onclick="rateChoice('${c.key}', true)" style="font-size:11px;padding:3px 10px;border:1px solid #9ae6b4;border-radius:6px;background:#f0fff4;color:#276749;cursor:pointer">修正: やはり説明できた ✓</button>`
-      : `<div style="display:flex;gap:6px;margin-top:6px">
-           <button onclick="rateChoice('${c.key}', true)" style="font-size:12px;padding:4px 14px;background:#276749;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700">✓ 説明できた</button>
-           <button onclick="rateChoice('${c.key}', false)" style="font-size:12px;padding:4px 14px;background:#fff5f5;color:#c53030;border:1px solid #fed7d7;border-radius:6px;cursor:pointer;font-weight:700">✗ できなかった</button>
+      ? `<button onclick="rateChoice('${c.key}', true)" style="font-size:12px;padding:4px 12px;border:1px solid #9ae6b4;border-radius:6px;background:#f0fff4;color:#276749;cursor:pointer">修正: やはり説明できた ✓</button>`
+      : `<div style="display:flex;gap:6px;margin-top:8px">
+           <button onclick="rateChoice('${c.key}', true)" style="font-size:13px;padding:5px 16px;background:#276749;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700">✓ 説明できた</button>
+           <button onclick="rateChoice('${c.key}', false)" style="font-size:13px;padding:5px 16px;background:#fff5f5;color:#c53030;border:1px solid #fed7d7;border-radius:6px;cursor:pointer;font-weight:700">✗ できなかった</button>
          </div>`;
 
-    return `<div style="border:1px solid ${border};border-radius:10px;padding:9px 12px;margin-bottom:7px;background:${bg}">
+    return `<div style="border:1px solid ${border};border-radius:10px;padding:10px 14px;margin-bottom:8px;background:${bg}">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <span style="font-weight:800;color:#4a5568;min-width:16px">${c.key}</span>
-        <span style="font-size:12px;color:#718096;flex:1;margin:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(c.text || '（テキストなし）')}</span>
+        <span style="font-size:15px;font-weight:800;color:#4a5568;min-width:18px">${c.key}</span>
+        <span style="font-size:14px;color:#4a5568;flex:1;margin:0 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(c.text || '（テキストなし）')}</span>
         ${headerRight}
       </div>
-      <div id="cc-exp-${c.key}" style="display:${expDisplay};margin-top:8px">
-        <div style="font-size:12px;line-height:1.7;color:#4a5568;background:#f7faff;border-radius:6px;padding:7px 10px;margin-bottom:7px">
+      <div id="cc-exp-${c.key}" style="display:${expDisplay};margin-top:10px">
+        <div style="font-size:14px;line-height:1.8;color:#2d3748;background:#f7faff;border-radius:6px;padding:9px 12px;margin-bottom:8px">
           ${correctMark}<br>${expContent}
         </div>
         <textarea id="cc-note-${c.key}" onblur="saveChoiceNote('${c.key}')" onkeydown="event.stopPropagation()"
-          style="width:100%;box-sizing:border-box;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;font-size:12px;line-height:1.6;resize:vertical;min-height:44px"
+          style="width:100%;box-sizing:border-box;border:1px solid #e2e8f0;border-radius:6px;padding:7px 10px;font-size:13px;line-height:1.7;resize:vertical;min-height:48px"
           placeholder="💡 追記メモ（覚え方・補足）...">${escapeHtml(note)}</textarea>
         ${actionButtons}
       </div>
     </div>`;
   }).join('');
 
+  // ===== ポイントボックス =====
+  const pointHtml = _choiceCheckPointLines.length > 0
+    ? `<div style="background:#fffbeb;border:1.5px solid #f6e05e;border-radius:10px;padding:12px 16px;margin-top:12px">
+        <div style="font-size:13px;font-weight:800;color:#744210;margin-bottom:7px">📌 ポイント</div>
+        <div style="font-size:14px;line-height:1.8;color:#2d3748">
+          ${_choiceCheckPointLines.map(l => escapeHtml(l)).join('<br>')}
+        </div>
+      </div>`
+    : '';
+
+  // ===== アクションボタン =====
+  const actionHtml = ctx?.isCorrect
+    ? `<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px">
+        <button class="btn btn-success btn-xl" onclick="recordAnswer(true)" style="min-width:140px">次の問題へ →</button>
+        <button class="btn btn-xl" onclick="recordAnswer(true, null, true)"
+          style="min-width:120px;background:#fff8e1;color:#b7791f;border:2px solid #f6e05e;font-weight:700">
+          ⚠️ あやふや
+        </button>
+      </div>`
+    : `<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px">
+        <button class="btn btn-danger btn-xl" onclick="${_choiceCheckIsWrong ? 'commitReason()' : 'recordAnswer(false)'}" style="min-width:140px">
+          次の問題へ →
+        </button>
+      </div>`;
+
   el.innerHTML = `<div style="border-top:2px solid #e2e8f0;margin-top:16px;padding-top:12px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <span style="font-size:13px;font-weight:700;color:#553c9a">📚 選択肢理解チェック</span>
-      <span style="font-size:11px;color:#718096">${ratedCount} / ${total} 確認済</span>
+    ${headerHtml}
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:14px;font-weight:700;color:#553c9a">📚 選択肢理解チェック</span>
+      <span style="font-size:12px;color:#718096">${ratedCount} / ${total} 確認済</span>
     </div>
-    <p style="font-size:11px;color:#718096;margin:0 0 9px">各選択肢の正誤と理由を頭の中で考えてから「確認 ▼」を押してください</p>
+    <p style="font-size:12px;color:#718096;margin:0 0 10px">各選択肢の正誤と理由を頭の中で考えてから「確認 ▼」を押してください</p>
     ${cardsHtml}
-    <div style="text-align:center;margin-top:6px">
-      <button onclick="recordAnswer(true)" style="font-size:12px;padding:5px 14px;border:1px solid #cbd5e0;border-radius:8px;background:white;color:#718096;cursor:pointer">スキップして次の問題へ →</button>
-    </div>
+    ${pointHtml}
+    ${ctx?.popHTML || ''}
+    ${actionHtml}
   </div>`;
 }
 
@@ -4284,9 +4301,9 @@ function showQ() {
   if (prevMemoEl) prevMemoEl.style.display = 'none';
   set('qm-num', `問題 ${qIdx+1} / ${queue.length}`);
   document.getElementById('qm-text').innerHTML = renderTextWithImages(q.question);
-  document.getElementById('qm-exp').innerHTML = renderExplanationStructured(q.explanation);
+  document.getElementById('qm-exp').innerHTML = renderExplanationStructured(q.explanation, { studyMode: true });
   cancelExpEdit(); // 問題が変わったら解説編集モードをリセット
-  _choiceCheckState = {}; _choiceCheckAll = []; // 選択肢理解チェックをリセット
+  _choiceCheckState = {}; _choiceCheckAll = []; _choiceCheckPointLines = []; _choiceCheckAnswerCtx = null;
   const catRevEl = document.getElementById('qm-category-reveal');
   if (catRevEl) { catRevEl.innerHTML = ''; catRevEl.style.display = 'none'; }
   set('qm-answer', q.answer);
@@ -4311,12 +4328,6 @@ function showQ() {
   document.getElementById('auto-judge-result').style.display = 'none';
   document.getElementById('auto-judge-result').innerHTML = '';
   document.getElementById('judge-buttons').style.display = 'flex';
-  document.getElementById('reason-picker').style.display = 'none';
-  // 理由選択ステートをリセット
-  _pendingReason = null;
-  const rNextBtn = document.getElementById('reason-next-btn');
-  if (rNextBtn) rNextBtn.style.display = 'none';
-  document.querySelectorAll('.reason-btn').forEach(btn => { btn.style.opacity = ''; btn.style.transform = ''; btn.style.boxShadow = ''; });
 
   // フラグボタンの色をこの問題のフラグ状態に合わせる
   _updateFlagBtn(!!q.flagged);
@@ -4375,7 +4386,12 @@ const EXP_SECTION_DEFS = [
     hBg: '#fef3c7', hColor: '#78350f', bBg: '#fffdf0', border: '#fde68a' },
 ];
 
-function renderExplanationStructured(text) {
+// 学習モードの解説表示で非表示にするセクション
+// 選択肢考察・ポイント → 選択肢理解チェックに統合済み
+// 診断・臨床診断 → Assessment に内包されるため冗長
+const EXP_STUDY_HIDE = new Set(['選択肢考察', 'ポイント', '診断', '臨床診断']);
+
+function renderExplanationStructured(text, { studyMode = false } = {}) {
   if (!text) return '';
 
   // 既インポート済みデータにも対応：表示時にも除去
@@ -4399,24 +4415,32 @@ function renderExplanationStructured(text) {
 
   if (!parsed.length) return `<div class="exp-fallback">${renderInlineText(text)}</div>`;
 
+  // studyMode: 選択肢考察・ポイント・診断系は選択肢理解チェックに移譲 → 非表示
+  const visible = studyMode
+    ? parsed.filter(p => !EXP_STUDY_HIDE.has(p.def.label))
+    : parsed;
+
   // ===== 必須セクションが欠けていれば「なし」で補完 =====
-  // 各グループ：いずれかのラベルが存在すれば「あり」と判定
   const REQUIRED_GROUPS = [
     { matchLabels: ['Assessment', 'アセスメント'], defKey: '**Assessment**' },
-    { matchLabels: ['診断', '臨床診断', '画像診断'],  defKey: '**診断'         },
-    { matchLabels: ['選択肢考察'],                    defKey: '**選択肢考察**' },
-    { matchLabels: ['ポイント'],                      defKey: '**ポイント**'   },
   ];
-  const presentLabels = new Set(parsed.map(p => p.def.label));
+  if (!studyMode) {
+    // 分析ビューではすべて補完
+    REQUIRED_GROUPS.push(
+      { matchLabels: ['選択肢考察'],                    defKey: '**選択肢考察**' },
+      { matchLabels: ['ポイント'],                      defKey: '**ポイント**'   },
+    );
+  }
+  const presentLabels = new Set(visible.map(p => p.def.label));
   for (const req of REQUIRED_GROUPS) {
     const isPresent = req.matchLabels.some(l => presentLabels.has(l));
     if (!isPresent) {
       const def = EXP_SECTION_DEFS.find(d => d.key === req.defKey || d.key.startsWith(req.defKey));
-      if (def) parsed.push({ def, lines: [] }); // lines空 → renderExpSection が「なし」を表示
+      if (def) visible.push({ def, lines: [] });
     }
   }
 
-  return parsed.map(({ def, lines }) => renderExpSection(def, lines)).join('');
+  return visible.map(({ def, lines }) => renderExpSection(def, lines)).join('');
 }
 
 function renderExpSection(def, lines) {
@@ -4831,8 +4855,6 @@ async function copyUbuddyPrompt() {
 }
 
 
-let _pendingReason = null; // selectReason で選ばれ commitReason で確定
-
 function _getQuestionNote() {
   const el = document.getElementById('question-note-input');
   return el ? el.value.trim() : '';
@@ -4843,21 +4865,9 @@ function _getFeynmanNote() {
   return el ? el.value.trim() : '';
 }
 
-function selectReason(reason) {
-  _pendingReason = reason;
-  // 選択ボタンをハイライト
-  document.querySelectorAll('.reason-btn').forEach(btn => {
-    const isSelected = btn.getAttribute('onclick').includes(`'${reason}'`);
-    btn.style.opacity = isSelected ? '1' : '0.45';
-    btn.style.transform = isSelected ? 'scale(1.04)' : '';
-    btn.style.boxShadow = isSelected ? '0 0 0 2px #c53030' : '';
-  });
-  const nextBtn = document.getElementById('reason-next-btn');
-  if (nextBtn) nextBtn.style.display = 'block';
-}
-
+// 選択肢理解チェック完了後に不正解を記録して次へ
 function commitReason() {
-  recordAnswer(false, _pendingReason || 'other', false);
+  recordAnswer(false);
 }
 
 function renderChoices(choices) {
@@ -5013,8 +5023,10 @@ function submitNumericAnswer() {
           あなたの回答：<strong style="color:#c53030">${escapeHtml(input)}</strong>　／
           正解：<strong style="color:#276749">${escapeHtml(q.answer || '')}</strong>
         </div>
+        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px">
+          <button class="btn btn-danger btn-xl" onclick="recordAnswer(false)" style="min-width:140px">次の問題へ →</button>
+        </div>
       </div>`;
-    document.getElementById('reason-picker').style.display = 'block';
   }
 }
 
@@ -5080,165 +5092,62 @@ function revealAnswer() {
   }, 80);
 }
 
+// 選択肢チェックに渡すための解答コンテキスト
+let _choiceCheckAnswerCtx = null;
+
 function autoJudge() {
-  // ○/× マークではなく q.answer を正解の根拠にする
-  // →「誤っているのはどれか」問題で × 選択肢が正解になる場合も正しく判定できる
   const answerKeys = getAnswerKeys();
   const isCorrect =
     answerKeys.size > 0 &&
     answerKeys.size === _selectedChoices.size &&
     [...answerKeys].every(k => _selectedChoices.has(k));
 
-  const el = document.getElementById('auto-judge-result');
-  el.style.display = 'block';
+  const correctLabels  = [...answerKeys].sort().join('・');
+  const selectedLabels = _selectedChoices.size > 0
+    ? [..._selectedChoices].sort().join('・') : '（未選択）';
 
-  if (isCorrect) {
-    const reviewSRLabel = _isReviewMode && queue[qIdx] && queue[qIdx].srInterval
-      ? ` (+${queue[qIdx].srInterval >= 30 ? '卒業🎓' : (queue[qIdx].srInterval >= 7 ? '30日後' : (queue[qIdx].srInterval >= 3 ? '7日後' : '3日後'))})`
-      : '';
-    el.innerHTML = `
-      <div style="padding:16px 0 12px;border-top:2px solid #e2e8f0;margin-top:16px">
-        <div style="text-align:center;margin-bottom:14px">
-          <div style="font-size:48px;line-height:1;margin-bottom:6px">🎉</div>
-          <div style="font-size:20px;font-weight:800;color:#276749">正解！${reviewSRLabel ? `<span style="font-size:13px;color:#553c9a;font-weight:600;margin-left:8px">${reviewSRLabel}</span>` : ''}</div>
-        </div>
-        <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px">
-          <button onclick="startChoiceCheck()"
-            style="min-width:180px;padding:10px 18px;background:#553c9a;color:white;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">
-            📚 選択肢理解チェック
-          </button>
-          <button class="btn btn-success btn-xl" onclick="recordAnswer(true)" style="min-width:150px">次の問題へ →</button>
-          <button class="btn btn-xl" onclick="recordAnswer(true, null, true)"
-            style="min-width:130px;background:#fff8e1;color:#b7791f;border:2px solid #f6e05e;font-weight:700">
-            ⚠️ あやふや
-          </button>
-        </div>
-      </div>`;
-  } else {
-    const correctLabels = [...answerKeys].sort().join('・');
-    const selectedLabels = _selectedChoices.size > 0
-      ? [..._selectedChoices].sort().join('・')
-      : '（未選択）';
+  // SR ラベル（正解・復習モード時）
+  let srLabel = '';
+  if (isCorrect && _isReviewMode && queue[qIdx]?.srInterval) {
+    const iv = queue[qIdx].srInterval;
+    srLabel = iv >= 30 ? '卒業🎓' : iv >= 7 ? '30日後' : iv >= 3 ? '7日後' : '3日後';
+  }
 
-    // ---- 母集団との比較データを構築 ----
+  // 母集団比較 HTML（不正解時のみ）
+  let popHTML = '';
+  if (!isCorrect) {
     const q = queue[qIdx];
     const rateMap = parseAnswerRates(q.explanation || '');
-    const hasRateData = Object.keys(rateMap).length > 0;
-
-    let popHTML = '';
-    if (hasRateData) {
-      // 正解選択肢の平均正解率（複数正解の場合は合計）
-      const avgCorrectPct = [...answerKeys]
-        .map(k => parseFloat(rateMap[k] || '0'))
-        .reduce((a, b) => a + b, 0);
-
-      // ユーザーが誤って選んだ選択肢とその選択率
-      const wrongSelected = [..._selectedChoices]
-        .filter(k => !answerKeys.has(k))
-        .map(k => ({ key: k, pct: parseFloat(rateMap[k] || '0') }));
-
-      // 難易度判定
-      const diff = avgCorrectPct >= 80
-        ? { label: '易問', color: '#276749', bg: '#f0fff4', emoji: '🟢', msg: 'ほとんどの受験生が正解する問題です。確実に押さえましょう。' }
-        : avgCorrectPct >= 60
-        ? { label: '標準', color: '#744210', bg: '#fffbeb', emoji: '🟡', msg: '半数以上が正解する標準問題です。概念の整理が有効です。' }
-        : avgCorrectPct >= 40
-        ? { label: '難問', color: '#c05621', bg: '#fff5f5', emoji: '🟠', msg: '正解者が少ない難問です。深追いしすぎず要点を押さえましょう。' }
-        : { label: '超難問', color: '#c53030', bg: '#fff5f5', emoji: '🔴', msg: '非常に難しい問題です。今は次に進んで構いません。' };
-
-      // 自分のミスが多数派か少数派か
-      const userWrongPct = wrongSelected.length > 0
-        ? wrongSelected.map(w => w.pct).reduce((a, b) => a + b, 0)
-        : 0;
-      const isMajorityMistake = userWrongPct > 10;
-
+    if (Object.keys(rateMap).length > 0) {
+      const avgCorrectPct = [...answerKeys].map(k => parseFloat(rateMap[k]||'0')).reduce((a,b)=>a+b,0);
+      const wrongSelected = [..._selectedChoices].filter(k=>!answerKeys.has(k)).map(k=>({key:k,pct:parseFloat(rateMap[k]||'0')}));
+      const diff = avgCorrectPct>=80 ? {label:'易問',color:'#276749',bg:'#f0fff4',emoji:'🟢',msg:'ほとんどの受験生が正解する問題です。確実に押さえましょう。'}
+                 : avgCorrectPct>=60 ? {label:'標準',color:'#744210',bg:'#fffbeb',emoji:'🟡',msg:'半数以上が正解する標準問題です。概念の整理が有効です。'}
+                 : avgCorrectPct>=40 ? {label:'難問',color:'#c05621',bg:'#fff5f5',emoji:'🟠',msg:'正解者が少ない難問です。深追いしすぎず要点を押さえましょう。'}
+                 :                    {label:'超難問',color:'#c53030',bg:'#fff5f5',emoji:'🔴',msg:'非常に難しい問題です。今は次に進んで構いません。'};
+      const userWrongPct = wrongSelected.map(w=>w.pct).reduce((a,b)=>a+b,0);
+      const isMajority = userWrongPct > 10;
       popHTML = `
-      <div style="margin:12px 0 0;background:#f7fafc;border-radius:10px;padding:14px;border:1px solid #e2e8f0;text-align:left">
+      <div style="background:#f7fafc;border-radius:10px;padding:14px;border:1px solid #e2e8f0;text-align:left;margin-top:10px">
         <div style="font-size:12px;font-weight:800;color:#4a5568;margin-bottom:10px;display:flex;align-items:center;gap:6px">
-          📊 <span>母集団との比較</span>
-          <span style="background:${diff.bg};color:${diff.color};border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;margin-left:4px">${diff.emoji} ${diff.label}（平均正解率 ${avgCorrectPct.toFixed(1)}%）</span>
+          📊 母集団との比較
+          <span style="background:${diff.bg};color:${diff.color};border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700">${diff.emoji} ${diff.label}（平均正解率 ${avgCorrectPct.toFixed(1)}%）</span>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-          ${[...answerKeys].sort().map(k => {
-            const pct = parseFloat(rateMap[k] || '0');
-            return `<div style="background:#f0fff4;border:1px solid #9ae6b4;border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:6px">
-              <span style="font-size:13px;font-weight:800;color:#276749">✅ 正解 ${k}</span>
-              <span style="font-size:12px;color:#276749;font-weight:600">${pct > 0 ? pct.toFixed(1)+'%' : '—'} が選択</span>
-            </div>`;
-          }).join('')}
-          ${wrongSelected.map(w => `
-            <div style="background:#fff5f5;border:1px solid #feb2b2;border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:6px">
-              <span style="font-size:13px;font-weight:800;color:#c53030">❌ あなた ${w.key}</span>
-              <span style="font-size:12px;color:#c53030;font-weight:600">${w.pct > 0 ? w.pct.toFixed(1)+'%' : '不明'} が選択</span>
-            </div>`).join('')}
+          ${[...answerKeys].sort().map(k=>{const pct=parseFloat(rateMap[k]||'0');return`<div style="background:#f0fff4;border:1px solid #9ae6b4;border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:6px"><span style="font-size:13px;font-weight:800;color:#276749">✅ 正解 ${k}</span><span style="font-size:12px;color:#276749;font-weight:600">${pct>0?pct.toFixed(1)+'%':'—'} が選択</span></div>`;}).join('')}
+          ${wrongSelected.map(w=>`<div style="background:#fff5f5;border:1px solid #feb2b2;border-radius:8px;padding:6px 12px;display:flex;align-items:center;gap:6px"><span style="font-size:13px;font-weight:800;color:#c53030">❌ あなた ${w.key}</span><span style="font-size:12px;color:#c53030;font-weight:600">${w.pct>0?w.pct.toFixed(1)+'%':'不明'} が選択</span></div>`).join('')}
         </div>
-        <div style="font-size:12px;padding:8px 10px;border-radius:7px;background:${isMajorityMistake ? '#fffbeb' : '#ebf8ff'};color:${isMajorityMistake ? '#744210' : '#2c5282'}">
-          ${isMajorityMistake
-            ? `⚠️ <strong>多くの受験生も同じ選択肢を選んでいます（${userWrongPct.toFixed(1)}%）。</strong>紛らわしい問題です。鑑別ポイントを整理しましょう。`
-            : `💡 <strong>この誤答パターンは少数派です（${userWrongPct > 0 ? userWrongPct.toFixed(1)+'%' : '少数'}）。</strong>${diff.msg}`}
+        <div style="font-size:12px;padding:8px 10px;border-radius:7px;background:${isMajority?'#fffbeb':'#ebf8ff'};color:${isMajority?'#744210':'#2c5282'}">
+          ${isMajority?`⚠️ <strong>多くの受験生も同じ選択肢を選んでいます（${userWrongPct.toFixed(1)}%）。</strong>紛らわしい問題です。鑑別ポイントを整理しましょう。`:`💡 <strong>この誤答パターンは少数派です（${userWrongPct>0?userWrongPct.toFixed(1)+'%':'少数'}）。</strong>${diff.msg}`}
         </div>
       </div>`;
     }
-
-    el.innerHTML = `
-      <div style="padding:16px 0 4px;border-top:2px solid #e2e8f0;margin-top:16px">
-
-        <!-- ① ❌ ヘッダー -->
-        <div style="text-align:center;margin-bottom:14px">
-          <div style="font-size:44px;line-height:1;margin-bottom:6px">❌</div>
-          <div style="font-size:18px;font-weight:800;color:#c53030;margin-bottom:6px">不正解</div>
-          <div style="font-size:13px;color:#718096">
-            あなたの選択：<strong style="color:#c53030">${selectedLabels}</strong>　／
-            正解：<strong style="color:#276749">${correctLabels}</strong>
-          </div>
-        </div>
-
-        <!-- ② 間違えた原因（直下） -->
-        <div style="background:#fff5f5;border:1px solid #fed7d7;border-radius:10px;padding:14px;margin-bottom:14px">
-          <div style="font-size:13px;font-weight:800;color:#c53030;margin-bottom:10px">❌ 間違えた原因を選んでください</div>
-          <div class="reason-grid" id="reason-grid">
-            <button class="reason-btn r-knowledge" onclick="selectReason('knowledge')">
-              📚 知識不足<br><span style="font-size:10px;font-weight:400">知らなかった</span>
-            </button>
-            <button class="reason-btn r-concept" onclick="selectReason('concept')">
-              🌀 理解不足<br><span style="font-size:10px;font-weight:400">概念が曖昧</span>
-            </button>
-            <button class="reason-btn r-count" onclick="selectReason('count')">
-              🔢 個数ミス<br><span style="font-size:10px;font-weight:400">選ぶ数を間違えた</span>
-            </button>
-            <button class="reason-btn r-misread" onclick="selectReason('misread')">
-              👀 読み違え<br><span style="font-size:10px;font-weight:400">問題文の誤読</span>
-            </button>
-            <button class="reason-btn r-careless" onclick="selectReason('careless')">
-              🖱️ うっかり<br><span style="font-size:10px;font-weight:400">クリック・ケアレス</span>
-            </button>
-            <button class="reason-btn r-calc" onclick="selectReason('calc')">
-              🔢 計算ミス<br><span style="font-size:10px;font-weight:400">計算を間違えた</span>
-            </button>
-            <button class="reason-btn r-other" onclick="selectReason('other')" style="grid-column:span 3">
-              💬 その他
-            </button>
-          </div>
-          <div id="reason-next-btn" style="display:none;margin-top:12px;text-align:center">
-            <button class="btn btn-danger btn-lg" onclick="commitReason()" style="min-width:200px">
-              記録して次の問題へ →
-            </button>
-          </div>
-        </div>
-
-        <!-- ③ 母集団との比較 -->
-        ${popHTML}
-
-      </div>`;
-
-    // 既存の reason-picker は非表示にする（インラインに含めたため）
-    document.getElementById('reason-picker').style.display = 'none';
   }
-}
 
-function showReasonPicker() {
-  document.getElementById('judge-buttons').style.display = 'none';
-  document.getElementById('reason-picker').style.display = 'block';
+  // コンテキストを保存してチェックパネルに渡す
+  _choiceCheckAnswerCtx = { isCorrect, correctLabels, selectedLabels, srLabel, popHTML };
+  document.getElementById('auto-judge-result').style.display = 'block';
+  startChoiceCheck(!isCorrect); // 選択肢理解チェックを自動起動
 }
 
 // reason: undefined(正解) | 'knowledge'|'concept'|'count'|'misread'|'careless'|'calc'|'other'
@@ -5251,6 +5160,7 @@ function recordAnswer(ok, reason, fuzzy) {
     attempt.seconds = Math.round((Date.now() - _questionStartTime) / 1000);
     _questionStartTime = null;
   }
+  // reason は後方互換のため残す（UI上は廃止済み）
   if (!ok && reason) attempt.reason = reason;
   if (ok && fuzzy) attempt.fuzzy = true;
   // 不正解時：選んだ選択肢と母集団データを保存（弱点分析用）
