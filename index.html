@@ -369,7 +369,7 @@ select.form-input { cursor: pointer; }
       <div class="hdr-stat-label">今日</div>
     </div>
     <div class="hdr-stat" style="font-size:10px;opacity:0.85;min-width:60px;text-align:right">
-      <div id="sync-status" style="color:#a0aec0;font-size:10px;white-space:nowrap">接続中...</div>
+      <div id="sync-status" style="color:#e2e8f0;font-size:10px;white-space:nowrap">接続中...</div>
     </div>
   </div>
 </header>
@@ -1598,7 +1598,7 @@ let _unsubscribeSnapshot = null; // リアルタイム監視の解除関数
 async function initFirebase() {
   if (typeof firebase === 'undefined') {
     console.warn('[Firebase] SDKが読み込まれていません（オフラインまたはCDNブロック）。');
-    _updateSyncStatus('オフライン', '#a0aec0');
+    _updateSyncStatus('オフライン', '#e2e8f0');
     _showCloudLoadingError('オフライン — Firebase SDK未接続');
     return;
   }
@@ -1620,7 +1620,7 @@ async function initFirebase() {
     }
 
     _cloudSyncEnabled = true;
-    _updateSyncStatus('接続済み ☁️', '#276749');
+    _updateSyncStatus('接続済み ☁️', '#9ae6b4');
     console.log('[Firebase] signed in:', _userId);
 
     // 旧localStorage残存データの一回限り移行（他端末でlocalStorageを使っていた場合）
@@ -1660,7 +1660,7 @@ async function initFirebase() {
     _hideCloudLoadingOverlay();
   } catch(e) {
     console.warn('[Firebase] 初期化失敗:', e);
-    _updateSyncStatus('オフライン', '#a0aec0');
+    _updateSyncStatus('オフライン', '#e2e8f0');
     _showCloudLoadingError('接続エラー — ' + e.message);
   }
 }
@@ -1704,7 +1704,7 @@ function startRealtimeSync() {
       updateHeader();
       renderDashboard();
       updateStudyModes();
-      _updateSyncStatus('同期済み ☁️', '#276749');
+      _updateSyncStatus('同期済み ☁️', '#9ae6b4');
       console.log('[Firebase] 他デバイスの変更を反映しました（', cloudQ.length, '問）');
     }, (err) => {
       console.warn('[Firebase] リアルタイム監視エラー:', err);
@@ -1715,7 +1715,7 @@ function startRealtimeSync() {
 async function syncFromCloud() {
   if (!_db || !_userId) return;
   try {
-    _updateSyncStatus('同期中...', '#b7791f');
+    _updateSyncStatus('同期中...', '#fefcbf');
     // metaドキュメントでチャンク数を確認
     const metaDoc = await _db.collection('users').doc(_userId)
       .collection('data').doc('meta').get();
@@ -1760,7 +1760,7 @@ async function syncFromCloud() {
     _updateSyncStatus('同期済み ☁️', '#276749');
   } catch(e) {
     console.warn('[Firebase] 同期失敗:', e);
-    _updateSyncStatus('同期エラー', '#c53030');
+    _updateSyncStatus('同期エラー', '#feb2b2');
   }
 }
 
@@ -1795,7 +1795,7 @@ async function saveToCloudNow() {
     console.log('[Firebase] クラウドに', questions.length, '問を保存（', chunks.length, 'チャンク）');
   } catch(e) {
     console.warn('[Firebase] クラウド保存失敗:', e);
-    _updateSyncStatus('保存エラー', '#c53030');
+    _updateSyncStatus('保存エラー', '#feb2b2');
   }
 }
 
@@ -1921,7 +1921,7 @@ function migrateTagNames() {
   if (changed) save();
 }
 function save() {
-  _updateSyncStatus('未保存 ●', '#b7791f');
+  _updateSyncStatus('未保存 ●', '#fbd38d');
   // ① ローカルバックアップ：Firestoreへの書き込みが完了する前にリフレッシュされても
   //    解答記録が消えないよう、変更データをlocalStorageに即時書き込みする
   _saveLocalBackup();
@@ -5837,9 +5837,19 @@ async function endStudy() {
   // 解答済みだが選択肢チェックが未完了のまま終了 → 答えを記録してから終わる
   _flushPendingAnswer();
   stopQuestionTimer();
-  // Firestoreに即時書き込み（1〜2秒フリーズ許容）
-  _updateSyncStatus('保存中...', '#b7791f');
-  try { await saveToCloudNow(); } catch(e) { console.warn('endStudy save error', e); }
+  // デバウンスタイマーをキャンセルして即時保存
+  clearTimeout(_saveDebounceTimer);
+  _saveDebounceTimer = null;
+  if (_cloudSyncEnabled && _db && _userId) {
+    _updateSyncStatus('保存中...', '#fefcbf');
+    try { await saveToCloudNow(); } catch(e) {
+      console.warn('endStudy save error', e);
+      _updateSyncStatus('保存エラー', '#feb2b2');
+    }
+  } else {
+    // クラウド同期が無効の場合はローカルのみ
+    _updateSyncStatus('保存済み ✓', '#9ae6b4');
+  }
   backToStudySetup();
 }
 
