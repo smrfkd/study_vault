@@ -15,6 +15,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1588,6 +1589,7 @@ const FIREBASE_CONFIG = {
 };
 
 let _db = null;
+let _storage = null;
 let _userId = null;
 let _cloudSyncEnabled = false;
 let _saveDebounceTimer = null;
@@ -1603,6 +1605,7 @@ async function initFirebase() {
   try {
     firebase.initializeApp(FIREBASE_CONFIG);
     _db = firebase.firestore();
+    _storage = (typeof firebase.storage === 'function') ? firebase.storage() : null;
     const auth = firebase.auth();
 
     const savedUid = localStorage.getItem('kokushi_uid');
@@ -1695,6 +1698,7 @@ function startRealtimeSync() {
       if (cloudQ.length === questions.length &&
           cloudQ.every((q,i) => q.nextReview === questions[i]?.nextReview && q.attempts?.length === questions[i]?.attempts?.length)) return;
       questions = cloudQ;
+      _mergeLocalBackup(); // バックアップマージ（他デバイスの変更 vs ローカル未送信変更の調停）
       deduplicateAttempts();
       migrateTagNames();
       updateHeader();
@@ -1727,6 +1731,8 @@ async function syncFromCloud() {
       const cloudQ = chunkDocs.flatMap(d => d.exists ? (d.data().questions || []) : []);
       if (cloudQ.length > 0) {
         questions = cloudQ;
+        // ローカルバックアップをマージ（リフレッシュ直後でFirestoreが古い場合の救済）
+        _mergeLocalBackup();
         deduplicateAttempts();
         migrateTagNames();
         updateHeader();
@@ -1783,6 +1789,8 @@ async function saveToCloudNow() {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     await batch.commit();
+    // Firestore書き込み完了 → ローカルバックアップは不要になるので削除
+    try { localStorage.removeItem('kokushi_local_backup'); } catch(e) {}
     _updateSyncStatus('同期済み ☁️', '#276749');
     console.log('[Firebase] クラウドに', questions.length, '問を保存（', chunks.length, 'チャンク）');
   } catch(e) {
@@ -1913,9 +1921,77 @@ function migrateTagNames() {
   if (changed) save();
 }
 function save() {
-  // localStorage保存を廃止 → Firestoreのみに保存
   _updateSyncStatus('未保存 ●', '#b7791f');
+  // ① ローカルバックアップ：Firestoreへの書き込みが完了する前にリフレッシュされても
+  //    解答記録が消えないよう、変更データをlocalStorageに即時書き込みする
+  _saveLocalBackup();
+  // ② Firestoreへの書き込み（3秒デバウンス）
   saveToCloud();
+}
+
+// Firestoreから読み込んだquestionsにlocalStorageバックアップをマージ
+// （リフレッシュでFirestoreが古い場合に、attempts数の多い方を採用）
+function _mergeLocalBackup() {
+  try {
+    const raw = localStorage.getItem('kokushi_local_backup');
+    if (!raw) return;
+    const { savedAt, changes } = JSON.parse(raw);
+    // バックアップが24時間以上古い場合は無視（古すぎるバックアップの誤適用を防ぐ）
+    if (Date.now() - savedAt > 86400000) {
+      localStorage.removeItem('kokushi_local_backup');
+      return;
+    }
+    let merged = 0;
+    for (const q of questions) {
+      const bk = changes[q.id];
+      if (!bk) continue;
+      // attemptsはより多い方を採用（Firestoreが古い＝リフレッシュ直後のケース）
+      if ((bk.attempts?.length || 0) > (q.attempts?.length || 0)) {
+        q.attempts = bk.attempts;
+        q.nextReview = bk.nextReview ?? q.nextReview;
+        q.srInterval = bk.srInterval ?? q.srInterval;
+        merged++;
+      }
+      // その他フィールドもバックアップを優先（欠けている場合のみ）
+      if (bk.personalNote !== undefined && !q.personalNote) q.personalNote = bk.personalNote;
+      if (bk.flagged !== undefined) q.flagged = bk.flagged;
+      if (bk.choiceNotes && !q.choiceNotes) q.choiceNotes = bk.choiceNotes;
+      if (bk.ankiLinks && !q.ankiLinks) q.ankiLinks = bk.ankiLinks;
+      if (bk.choiceImages && !q.choiceImages) q.choiceImages = bk.choiceImages;
+    }
+    if (merged > 0) {
+      console.log(`[Backup] ローカルバックアップから ${merged} 問の解答記録を復元しました`);
+    }
+  } catch(e) {
+    console.warn('[Backup] マージ失敗:', e);
+  }
+}
+
+// 解答記録の変更分をlocalStorageに即時保存（Firestoreのデバウンス期間の橋渡し）
+function _saveLocalBackup() {
+  try {
+    const changes = {};
+    for (const q of questions) {
+      if (!q.id || !q.attempts || q.attempts.length === 0) continue;
+      changes[q.id] = {
+        attempts: q.attempts,
+        nextReview: q.nextReview,
+        srInterval: q.srInterval,
+        ankiDismissed: q.ankiDismissed,
+        ankiLinks: q.ankiLinks,
+        choiceImages: q.choiceImages,
+        choiceNotes: q.choiceNotes,
+        personalNote: q.personalNote,
+        flagged: q.flagged,
+      };
+    }
+    localStorage.setItem('kokushi_local_backup', JSON.stringify({
+      savedAt: Date.now(),
+      changes,
+    }));
+  } catch(e) {
+    console.warn('[Backup] localStorageへの書き込み失敗:', e);
+  }
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
@@ -3543,9 +3619,18 @@ function _renderChoiceCheckPanel() {
           ${correctMark}<br>${expContent}
         </div>
         <div id="cc-anki-${c.key}"></div>
-        <textarea id="cc-note-${c.key}" onblur="saveChoiceNote('${c.key}')" onkeydown="event.stopPropagation()"
-          style="width:100%;box-sizing:border-box;border:1px solid #e2e8f0;border-radius:6px;padding:7px 10px;font-size:13px;line-height:1.7;resize:vertical;min-height:48px"
-          placeholder="💡 追記メモ（覚え方・補足）...">${escapeHtml(note)}</textarea>
+        <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:4px">
+          <textarea id="cc-note-${c.key}" onblur="saveChoiceNote('${c.key}')" onkeydown="event.stopPropagation()"
+            style="flex:1;box-sizing:border-box;border:1px solid #e2e8f0;border-radius:6px;padding:7px 10px;font-size:13px;line-height:1.7;resize:vertical;min-height:48px"
+            placeholder="💡 追記メモ（覚え方・補足）...">${escapeHtml(note)}</textarea>
+          <label title="画像をアップロード"
+            style="cursor:pointer;padding:6px 8px;background:#f0f4ff;border:1px solid #c3dafe;border-radius:6px;font-size:16px;line-height:1;color:#4361ee;flex-shrink:0;align-self:flex-start;margin-top:0">
+            📷
+            <input type="file" accept="image/*" style="display:none"
+              onchange="uploadChoiceImage('${c.key}', this)">
+          </label>
+        </div>
+        <div id="cc-images-${c.key}" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
         ${actionButtons}
       </div>
     </div>`;
@@ -3582,6 +3667,8 @@ function _renderChoiceCheckPanel() {
   </div>`;
   // 全選択肢のAnkiカードを描画（折りたたみ状態で）
   _choiceCheckAll.forEach(c => _renderCcAnkiCards(c.key));
+  // 保存済み画像のサムネイルを描画
+  _choiceCheckAll.forEach(c => _renderChoiceImageThumbs(c.key));
 }
 
 function revealChoiceExp(key) {
@@ -3638,6 +3725,22 @@ function _renderCcAnkiCards(key) {
   if (body) body.style.display = 'none';
 }
 
+// .qpanel-right内でelが中央に来るようスクロール（scrollIntoViewはoverflow-y:autoコンテナで不安定なため）
+function _scrollIntoPanel(el) {
+  if (!el) return;
+  const panel = document.querySelector('.qpanel-right');
+  if (!panel) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+  // elのpanelからの相対offsetTopを再帰的に計算
+  let offsetTop = 0;
+  let node = el;
+  while (node && node !== panel) {
+    offsetTop += node.offsetTop;
+    node = node.offsetParent;
+  }
+  const targetTop = offsetTop - panel.clientHeight / 2 + el.offsetHeight / 2;
+  panel.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+}
+
 function rateChoice(key, matched) {
   saveChoiceNote(key);
   _choiceCheckState[key] = matched ? 'matched' : 'unmatched';
@@ -3649,8 +3752,8 @@ function rateChoice(key, matched) {
     // 「次の問題へ」ボタンへスクロール
     setTimeout(() => {
       const fin = document.getElementById('choice-check-finalize');
-      if (fin) fin.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 80);
+      _scrollIntoPanel(fin);
+    }, 100);
     return;
   }
 
@@ -3663,8 +3766,8 @@ function rateChoice(key, matched) {
   if (nextKey) {
     setTimeout(() => {
       const el = document.getElementById(`cc-card-${nextKey}`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 80);
+      _scrollIntoPanel(el);
+    }, 100);
   }
 }
 
@@ -3860,6 +3963,169 @@ function toggleAnkiReveal(btn) {
   front.style.display = showing ? 'block' : 'none';
   full.style.display  = showing ? 'none'  : 'block';
   btn.textContent = showing ? '答えを見る' : '隠す';
+}
+
+// ========== CHOICE IMAGE UPLOAD ==========
+
+/**
+ * 画像をリサイズしてJPEGに変換（canvas使用）
+ * @param {File} file
+ * @param {number} maxPx 最大辺長（px）
+ * @param {number} quality JPEG品質 0〜1
+ * @returns {Promise<Blob>}
+ */
+function _compressImage(file, maxPx = 1200, quality = 0.78) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxPx || height > maxPx) {
+        if (width >= height) { height = Math.round(height * maxPx / width); width = maxPx; }
+        else { width = Math.round(width * maxPx / height); height = maxPx; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('変換失敗')), 'image/jpeg', quality);
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+/**
+ * Firebase Storage にアップロードして download URL を返す
+ */
+async function _uploadToStorage(blob, path) {
+  if (!_storage) throw new Error('Firebase Storage が初期化されていません');
+  const ref = _storage.ref(path);
+  await ref.put(blob, { contentType: 'image/jpeg' });
+  return await ref.getDownloadURL();
+}
+
+/**
+ * 選択肢メモの画像をアップロード
+ */
+async function uploadChoiceImage(choiceKey, input) {
+  const file = input.files[0];
+  if (!file) return;
+  input.value = ''; // リセット（同じファイルを再選択できるよう）
+
+  const q = queue[qIdx];
+  if (!q) return;
+
+  const label = input.closest('label');
+  if (label) label.textContent = '⏳';
+
+  try {
+    // 圧縮
+    const blob = await _compressImage(file);
+    const kb = Math.round(blob.size / 1024);
+
+    // Storage パス: users/{uid}/choice-images/{qId}/{choiceKey}/{timestamp}.jpg
+    const ts = Date.now();
+    const storagePath = `users/${_userId}/choice-images/${q.id}/${choiceKey}/${ts}.jpg`;
+
+    let url;
+    if (_storage && _userId) {
+      url = await _uploadToStorage(blob, storagePath);
+    } else {
+      // オフライン fallback: data URL（Firestoreには小サイズのみ保存）
+      url = await new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = e => res(e.target.result);
+        reader.onerror = rej;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    // Firestore に URL を保存
+    if (!q.choiceImages) q.choiceImages = {};
+    if (!q.choiceImages[choiceKey]) q.choiceImages[choiceKey] = [];
+    q.choiceImages[choiceKey].push({
+      url,
+      storagePath: (_storage && _userId) ? storagePath : null,
+      filename: file.name,
+      uploadedAt: new Date().toISOString(),
+      sizeKb: kb,
+    });
+
+    const mq = questions.find(x => x.id === q.id);
+    if (mq && mq !== q) mq.choiceImages = q.choiceImages;
+
+    save();
+    saveToCloud();
+
+    _renderChoiceImageThumbs(choiceKey);
+    toast(`📷 画像を保存しました（${kb}KB）`, 'success');
+  } catch(e) {
+    console.error('画像アップロードエラー:', e);
+    toast('画像のアップロードに失敗しました: ' + e.message, 'error');
+  } finally {
+    if (label) label.textContent = '📷';
+    // input要素を再生成（同じファイルの再選択に対応）
+    if (label) {
+      const newInput = document.createElement('input');
+      newInput.type = 'file';
+      newInput.accept = 'image/*';
+      newInput.style.display = 'none';
+      newInput.setAttribute('onchange', `uploadChoiceImage('${choiceKey}', this)`);
+      label.appendChild(newInput);
+    }
+  }
+}
+
+/**
+ * 選択肢の保存済み画像サムネイルを描画
+ */
+function _renderChoiceImageThumbs(choiceKey) {
+  const q = queue[qIdx];
+  const container = document.getElementById(`cc-images-${choiceKey}`);
+  if (!q || !container) return;
+
+  const images = (q.choiceImages || {})[choiceKey] || [];
+  if (images.length === 0) { container.style.display = 'none'; return; }
+
+  container.style.display = 'flex';
+  container.innerHTML = images.map((img, i) => `
+    <div style="position:relative;display:inline-block">
+      <img src="${escapeHtml(img.url)}" alt="${escapeHtml(img.filename || '')}"
+        onclick="openLightbox('${escapeHtml(img.url)}')"
+        style="width:72px;height:72px;object-fit:cover;border-radius:7px;border:1.5px solid #c3dafe;cursor:zoom-in">
+      <button onclick="deleteChoiceImage('${choiceKey}', ${i})"
+        title="削除"
+        style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#e53e3e;color:white;border:none;cursor:pointer;font-size:10px;line-height:1;padding:0;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+  `).join('');
+}
+
+/**
+ * 画像を削除（Storage + Firestore）
+ */
+async function deleteChoiceImage(choiceKey, idx) {
+  const q = queue[qIdx];
+  if (!q || !q.choiceImages || !q.choiceImages[choiceKey]) return;
+
+  const img = q.choiceImages[choiceKey][idx];
+  if (!img) return;
+
+  // Storage から削除（パスがある場合）
+  if (img.storagePath && _storage) {
+    try { await _storage.ref(img.storagePath).delete(); } catch(e) { console.warn('Storage削除エラー:', e); }
+  }
+
+  q.choiceImages[choiceKey].splice(idx, 1);
+  if (q.choiceImages[choiceKey].length === 0) delete q.choiceImages[choiceKey];
+
+  const mq = questions.find(x => x.id === q.id);
+  if (mq && mq !== q) mq.choiceImages = q.choiceImages;
+
+  save();
+  saveToCloud();
+  _renderChoiceImageThumbs(choiceKey);
+  toast('画像を削除しました', 'success');
 }
 
 // ========== ANKI MATCHING ==========
@@ -5566,11 +5832,14 @@ function _updateFlagBtn(flagged) {
   btn.classList.add(flagged ? 'btn-flag-on' : 'btn-flag-off');
 }
 
-function endStudy() {
+async function endStudy() {
   if (qIdx>0 && !confirm('学習を終了しますか？')) return;
   // 解答済みだが選択肢チェックが未完了のまま終了 → 答えを記録してから終わる
   _flushPendingAnswer();
   stopQuestionTimer();
+  // Firestoreに即時書き込み（1〜2秒フリーズ許容）
+  _updateSyncStatus('保存中...', '#b7791f');
+  try { await saveToCloudNow(); } catch(e) { console.warn('endStudy save error', e); }
   backToStudySetup();
 }
 
