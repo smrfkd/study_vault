@@ -3523,7 +3523,7 @@ function _renderChoiceCheckPanel() {
       ? `<span style="color:#276749;font-weight:700">✓ 正解選択肢</span>`
       : `<span style="color:#c53030;font-weight:700">✗ 不正解選択肢</span>`;
     const expContent = c.expLines.length > 0
-      ? c.expLines.map(l => escapeHtml(l)).join('<br>')
+      ? c.expLines.map(l => renderTextWithImages(l)).join('<br>')
       : `<span style="color:#a0aec0">（説明文なし — ✏️編集で追記できます）</span>`;
     const actionButtons = state === 'unmatched'
       ? `<button onclick="rateChoice('${c.key}', true)" style="font-size:12px;padding:4px 12px;border:1px solid #9ae6b4;border-radius:6px;background:#f0fff4;color:#276749;cursor:pointer">修正: やはり説明できた ✓</button>`
@@ -3556,7 +3556,7 @@ function _renderChoiceCheckPanel() {
     ? `<div style="background:#fffbeb;border:1.5px solid #f6e05e;border-radius:10px;padding:12px 16px;margin-top:12px">
         <div style="font-size:13px;font-weight:800;color:#744210;margin-bottom:7px">📌 ポイント</div>
         <div style="font-size:14px;line-height:1.8;color:#2d3748">
-          ${_choiceCheckPointLines.map(l => escapeHtml(l)).join('<br>')}
+          ${_choiceCheckPointLines.map(l => renderTextWithImages(l)).join('<br>')}
         </div>
       </div>`
     : '';
