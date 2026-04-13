@@ -3532,7 +3532,7 @@ function _renderChoiceCheckPanel() {
            <button onclick="rateChoice('${c.key}', false)" style="font-size:13px;padding:5px 16px;background:#fff5f5;color:#c53030;border:1px solid #fed7d7;border-radius:6px;cursor:pointer;font-weight:700">✗ できなかった</button>
          </div>`;
 
-    return `<div style="border:1px solid ${border};border-radius:10px;padding:10px 14px;margin-bottom:8px;background:${bg}">
+    return `<div id="cc-card-${c.key}" style="border:1px solid ${border};border-radius:10px;padding:10px 14px;margin-bottom:8px;background:${bg}">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-size:15px;font-weight:800;color:#4a5568;min-width:18px">${c.key}</span>
         <span style="font-size:14px;color:#4a5568;flex:1;margin:0 10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(c.text || '（テキストなし）')}</span>
@@ -3642,11 +3642,30 @@ function rateChoice(key, matched) {
   saveChoiceNote(key);
   _choiceCheckState[key] = matched ? 'matched' : 'unmatched';
   _renderChoiceCheckPanel();
-  if (!matched) {
-    const el = document.getElementById(`cc-exp-${key}`);
-    if (el) el.style.display = 'block';
+
+  // 全評価完了チェック
+  if (Object.values(_choiceCheckState).every(v => v !== null)) {
+    _finalizeChoiceCheck();
+    // 「次の問題へ」ボタンへスクロール
+    setTimeout(() => {
+      const fin = document.getElementById('choice-check-finalize');
+      if (fin) fin.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
+    return;
   }
-  if (Object.values(_choiceCheckState).every(v => v !== null)) _finalizeChoiceCheck();
+
+  // 次の未評価選択肢へスクロール
+  const keys = _choiceCheckAll.map(c => c.key);
+  const currentIdx = keys.indexOf(key);
+  // 現在の次から探し、なければ先頭から探す
+  const nextKey = keys.slice(currentIdx + 1).find(k => _choiceCheckState[k] === null)
+    ?? keys.find(k => _choiceCheckState[k] === null);
+  if (nextKey) {
+    setTimeout(() => {
+      const el = document.getElementById(`cc-card-${nextKey}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
+  }
 }
 
 function saveChoiceNote(key) {
