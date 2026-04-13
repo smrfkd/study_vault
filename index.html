@@ -174,6 +174,15 @@ select.form-input { cursor: pointer; }
 .anki-card-front { font-size:13px;line-height:1.7;color:#2d3748; }
 .anki-card-full { font-size:13px;line-height:1.7;color:#2d3748; }
 .anki-relevance { font-size:11px;color:#718096;font-style:italic;flex:1; }
+/* Anki候補レビュー */
+.anki-candidate-item { background:#fff;border:1.5px solid #e9d8fd;border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:6px; }
+.anki-candidate-item.approved { border-color:#9ae6b4;background:#f0fff4; }
+.anki-candidate-item.rejected { opacity:0.4;border-color:#e2e8f0; }
+.anki-candidate-actions { display:flex;gap:8px;align-items:center;margin-top:4px; }
+.anki-approve-btn { font-size:12px;padding:4px 12px;background:#276749;color:white;border:none;border-radius:7px;cursor:pointer;font-weight:700; }
+.anki-reject-btn  { font-size:12px;padding:4px 12px;background:#fff;color:#a0aec0;border:1px solid #e2e8f0;border-radius:7px;cursor:pointer; }
+/* 選択肢チェック内Ankiカード */
+.cc-anki-mini { margin-top:6px;background:#faf5ff;border:1px solid #e9d8fd;border-radius:8px;padding:7px 10px;font-size:12px;color:#553c9a; }
 .session-header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; background: white; padding: 14px 18px; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
 .session-counts { display: flex; gap: 16px; font-size: 14px; font-weight: 700; }
 
@@ -959,6 +968,23 @@ select.form-input { cursor: pointer; }
               <span id="anki-chevron" style="font-size:11px">▼</span>
             </div>
             <div id="anki-cards-body" class="anki-cards-body" style="display:none"></div>
+          </div>
+          <!-- Ankiカード未リンク → 候補を探す -->
+          <div id="anki-match-area" style="display:none;margin-top:10px">
+            <div id="anki-match-btn-wrap" style="text-align:center">
+              <button onclick="runAnkiMatchForCurrent()"
+                style="font-size:12px;padding:6px 18px;background:#faf5ff;border:1.5px solid #b794f4;border-radius:9px;color:#553c9a;cursor:pointer;font-weight:700">
+                🔍 AIでAnkiカード候補を探す
+              </button>
+            </div>
+            <!-- 候補レビューUI -->
+            <div id="anki-candidates-wrap" style="display:none;margin-top:10px">
+              <div style="font-size:12px;font-weight:700;color:#553c9a;margin-bottom:8px">
+                📋 候補カード — ✓で確定リンク、✗でスキップ
+              </div>
+              <div id="anki-candidates-body" style="display:flex;flex-direction:column;gap:8px"></div>
+              <div id="anki-candidates-commit" style="margin-top:10px;text-align:right"></div>
+            </div>
           </div>
 
           <!-- 前回の理解メモ（解説確認後に表示） -->
@@ -3525,6 +3551,7 @@ function _renderChoiceCheckPanel() {
         <div style="font-size:14px;line-height:1.8;color:#2d3748;background:#f7faff;border-radius:6px;padding:9px 12px;margin-bottom:8px">
           ${correctMark}<br>${expContent}
         </div>
+        <div id="cc-anki-${c.key}"></div>
         <textarea id="cc-note-${c.key}" onblur="saveChoiceNote('${c.key}')" onkeydown="event.stopPropagation()"
           style="width:100%;box-sizing:border-box;border:1px solid #e2e8f0;border-radius:6px;padding:7px 10px;font-size:13px;line-height:1.7;resize:vertical;min-height:48px"
           placeholder="💡 追記メモ（覚え方・補足）...">${escapeHtml(note)}</textarea>
@@ -3568,6 +3595,44 @@ function _renderChoiceCheckPanel() {
 function revealChoiceExp(key) {
   const el = document.getElementById(`cc-exp-${key}`);
   if (el) el.style.display = 'block';
+  // 選択肢に対応するリンク済みAnkiカードを表示
+  _renderCcAnkiCards(key);
+}
+
+function _renderCcAnkiCards(key) {
+  const q = queue[qIdx];
+  const container = document.getElementById(`cc-anki-${key}`);
+  if (!q || !container) return;
+
+  const allLinks = (q.ankiLinks && q.ankiLinks.length > 0)
+    ? q.ankiLinks : (ANKI_LINKS[q.id] || []);
+  // この選択肢に対応するカード（choice一致、または全体/未設定かつ全選択肢に表示）
+  const related = allLinks.filter(c =>
+    !c.choice || c.choice === key || c.choice === '全体'
+  );
+  if (related.length === 0) { container.innerHTML = ''; return; }
+
+  container.innerHTML = `<div style="margin-bottom:8px">
+    <div style="font-size:11px;font-weight:700;color:#553c9a;margin-bottom:4px">📇 関連Ankiカード</div>
+    ${related.map(c => {
+      const src = (c.raw && c.raw.includes('{{c')) ? c.raw : c.plain;
+      const front = src.replace(/\{\{c\d+::([^:}]+)(?:::[^}]*)?\}\}/g,
+        '<span style="background:#e9d8fd;border-radius:3px;padding:0 4px;color:#553c9a;font-weight:700">▢▢▢</span>');
+      const full  = src.replace(/\{\{c\d+::([^:}]+)(?:::[^}]*)?\}\}/g,
+        '<strong style="color:#553c9a">$1</strong>');
+      const deckBg   = c.deck === 'Pathoma' ? '#ebf8ff' : c.deck === 'Sketchy Pharm' ? '#f0fff4' : '#fefcbf';
+      const deckText = c.deck === 'Pathoma' ? '#2b6cb0' : c.deck === 'Sketchy Pharm' ? '#276749' : '#744210';
+      return `<div class="cc-anki-mini" data-cc-anki-front>
+        <div style="display:flex;gap:5px;align-items:center;margin-bottom:4px">
+          <span style="font-size:10px;font-weight:700;background:${deckBg};color:${deckText};border-radius:6px;padding:1px 7px">${escapeHtml(c.deck)}</span>
+        </div>
+        <div class="cc-anki-front-text">${front}</div>
+        <div class="cc-anki-full-text" style="display:none">${full}</div>
+        <button onclick="this.previousElementSibling.style.display='block';this.previousElementSibling.previousElementSibling.style.display='none';this.style.display='none'"
+          style="font-size:10px;padding:2px 8px;border:1px solid #9f7aea;border-radius:6px;background:white;color:#553c9a;cursor:pointer;margin-top:4px">答えを見る</button>
+      </div>`;
+    }).join('')}
+  </div>`;
 }
 
 function rateChoice(key, matched) {
@@ -3716,41 +3781,66 @@ async function loadAnkiLinks() {
 
 async function renderAnkiCards(q) {
   const area = document.getElementById('anki-cards-area');
+  const matchArea = document.getElementById('anki-match-area');
   if (!area || !q) return;
-  // JSONがまだ読み込まれていなければ待つ
-  if (!_ankiLinksLoaded) {
-    await loadAnkiLinks();
-  }
-  const cards = ANKI_LINKS[q.id];
-  if (!cards || cards.length === 0) { area.style.display = 'none'; return; }
-  const dismissed = q.ankiDismissed || [];
-  const visible = cards.map((c, i) => ({...c, origIdx: i})).filter(c => !dismissed.includes(c.origIdx));
-  if (visible.length === 0) { area.style.display = 'none'; return; }
-  area.style.display = 'block';
-  document.getElementById('anki-count-badge').textContent = visible.length;
-  const body = document.getElementById('anki-cards-body');
-  body.style.display = 'none'; // デフォルト折り畳み
-  document.getElementById('anki-chevron').textContent = '▼';
-  body.innerHTML = visible.map(card => {
-    // rawフィールド（cloze記法あり）を優先。なければplainで代替
+
+  // q.ankiLinks（Firestore保存済み）を優先、なければ静的anki_links.json
+  let cards = (q.ankiLinks && q.ankiLinks.length > 0)
+    ? q.ankiLinks
+    : (!_ankiLinksLoaded ? (await loadAnkiLinks(), ANKI_LINKS[q.id]) : ANKI_LINKS[q.id]);
+
+  const _renderCard = (card, origIdx) => {
     const src = (card.raw && card.raw.includes('{{c')) ? card.raw : card.plain;
     const front = src.replace(/\{\{c\d+::([^:}]+)(?:::[^}]*)?\}\}/g, '<span style="background:#e9d8fd;border-radius:4px;padding:0 6px;color:#553c9a;font-weight:700">▢▢▢</span>');
     const full  = src.replace(/\{\{c\d+::([^:}]+)(?:::[^}]*)?\}\}/g, '<strong style="color:#553c9a;background:#f3e8ff;border-radius:4px;padding:0 4px">$1</strong>');
-    const deckColor = card.deck === 'Pathoma' ? '#ebf8ff' : card.deck === 'Sketchy Pharm' ? '#f0fff4' : '#fefcbf';
-    const deckText  = card.deck === 'Pathoma' ? '#2b6cb0' : card.deck === 'Sketchy Pharm' ? '#276749' : '#744210';
-    return `<div class="anki-card-item" id="ankicard-${card.origIdx}">
+    const deckBg   = card.deck === 'Pathoma' ? '#ebf8ff' : card.deck === 'Sketchy Pharm' ? '#f0fff4' : '#fefcbf';
+    const deckText = card.deck === 'Pathoma' ? '#2b6cb0' : card.deck === 'Sketchy Pharm' ? '#276749' : '#744210';
+    const choiceBadge = (card.choice && card.choice !== '全体')
+      ? `<span style="font-size:10px;background:#e9d8fd;color:#553c9a;border-radius:6px;padding:1px 7px;margin-left:4px">選択肢 ${escapeHtml(card.choice)}</span>` : '';
+    return `<div class="anki-card-item" id="ankicard-${origIdx}">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="font-size:10px;font-weight:700;background:${deckColor};color:${deckText};border-radius:8px;padding:2px 9px">${escapeHtml(card.deck)}</span>
-        <button onclick="dismissAnkiCard('${q.id}',${card.origIdx})" title="このカードを非表示" style="border:none;background:none;color:#a0aec0;cursor:pointer;font-size:16px;padding:0;line-height:1;margin-left:8px">×</button>
+        <div><span style="font-size:10px;font-weight:700;background:${deckBg};color:${deckText};border-radius:8px;padding:2px 9px">${escapeHtml(card.deck)}</span>${choiceBadge}</div>
+        <button onclick="dismissAnkiCard('${q.id}',${origIdx})" title="このカードを非表示" style="border:none;background:none;color:#a0aec0;cursor:pointer;font-size:16px;padding:0;line-height:1;margin-left:8px">×</button>
       </div>
       <div class="anki-card-front">${front}</div>
       <div class="anki-card-full" style="display:none">${full}</div>
       <div style="display:flex;gap:8px;margin-top:8px;align-items:flex-start;flex-wrap:wrap">
         <button onclick="toggleAnkiReveal(this)" style="font-size:10px;padding:3px 10px;border:1px solid #9f7aea;border-radius:8px;background:white;color:#553c9a;cursor:pointer;white-space:nowrap;flex-shrink:0">答えを見る</button>
-        <span class="anki-relevance">🔗 ${escapeHtml(card.relevance)}</span>
+        ${card.relevance ? `<span class="anki-relevance">🔗 ${escapeHtml(card.relevance)}</span>` : ''}
       </div>
     </div>`;
-  }).join('');
+  };
+
+  if (!cards || cards.length === 0) {
+    area.style.display = 'none';
+    // 「候補を探す」ボタンを表示
+    if (matchArea) {
+      matchArea.style.display = 'block';
+      const btnWrap = document.getElementById('anki-match-btn-wrap');
+      if (btnWrap) btnWrap.innerHTML = `<button onclick="runAnkiMatchForCurrent()"
+        style="font-size:12px;padding:6px 18px;background:#faf5ff;border:1.5px solid #b794f4;border-radius:9px;color:#553c9a;cursor:pointer;font-weight:700">
+        🔍 AIでAnkiカード候補を探す
+      </button>`;
+      const candidatesWrap = document.getElementById('anki-candidates-wrap');
+      if (candidatesWrap) candidatesWrap.style.display = 'none';
+      // 既に候補があれば表示
+      if (q.ankiCandidates && q.ankiCandidates.length > 0) renderAnkiCandidates(q);
+    }
+    return;
+  }
+
+  // リンク済みカードを表示
+  const dismissed = q.ankiDismissed || [];
+  const visible = cards.map((c, i) => ({...c, origIdx: i})).filter(c => !dismissed.includes(c.origIdx));
+  if (visible.length === 0) { area.style.display = 'none'; return; }
+
+  area.style.display = 'block';
+  if (matchArea) matchArea.style.display = 'none';
+  document.getElementById('anki-count-badge').textContent = visible.length;
+  const body = document.getElementById('anki-cards-body');
+  body.style.display = 'none';
+  document.getElementById('anki-chevron').textContent = '▼';
+  body.innerHTML = visible.map(card => _renderCard(card, card.origIdx)).join('');
 }
 
 function dismissAnkiCard(qId, origIdx) {
@@ -3791,6 +3881,285 @@ function toggleAnkiReveal(btn) {
   front.style.display = showing ? 'block' : 'none';
   full.style.display  = showing ? 'none'  : 'block';
   btn.textContent = showing ? '答えを見る' : '隠す';
+}
+
+// ========== ANKI MATCHING ==========
+
+let ANKI_DECK_DATA = null;
+let _deckLoading = false;
+let _deckLoaded = false;
+
+async function loadAnkiDeck() {
+  if (_deckLoaded) return true;
+  if (_deckLoading) {
+    // ロード中なら待つ
+    while (_deckLoading) await new Promise(r => setTimeout(r, 100));
+    return _deckLoaded;
+  }
+  _deckLoading = true;
+  try {
+    const res = await fetch('./anki_deck.json');
+    if (res.ok) {
+      ANKI_DECK_DATA = await res.json();
+      _deckLoaded = true;
+    }
+  } catch(e) { console.warn('anki_deck.json 読み込み失敗:', e); }
+  _deckLoading = false;
+  return _deckLoaded;
+}
+
+// キーワードトークナイザー（英語単語 + 日本語2gram）
+function _ankiTokenize(text) {
+  const words = new Set();
+  for (const m of (text.toLowerCase().matchAll(/[a-z]{3,}/g))) words.add(m[0]);
+  const jp = text.replace(/[^\u3040-\u9fff]/g, '');
+  for (let i = 0; i < jp.length - 1; i++) words.add(jp.slice(i, i + 2));
+  return words;
+}
+
+// BM25-simplifed: クエリ × カードのトークン重複スコア
+function _bm25Score(qToks, cToks, avgLen, k1 = 1.5, b = 0.75) {
+  let s = 0;
+  for (const t of qToks) {
+    if (cToks.has(t)) s += (k1 + 1) / (1 + k1 * (1 - b + b * cToks.size / avgLen));
+  }
+  return s;
+}
+
+// デッキ全体からtopK件に絞る
+function _filterDeck(queryText, topK = 40) {
+  if (!ANKI_DECK_DATA) return [];
+  const qToks = _ankiTokenize(queryText);
+  if (qToks.size === 0) return [];
+  // 事前トークン化キャッシュ（初回のみ）
+  if (!ANKI_DECK_DATA._avgLen) {
+    ANKI_DECK_DATA.cards.forEach(c => { c._toks = _ankiTokenize(c.plain); });
+    ANKI_DECK_DATA._avgLen = ANKI_DECK_DATA.cards.reduce((s, c) => s + c._toks.size, 0) / ANKI_DECK_DATA.cards.length;
+  }
+  const avg = ANKI_DECK_DATA._avgLen;
+  return ANKI_DECK_DATA.cards
+    .map(c => ({ c, sc: _bm25Score(qToks, c._toks, avg) }))
+    .filter(x => x.sc > 0)
+    .sort((a, b) => b.sc - a.sc)
+    .slice(0, topK)
+    .map(x => x.c);
+}
+
+// Claude API呼び出し（ランキング）
+async function _callClaudeForAnkiMatch(q, candidates) {
+  const apiKey = getClaudeApiKey();
+  if (!apiKey) throw new Error('APIキーが設定されていません');
+
+  const expText = (q.explanation || '').replace(/\*\*[^*]+\*\*/g, ' ').replace(/\{\{c\d+::[^}]+\}\}/g, '').slice(0, 900);
+  const candidateList = candidates.map((c, i) =>
+    `[${i+1}] [${c.deck}] ID:${c.id}\n${c.plain.slice(0, 180)}`
+  ).join('\n\n');
+
+  const prompt = `あなたは医学教育の専門家です。
+日本の医師国家試験の問題解説を読み、関連するAnkiカードを選んでください。
+
+## 問題
+${(q.question || '').slice(0, 250)}
+
+## 選択肢解説
+${expText}
+
+## Ankiカード候補（${candidates.length}件）
+${candidateList}
+
+## 指示
+上記の候補から、この問題の学習に役立つカードを最大6枚選んでください。
+各カードについて：
+- どの選択肢（a/b/c/d/e/全体）に対応するか
+- 関連理由（日本語・20字以内）
+- 関連度スコア1〜5（3未満は除外）
+
+## 出力（JSONのみ、前後に余分なテキスト不要）
+[{"cardId":"ID","choice":"a","relevance":"理由","score":5}]`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 800,
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  });
+  if (!res.ok) throw new Error(`API error ${res.status}`);
+  const data = await res.json();
+  const text = data.content[0].text;
+  const match = text.match(/\[[\s\S]*\]/);
+  if (!match) throw new Error('JSONが返りませんでした');
+  return JSON.parse(match[0]);
+}
+
+// メインのマッチング関数（現在の問題に対して実行）
+async function runAnkiMatchForCurrent() {
+  const q = queue[qIdx];
+  if (!q) return;
+  const apiKey = getClaudeApiKey();
+  if (!apiKey) { toast('APIキーを設定してください', 'error'); return; }
+
+  const btnWrap = document.getElementById('anki-match-btn-wrap');
+  if (btnWrap) btnWrap.innerHTML = '<span style="font-size:12px;color:#a0aec0">🔄 デッキ読み込み中...</span>';
+
+  const ok = await loadAnkiDeck();
+  if (!ok) { toast('anki_deck.json の読み込みに失敗しました', 'error'); return; }
+
+  if (btnWrap) btnWrap.innerHTML = '<span style="font-size:12px;color:#a0aec0">🔍 キーワードフィルタ中...</span>';
+  const queryText = (q.question || '') + ' ' + (q.explanation || '');
+  const filtered = _filterDeck(queryText, 40);
+
+  if (filtered.length === 0) {
+    if (btnWrap) btnWrap.innerHTML = '<span style="font-size:12px;color:#a0aec0">関連カードが見つかりませんでした</span>';
+    return;
+  }
+
+  if (btnWrap) btnWrap.innerHTML = `<span style="font-size:12px;color:#a0aec0">🤖 Claude で関連度評価中（${filtered.length}件→最大6件）...</span>`;
+
+  try {
+    const results = await _callClaudeForAnkiMatch(q, filtered);
+    const cardMap = {};
+    ANKI_DECK_DATA.cards.forEach(c => { cardMap[c.id] = c; });
+
+    const candidates = results
+      .filter(r => r.score >= 3)
+      .map(r => {
+        const card = cardMap[r.cardId];
+        if (!card) return null;
+        return { id: card.id, deck: card.deck, raw: card.raw, plain: card.plain,
+                 choice: r.choice || null, relevance: r.relevance || '', score: r.score };
+      }).filter(Boolean);
+
+    if (candidates.length === 0) {
+      if (btnWrap) btnWrap.innerHTML = '<span style="font-size:12px;color:#a0aec0">関連カードが見つかりませんでした</span>';
+      return;
+    }
+
+    // 候補を問題オブジェクトに保存
+    q.ankiCandidates = candidates.map(c => ({ ...c, _status: 'pending' }));
+    if (btnWrap) btnWrap.innerHTML = '';
+    renderAnkiCandidates(q);
+
+  } catch(e) {
+    console.error(e);
+    toast('マッチングエラー: ' + e.message, 'error');
+    if (btnWrap) btnWrap.innerHTML = `<button onclick="runAnkiMatchForCurrent()" style="font-size:12px;padding:6px 18px;background:#faf5ff;border:1.5px solid #b794f4;border-radius:9px;color:#553c9a;cursor:pointer;font-weight:700">🔍 再試行</button>`;
+  }
+}
+
+// 候補レビューUI
+function renderAnkiCandidates(q) {
+  const wrap = document.getElementById('anki-candidates-wrap');
+  const body = document.getElementById('anki-candidates-body');
+  const commit = document.getElementById('anki-candidates-commit');
+  if (!wrap || !body || !q.ankiCandidates) return;
+
+  wrap.style.display = 'block';
+
+  const choiceLabel = (ch) => {
+    if (!ch || ch === '全体') return '<span style="font-size:10px;background:#e2e8f0;color:#4a5568;border-radius:6px;padding:1px 7px">問題全体</span>';
+    return `<span style="font-size:10px;background:#e9d8fd;color:#553c9a;border-radius:6px;padding:1px 7px">選択肢 ${ch}</span>`;
+  };
+  const deckColor = (d) => d === 'Pathoma' ? '#ebf8ff:#2b6cb0' : d === 'Sketchy Pharm' ? '#f0fff4:#276749' : '#fefcbf:#744210';
+
+  body.innerHTML = q.ankiCandidates.map((c, i) => {
+    const [bg, col] = deckColor(c.deck).split(':');
+    const front = (c.raw || c.plain).replace(/\{\{c\d+::([^:}]+)(?:::[^}]*)?\}\}/g,
+      '<span style="background:#e9d8fd;border-radius:3px;padding:0 5px;color:#553c9a;font-weight:700">▢▢▢</span>');
+    const statusStyle = c._status === 'approved' ? 'approved' : c._status === 'rejected' ? 'rejected' : '';
+    return `<div class="anki-candidate-item ${statusStyle}" id="anki-cand-${i}">
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">
+        <span style="font-size:10px;font-weight:700;background:${bg};color:${col};border-radius:7px;padding:1px 8px">${escapeHtml(c.deck)}</span>
+        ${choiceLabel(c.choice)}
+        <span style="font-size:10px;color:#a0aec0">関連度 ${'★'.repeat(c.score)}${'☆'.repeat(5-c.score)}</span>
+      </div>
+      <div style="font-size:12px;line-height:1.7;color:#2d3748">${front}</div>
+      <div style="font-size:11px;color:#718096;margin-top:3px;font-style:italic">🔗 ${escapeHtml(c.relevance)}</div>
+      <div class="anki-candidate-actions">
+        <button class="anki-approve-btn" onclick="approveAnkiCandidate(${i})">✓ リンク</button>
+        <button class="anki-reject-btn" onclick="rejectAnkiCandidate(${i})">✗ スキップ</button>
+        ${c._status === 'approved' ? '<span style="font-size:11px;color:#276749;font-weight:700">✅ 確定</span>' : ''}
+        ${c._status === 'rejected' ? '<span style="font-size:11px;color:#a0aec0">スキップ済</span>' : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // 全候補が処理済みなら確定ボタン表示
+  const allDone = q.ankiCandidates.every(c => c._status !== 'pending');
+  commit.innerHTML = allDone ? `<button onclick="commitAnkiLinks()"
+    style="font-size:13px;padding:7px 22px;background:#553c9a;color:white;border:none;border-radius:9px;cursor:pointer;font-weight:700">
+    ✅ 選択を確定して保存
+  </button>` : '';
+}
+
+function approveAnkiCandidate(idx) {
+  const q = queue[qIdx];
+  if (!q || !q.ankiCandidates) return;
+  q.ankiCandidates[idx]._status = 'approved';
+  renderAnkiCandidates(q);
+}
+
+function rejectAnkiCandidate(idx) {
+  const q = queue[qIdx];
+  if (!q || !q.ankiCandidates) return;
+  q.ankiCandidates[idx]._status = 'rejected';
+  renderAnkiCandidates(q);
+}
+
+function commitAnkiLinks() {
+  const q = queue[qIdx];
+  if (!q || !q.ankiCandidates) return;
+  const approved = q.ankiCandidates.filter(c => c._status === 'approved');
+  if (approved.length === 0) { toast('リンクするカードを選択してください', 'error'); return; }
+
+  // q.ankiLinks に保存（既存と統合）
+  if (!q.ankiLinks) q.ankiLinks = [];
+  for (const c of approved) {
+    if (!q.ankiLinks.find(x => x.id === c.id)) {
+      q.ankiLinks.push({ id: c.id, deck: c.deck, raw: c.raw, plain: c.plain,
+                         choice: c.choice, relevance: c.relevance });
+    }
+  }
+  q.ankiCandidates = null; // 候補クリア
+
+  const mq = questions.find(x => x.id === q.id);
+  if (mq) { mq.ankiLinks = q.ankiLinks; mq.ankiCandidates = null; }
+
+  save();
+  saveToCloud();
+  toast(`✅ ${approved.length} 件のAnkiカードをリンクしました`, 'success');
+
+  // 表示を更新
+  renderAnkiCards(q);
+  const matchArea = document.getElementById('anki-match-area');
+  if (matchArea) matchArea.style.display = 'none';
+}
+
+// 問題エクスポート（バッチスクリプト用）
+function exportQuestionsForBatch() {
+  const data = questions
+    .filter(q => q.explanation && q.explanation.length > 30)
+    .map(q => ({
+      id: q.id,
+      number: q.number || '',
+      category: q.category || '',
+      question: q.question || '',
+      answer: q.answer || '',
+      explanation: q.explanation || '',
+    }));
+  const blob = new Blob([JSON.stringify({ questions: data }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'questions_export.json';
+  a.click();
+  toast(`📤 ${data.length} 問エクスポートしました`, 'success');
 }
 
 // ========== TAGS ==========
@@ -5075,6 +5444,8 @@ function revealAnswer() {
 
 // 選択肢チェックに渡すための解答コンテキスト
 let _choiceCheckAnswerCtx = null;
+// autoJudge後・recordAnswer前の「記録待ち」フラグ
+let _answerPending = false;
 
 function autoJudge() {
   const answerKeys = getAnswerKeys();
@@ -5137,6 +5508,7 @@ function autoJudge() {
 
   // コンテキストを保存してチェックパネルに渡す
   _choiceCheckAnswerCtx = { isCorrect, correctLabels, selectedLabels, srLabel, popHTML };
+  _answerPending = true; // recordAnswer() が呼ばれるまで「記録待ち」
   document.getElementById('auto-judge-result').style.display = 'block';
   startChoiceCheck(!isCorrect); // 選択肢理解チェックを自動起動
 }
@@ -5144,6 +5516,7 @@ function autoJudge() {
 // reason: undefined(正解) | 'knowledge'|'concept'|'count'|'misread'|'careless'|'calc'|'other'
 // fuzzy: true → 正解だがあやふや（自信なし）
 function recordAnswer(ok, reason, fuzzy) {
+  _answerPending = false; // 記録実行 → フラグ解除
   const q = queue[qIdx];
   const attempt = {date:today(), ok};
   // 解答秒数を記録（新規 vs 反復の時間分析用）
@@ -5216,8 +5589,42 @@ function _updateFlagBtn(flagged) {
 
 function endStudy() {
   if (qIdx>0 && !confirm('学習を終了しますか？')) return;
+  // 解答済みだが選択肢チェックが未完了のまま終了 → 答えを記録してから終わる
+  _flushPendingAnswer();
   stopQuestionTimer();
   backToStudySetup();
+}
+
+// 記録待ちの解答を確定して保存（次の問題へは進まない）
+function _flushPendingAnswer() {
+  if (!_answerPending || !_choiceCheckAnswerCtx) return;
+  const q = queue[qIdx];
+  if (!q) return;
+
+  const { isCorrect } = _choiceCheckAnswerCtx;
+  const attempt = { date: today(), ok: isCorrect };
+  if (_questionStartTime) {
+    attempt.seconds = Math.round((Date.now() - _questionStartTime) / 1000);
+    _questionStartTime = null;
+  }
+  if (!isCorrect && _selectedChoices.size > 0) {
+    attempt.selectedChoices = [..._selectedChoices].sort();
+    const rateMap = parseAnswerRates(q.explanation || '');
+    if (Object.keys(rateMap).length > 0) attempt.answerRates = rateMap;
+  }
+  q.attempts.push(attempt);
+  const mq = questions.find(x => x.id === q.id);
+  if (mq && mq !== q) mq.attempts.push(attempt);
+
+  // SRS更新（正解かつ途中でunmatched評価があればあやふや扱い）
+  const hasUnmatched = Object.values(_choiceCheckState).some(v => v === 'unmatched');
+  const fuzzy = isCorrect && hasUnmatched;
+  scheduleReview(q, isCorrect, fuzzy);
+  if (mq && mq !== q) { mq.nextReview = q.nextReview; mq.srInterval = q.srInterval; }
+
+  save();
+  _answerPending = false;
+  _choiceCheckAnswerCtx = null;
 }
 
 // 弱点分析などから特定問題を1問だけ表示する
