@@ -1757,7 +1757,7 @@ async function syncFromCloud() {
         // moshiExams loaded from Firestore (no localStorage write)
       }
     }
-    _updateSyncStatus('同期済み ☁️', '#276749');
+    _updateSyncStatus('同期済み ☁️', '#9ae6b4');
   } catch(e) {
     console.warn('[Firebase] 同期失敗:', e);
     _updateSyncStatus('同期エラー', '#feb2b2');
@@ -1791,7 +1791,7 @@ async function saveToCloudNow() {
     await batch.commit();
     // Firestore書き込み完了 → ローカルバックアップは不要になるので削除
     try { localStorage.removeItem('kokushi_local_backup'); } catch(e) {}
-    _updateSyncStatus('同期済み ☁️', '#276749');
+    _updateSyncStatus('同期済み ☁️', '#9ae6b4');
     console.log('[Firebase] クラウドに', questions.length, '問を保存（', chunks.length, 'チャンク）');
   } catch(e) {
     console.warn('[Firebase] クラウド保存失敗:', e);
