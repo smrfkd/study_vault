@@ -17,6 +17,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif; background: #f0f4f8; color: #2d3748; min-height: 100vh; }
@@ -170,6 +171,19 @@ select.form-input { cursor: pointer; }
 /* ANKI CARDS */
 .anki-section-header { display:flex;align-items:center;justify-content:space-between;background:#faf5ff;border:1px solid #e9d8fd;border-radius:10px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:700;color:#553c9a;user-select:none; }
 .anki-section-header:hover { background:#f3e8ff; }
+.memo-md-preview { font-size:13px;line-height:1.8;color:#2d3748;background:#fffef7;border:1px solid #e9d8a0;border-radius:6px;padding:8px 12px;margin-bottom:4px; }
+.memo-md-preview h1,.memo-md-preview h2,.memo-md-preview h3 { font-size:14px;font-weight:800;margin:8px 0 4px;color:#2b6cb0; }
+.memo-md-preview strong { font-weight:700;color:#2d3748; }
+.memo-md-preview em { font-style:italic;color:#553c9a; }
+.memo-md-preview ul,.memo-md-preview ol { padding-left:18px;margin:4px 0; }
+.memo-md-preview li { margin-bottom:2px; }
+.memo-md-preview code { background:#edf2f7;border-radius:3px;padding:1px 5px;font-family:monospace;font-size:12px; }
+.memo-md-preview pre { background:#edf2f7;border-radius:6px;padding:8px;overflow-x:auto;margin:6px 0; }
+.memo-md-preview blockquote { border-left:3px solid #cbd5e0;padding-left:10px;color:#718096;margin:4px 0; }
+.memo-md-preview hr { border:none;border-top:1px solid #e2e8f0;margin:8px 0; }
+.memo-md-preview table { border-collapse:collapse;width:100%;margin:6px 0;font-size:12px; }
+.memo-md-preview th,.memo-md-preview td { border:1px solid #e2e8f0;padding:4px 8px; }
+.memo-md-preview th { background:#f7fafc;font-weight:700; }
 .anki-cards-body { padding:10px 4px 4px 4px;display:flex;flex-direction:column;gap:10px; }
 .anki-card-item { background:white;border:1px solid #e9d8fd;border-radius:10px;padding:12px 14px;position:relative; }
 .anki-card-front { font-size:13px;line-height:1.7;color:#2d3748; }
@@ -908,60 +922,6 @@ select.form-input { cursor: pointer; }
             <div id="original-exp-display" class="explanation-box" style="background:#f0fff4;border-color:#9ae6b4"></div>
           </div>
 
-          <!-- AIドラフト生成ボタン＆エディタ -->
-          <div id="ai-draft-area" style="margin-top:14px;background:#f7fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-              <div style="display:flex;align-items:center;gap:8px">
-                <div style="font-size:12px;font-weight:800;color:#2d3748">🤖 AI解説</div>
-                <span id="ai-queue-badge" style="display:none;font-size:10px;font-weight:700;background:#ebf8ff;color:#2b6cb0;border:1px solid #bee3f8;border-radius:10px;padding:2px 8px"></span>
-              </div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap">
-                <button id="ai-queue-btn" onclick="queueForAiExplanation()"
-                  style="font-size:12px;padding:6px 14px;background:#553c9a;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
-                  📋 夜間キューに追加
-                </button>
-                <button onclick="copyAiPrompt()"
-                  style="font-size:12px;padding:6px 14px;background:#2b6cb0;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
-                  📎 プロンプトをコピー
-                </button>
-                <button onclick="toggleAiDraftEditor()" style="font-size:11px;padding:6px 10px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer">
-                  貼り付け入力
-                </button>
-              </div>
-            </div>
-
-            <!-- キュー状態バナー -->
-            <div id="ai-queue-banner" style="display:none;font-size:11px;padding:7px 10px;background:#ebf8ff;border-radius:8px;border:1px solid #bee3f8;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
-              <span id="ai-queue-banner-text"></span>
-            </div>
-
-            <!-- コピー完了ヒント -->
-            <div id="ai-copy-hint" style="display:none;font-size:11px;padding:8px 10px;background:#f0fff4;border-radius:8px;border:1px solid #9ae6b4;margin-bottom:8px;color:#276749">
-              ✅ プロンプトをコピーしました！<a href="https://claude.ai" target="_blank" style="color:#2b6cb0;font-weight:700">claude.ai</a> に貼り付けて解説を取得 → 「貼り付け入力」で保存してください。
-            </div>
-
-            <!-- 貼り付け入力エリア（claude.aiからの解説を貼り付け） -->
-            <div id="ai-draft-editor" style="display:none">
-              <div style="font-size:11px;color:#718096;margin-bottom:4px">Claude（claude.ai）の返答をここに貼り付けてください：</div>
-              <textarea id="ai-draft-text" rows="8"
-                style="width:100%;box-sizing:border-box;resize:vertical;border:1px solid #bee3f8;border-radius:8px;padding:10px;font-size:12px;line-height:1.8;outline:none;background:white;font-family:inherit"
-                placeholder="claude.ai で生成した解説をここに貼り付け..."></textarea>
-              <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-                <button onclick="saveOriginalExp()" style="font-size:12px;padding:7px 18px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
-                  💾 オリジナル解説として保存
-                </button>
-                <button onclick="document.getElementById('ai-draft-editor').style.display='none';document.getElementById('ai-copy-hint').style.display='none'" style="font-size:11px;padding:7px 12px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer">
-                  閉じる
-                </button>
-                <span id="ai-draft-status" style="font-size:11px;color:#718096;margin-left:4px"></span>
-              </div>
-            </div>
-
-            <div id="ai-draft-loading" style="display:none;text-align:center;padding:16px;color:#718096;font-size:12px">
-              <span id="ai-draft-loading-text">⏳ 処理中...</span>
-            </div>
-          </div>
-
           <!-- Ankiカード候補を探す（リンク管理用） -->
           <div id="anki-match-area" style="display:none;margin-top:10px">
             <div id="anki-match-btn-wrap" style="text-align:center">
@@ -1030,6 +990,60 @@ select.form-input { cursor: pointer; }
                 style="font-size:11px;padding:3px 8px;border:1px solid #d6bcfa;border-radius:12px;outline:none;width:90px"
                 onkeydown="event.stopPropagation();if(event.key==='Enter'&&!event.isComposing){addTagFromInput();event.preventDefault()}">
               <button onclick="addTagFromInput()" style="font-size:11px;padding:3px 8px;border:1px solid #805ad5;border-radius:12px;background:transparent;color:#805ad5;cursor:pointer">追加</button>
+            </div>
+          </div>
+
+          <!-- AIドラフト生成ボタン＆エディタ -->
+          <div id="ai-draft-area" style="margin-top:14px;background:#f7fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div style="font-size:12px;font-weight:800;color:#2d3748">🤖 AI解説</div>
+                <span id="ai-queue-badge" style="display:none;font-size:10px;font-weight:700;background:#ebf8ff;color:#2b6cb0;border:1px solid #bee3f8;border-radius:10px;padding:2px 8px"></span>
+              </div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button id="ai-queue-btn" onclick="queueForAiExplanation()"
+                  style="font-size:12px;padding:6px 14px;background:#553c9a;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
+                  📋 夜間キューに追加
+                </button>
+                <button onclick="copyAiPrompt()"
+                  style="font-size:12px;padding:6px 14px;background:#2b6cb0;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
+                  📎 プロンプトをコピー
+                </button>
+                <button onclick="toggleAiDraftEditor()" style="font-size:11px;padding:6px 10px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer">
+                  貼り付け入力
+                </button>
+              </div>
+            </div>
+
+            <!-- キュー状態バナー -->
+            <div id="ai-queue-banner" style="display:none;font-size:11px;padding:7px 10px;background:#ebf8ff;border-radius:8px;border:1px solid #bee3f8;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+              <span id="ai-queue-banner-text"></span>
+            </div>
+
+            <!-- コピー完了ヒント -->
+            <div id="ai-copy-hint" style="display:none;font-size:11px;padding:8px 10px;background:#f0fff4;border-radius:8px;border:1px solid #9ae6b4;margin-bottom:8px;color:#276749">
+              ✅ プロンプトをコピーしました！<a href="https://claude.ai" target="_blank" style="color:#2b6cb0;font-weight:700">claude.ai</a> に貼り付けて解説を取得 → 「貼り付け入力」で保存してください。
+            </div>
+
+            <!-- 貼り付け入力エリア（claude.aiからの解説を貼り付け） -->
+            <div id="ai-draft-editor" style="display:none">
+              <div style="font-size:11px;color:#718096;margin-bottom:4px">Claude（claude.ai）の返答をここに貼り付けてください：</div>
+              <textarea id="ai-draft-text" rows="8"
+                style="width:100%;box-sizing:border-box;resize:vertical;border:1px solid #bee3f8;border-radius:8px;padding:10px;font-size:12px;line-height:1.8;outline:none;background:white;font-family:inherit"
+                placeholder="claude.ai で生成した解説をここに貼り付け..."></textarea>
+              <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+                <button onclick="saveOriginalExp()" style="font-size:12px;padding:7px 18px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700">
+                  💾 オリジナル解説として保存
+                </button>
+                <button onclick="document.getElementById('ai-draft-editor').style.display='none';document.getElementById('ai-copy-hint').style.display='none'" style="font-size:11px;padding:7px 12px;border:1px solid #cbd5e0;border-radius:8px;background:white;cursor:pointer">
+                  閉じる
+                </button>
+                <span id="ai-draft-status" style="font-size:11px;color:#718096;margin-left:4px"></span>
+              </div>
+            </div>
+
+            <div id="ai-draft-loading" style="display:none;text-align:center;padding:16px;color:#718096;font-size:12px">
+              <span id="ai-draft-loading-text">⏳ 処理中...</span>
             </div>
           </div>
 
@@ -3620,9 +3634,9 @@ function _renderChoiceCheckPanel() {
         </div>
         <div id="cc-anki-${c.key}"></div>
         <div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:4px">
-          <textarea id="cc-note-${c.key}" onblur="saveChoiceNote('${c.key}')" onkeydown="event.stopPropagation()"
+          <textarea id="cc-note-${c.key}" onblur="saveChoiceNote('${c.key}')" onkeydown="event.stopPropagation()" oninput="_updateMemoPreview('${c.key}')"
             style="flex:1;box-sizing:border-box;border:1px solid #e2e8f0;border-radius:6px;padding:7px 10px;font-size:13px;line-height:1.7;resize:vertical;min-height:48px"
-            placeholder="💡 追記メモ（覚え方・補足）...">${escapeHtml(note)}</textarea>
+            placeholder="💡 追記メモ（Markdownで記入できます）...">${escapeHtml(note)}</textarea>
           <label title="画像をアップロード"
             style="cursor:pointer;padding:6px 8px;background:#f0f4ff;border:1px solid #c3dafe;border-radius:6px;font-size:16px;line-height:1;color:#4361ee;flex-shrink:0;align-self:flex-start;margin-top:0">
             📷
@@ -3630,6 +3644,7 @@ function _renderChoiceCheckPanel() {
               onchange="uploadChoiceImage('${c.key}', this)">
           </label>
         </div>
+        <div id="cc-note-preview-${c.key}" class="memo-md-preview" style="display:${note ? 'block' : 'none'}"></div>
         <div id="cc-images-${c.key}" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px"></div>
         ${actionButtons}
       </div>
@@ -3646,14 +3661,14 @@ function _renderChoiceCheckPanel() {
       </div>`
     : '';
 
-  // スキップリンク（全評価完了前のみ表示；完了後は _finalizeChoiceCheck が上書き）
+  // スキップボタン（全評価完了前のみ表示；完了後は _finalizeChoiceCheck が上書き）
   const skipAction = _choiceCheckIsWrong ? 'commitReason()' : 'recordAnswer(true)';
-  const skipHtml = `<div style="text-align:center;margin-top:14px">
+  const skipHtml = ratedCount < total ? `<div style="text-align:center;margin:14px 0 8px">
     <button onclick="${skipAction}"
-      style="font-size:12px;color:#a0aec0;background:none;border:none;cursor:pointer;text-decoration:underline">
+      style="font-size:14px;font-weight:600;color:#718096;background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:9px 24px;cursor:pointer;width:100%">
       スキップして次の問題へ →
     </button>
-  </div>`;
+  </div>` : '';
 
   el.innerHTML = `<div style="border-top:2px solid #e2e8f0;margin-top:16px;padding-top:12px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -3661,14 +3676,17 @@ function _renderChoiceCheckPanel() {
       <span style="font-size:12px;color:#718096">${ratedCount} / ${total} 確認済</span>
     </div>
     ${cardsHtml}
+    ${skipHtml}
     ${pointHtml}
     ${ctx?.popHTML || ''}
-    <div id="choice-check-finalize">${ratedCount < total ? skipHtml : ''}</div>
+    <div id="choice-check-finalize"></div>
   </div>`;
   // 全選択肢のAnkiカードを描画（折りたたみ状態で）
   _choiceCheckAll.forEach(c => _renderCcAnkiCards(c.key));
   // 保存済み画像のサムネイルを描画
   _choiceCheckAll.forEach(c => _renderChoiceImageThumbs(c.key));
+  // 既存メモのMarkdownプレビューを初期描画
+  _choiceCheckAll.forEach(c => _updateMemoPreview(c.key));
 }
 
 function revealChoiceExp(key) {
@@ -3769,6 +3787,24 @@ function rateChoice(key, matched) {
       _scrollIntoPanel(el);
     }, 100);
   }
+}
+
+function _updateMemoPreview(key) {
+  const ta = document.getElementById(`cc-note-${key}`);
+  const preview = document.getElementById(`cc-note-preview-${key}`);
+  if (!ta || !preview) return;
+  const text = ta.value.trim();
+  if (!text) {
+    preview.style.display = 'none';
+    preview.innerHTML = '';
+    return;
+  }
+  try {
+    preview.innerHTML = marked.parse(text);
+  } catch(e) {
+    preview.innerHTML = `<span style="color:#a0aec0">${escapeHtml(text)}</span>`;
+  }
+  preview.style.display = 'block';
 }
 
 function saveChoiceNote(key) {
