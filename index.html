@@ -3453,6 +3453,15 @@ function saveExpEdit() {
   // 選択肢も再抽出
   const choices = extractChoicesFromExplanation(newExp);
   renderChoices(choices);
+  // 選択肢理解チェックが表示中なら内容を再初期化
+  const judgeEl = document.getElementById('auto-judge-result');
+  if (judgeEl && judgeEl.style.display !== 'none' && _choiceCheckAll.length > 0) {
+    const prevState = { ..._choiceCheckState }; // 評価済み状態を保持
+    startChoiceCheck(_choiceCheckIsWrong);
+    // 評価済みの選択肢の状態を復元
+    Object.entries(prevState).forEach(([k, v]) => { if (v !== null) _choiceCheckState[k] = v; });
+    _renderChoiceCheckPanel();
+  }
   cancelExpEdit();
   save();
   if (_cloudSyncEnabled && _db && _userId) saveToCloud();
@@ -3615,8 +3624,7 @@ function _renderChoiceCheckPanel() {
     const expContent = c.expLines.length > 0
       ? c.expLines.map(l => renderTextWithImages(l)).join('<br>')
       : `<span style="color:#a0aec0">（説明文なし — ✏️編集で追記できます）</span>`;
-    const actionButtons = state === 'unmatched'
-      ? `<button onclick="rateChoice('${c.key}', true)" style="font-size:12px;padding:4px 12px;border:1px solid #9ae6b4;border-radius:6px;background:#f0fff4;color:#276749;cursor:pointer">修正: やはり説明できた ✓</button>`
+    const actionButtons = state !== null ? ''
       : `<div style="display:flex;gap:6px;margin-top:8px">
            <button onclick="rateChoice('${c.key}', true)" style="font-size:13px;padding:5px 16px;background:#276749;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700">✓ 説明できた</button>
            <button onclick="rateChoice('${c.key}', false)" style="font-size:13px;padding:5px 16px;background:#fff5f5;color:#c53030;border:1px solid #fed7d7;border-radius:6px;cursor:pointer;font-weight:700">✗ できなかった</button>
@@ -3665,9 +3673,10 @@ function _renderChoiceCheckPanel() {
   const skipAction = _choiceCheckIsWrong ? 'commitReason()' : 'recordAnswer(true)';
   const skipHtml = ratedCount < total ? `<div style="text-align:center;margin:14px 0 8px">
     <button onclick="${skipAction}"
-      style="font-size:14px;font-weight:600;color:#718096;background:#f7fafc;border:1px solid #e2e8f0;border-radius:10px;padding:9px 24px;cursor:pointer;width:100%">
+      style="font-size:14px;font-weight:700;padding:8px 26px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer;width:100%">
       スキップして次の問題へ →
     </button>
+    <div style="font-size:11px;color:#a0aec0;margin-top:5px">スキップ → 通常インターバル</div>
   </div>` : '';
 
   el.innerHTML = `<div style="border-top:2px solid #e2e8f0;margin-top:16px;padding-top:12px">
@@ -3834,6 +3843,7 @@ function _finalizeChoiceCheck() {
         style="font-size:14px;font-weight:700;padding:8px 26px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer">
         次の問題へ →
       </button>
+      <div style="font-size:11px;color:#a0aec0;margin-top:5px">不正解 → インターバルリセット（翌日）</div>
     </div>`;
   } else {
     // 正解：全matched → 通常 / 1個でもunmatched → あやふや半減
