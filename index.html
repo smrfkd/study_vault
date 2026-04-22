@@ -272,6 +272,10 @@ select.form-input { cursor: pointer; }
   .qpanel-left, .qpanel-right { padding:16px; border-right:none; }
   .study-mode-split { flex-direction:column; }
   .study-mode-left  { flex:none; width:100%; }
+  .study-mode-right { width:100%; box-sizing:border-box; }
+  .filter-axis-grid { grid-template-columns:1fr !important; }
+  .filter-bottom-row { flex-direction:column; align-items:stretch !important; }
+  .filter-bottom-row button { width:100%; }
 }
 
 /* COLORS */
@@ -734,7 +738,7 @@ select.form-input { cursor: pointer; }
           </div>
 
           <!-- 4軸フィルター（2×2グリッド） -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div class="filter-axis-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
 
             <!-- 挑戦状況 -->
             <div style="background:white;border-radius:9px;padding:11px 13px;border:1px solid #e2e8f0">
@@ -806,7 +810,7 @@ select.form-input { cursor: pointer; }
           <div id="filter-result-list" style="display:none;margin-bottom:12px;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;max-height:280px;overflow-y:auto;background:white"></div>
 
           <!-- 一致件数 + 開始ボタン -->
-          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+          <div class="filter-bottom-row" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
               <span id="filter-match-count" style="font-size:13px;font-weight:600;color:#718096"></span>
               <button id="filter-select-all-btn" onclick="_filterSelectAll(true)" style="display:none;font-size:11px;padding:3px 10px;border:1px solid #bee3f8;border-radius:8px;background:white;color:#2b6cb0;cursor:pointer">全選択</button>
@@ -3624,11 +3628,10 @@ function _renderChoiceCheckPanel() {
     const expContent = c.expLines.length > 0
       ? c.expLines.map(l => renderTextWithImages(l)).join('<br>')
       : `<span style="color:#a0aec0">（説明文なし — ✏️編集で追記できます）</span>`;
-    const actionButtons = state !== null ? ''
-      : `<div style="display:flex;gap:6px;margin-top:8px">
-           <button onclick="rateChoice('${c.key}', true)" style="font-size:13px;padding:5px 16px;background:#276749;color:white;border:none;border-radius:6px;cursor:pointer;font-weight:700">✓ 説明できた</button>
-           <button onclick="rateChoice('${c.key}', false)" style="font-size:13px;padding:5px 16px;background:#fff5f5;color:#c53030;border:1px solid #fed7d7;border-radius:6px;cursor:pointer;font-weight:700">✗ できなかった</button>
-         </div>`;
+    const actionButtons = `<div style="display:flex;gap:6px;margin-top:8px">
+      <button onclick="rateChoice('${c.key}', true)" style="font-size:13px;padding:5px 16px;background:${state==='matched'?'#276749':'white'};color:${state==='matched'?'white':'#276749'};border:1px solid #9ae6b4;border-radius:6px;cursor:pointer;font-weight:700">✓ 説明できた</button>
+      <button onclick="rateChoice('${c.key}', false)" style="font-size:13px;padding:5px 16px;background:${state==='unmatched'?'#c53030':'white'};color:${state==='unmatched'?'white':'#c53030'};border:1px solid #fed7d7;border-radius:6px;cursor:pointer;font-weight:700">✗ できなかった</button>
+    </div>`;
 
     return `<div id="cc-card-${c.key}" style="border:1px solid ${border};border-radius:10px;padding:10px 14px;margin-bottom:8px;background:${bg}">
       <div style="display:flex;justify-content:space-between;align-items:center">
@@ -4468,7 +4471,7 @@ const SUGGESTED_TAGS = [
   '病理','末梢血塗抹','骨髄像','血清蛋白分画','免疫電気泳動','皮膚所見画像',
   '左右心室圧波形','酸素飽和度','心音','Gram染色',
   // ── 学習概念タグ ──
-  '統計','薬理','解剖','生理','生化学','内科','マイナー',
+  '統計','薬理','解剖','生理','生化学','内科','マイナー','計算',
   // ── 手技・検査タグ ──
   '頭位','コルポスコピー','パルトグラム',
   // ── 管理タグ ──
@@ -5888,12 +5891,21 @@ async function endStudy() {
   _saveDebounceTimer = null;
   if (_cloudSyncEnabled && _db && _userId) {
     _updateSyncStatus('保存中...', '#fefcbf');
-    try { await saveToCloudNow(); } catch(e) {
+    try {
+      // 5秒でタイムアウト（ネットワーク不調時に永遠に待たないようにする）
+      await Promise.race([
+        saveToCloudNow(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+      ]);
+    } catch(e) {
       console.warn('endStudy save error', e);
-      _updateSyncStatus('保存エラー', '#feb2b2');
+      // タイムアウト・エラーでもlocalStorageバックアップは保存済みなのでデータは安全
+      _updateSyncStatus(
+        e.message === 'timeout' ? 'タイムアウト（ローカル保存済み）' : '保存エラー',
+        '#feb2b2'
+      );
     }
   } else {
-    // クラウド同期が無効の場合はローカルのみ
     _updateSyncStatus('保存済み ✓', '#9ae6b4');
   }
   backToStudySetup();
