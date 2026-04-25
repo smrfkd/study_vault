@@ -1425,7 +1425,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.25.8";
+const APP_VERSION = "v2026.04.25.9";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -4140,9 +4140,40 @@ function samFlipCard(el) {
 }
 
 function samOpenSlide(path, page) {
-  // 日本語・絵文字を含むパスをURLエンコード（スラッシュはそのまま）
+  // まず file:// で開くことを試みる
   const encoded = encodeURI(path);
-  window.open('file://' + encoded + '#page=' + page, '_blank');
+  const url = 'file://' + encoded + '#page=' + page;
+  const a = document.createElement('a');
+  a.href = url; a.target = '_blank'; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  // 同時にinfo パネルも表示（ブラウザがブロックした場合の補助）
+  const fname = path.split('/').pop();
+  const dir = path.split('/').slice(-2, -1)[0] || '';
+  let panel = document.getElementById('sam-slide-panel');
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.id = 'sam-slide-panel';
+    panel.style.cssText = 'position:fixed;bottom:20px;right:20px;background:white;border:1.5px solid #90cdf4;border-radius:12px;padding:14px 16px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:9999;max-width:380px;font-size:12px';
+    document.body.appendChild(panel);
+  }
+  panel.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-weight:800;color:#2b6cb0;font-size:13px">📖 スライド</span>
+      <button onclick="this.closest('#sam-slide-panel').remove()" style="border:none;background:none;cursor:pointer;font-size:16px;color:#a0aec0;padding:0">✕</button>
+    </div>
+    <div style="color:#4a5568;margin-bottom:4px"><span style="color:#718096;font-size:11px">${dir}/</span><br><strong>${fname}</strong></div>
+    <div style="color:#553c9a;font-weight:700;margin-bottom:10px">p.${page}</div>
+    <div style="display:flex;gap:8px">
+      <button onclick="navigator.clipboard.writeText('${path.replace(/'/g,"\'")}').then(()=>{this.textContent='コピー済み✓';setTimeout(()=>this.textContent='パスをコピー',2000)})"
+        style="flex:1;padding:6px;background:#ebf8ff;border:1px solid #90cdf4;border-radius:7px;color:#2b6cb0;cursor:pointer;font-size:11px;font-weight:700">
+        📋 パスをコピー
+      </button>
+      <button onclick="window.open('${url}','_blank')"
+        style="flex:1;padding:6px;background:#faf5ff;border:1px solid #b794f4;border-radius:7px;color:#553c9a;cursor:pointer;font-size:11px;font-weight:700">
+        🔗 別タブで開く
+      </button>
+    </div>
+    <div style="font-size:10px;color:#a0aec0;margin-top:8px">ブラウザでブロックされた場合はパスをコピーしてFinderで開いてください</div>`;
 }
 
 function samFindSlides(conceptName) {
@@ -4199,10 +4230,20 @@ async function renderAnkiCards(q) {
     for (const card of cards) {
       const raw = card.raw || card.plain || '';
       const hasCloze = raw.includes('{{c');
+      const cid = card.id || card.plain;
+      const isSel = !!(ankiCardSRS[cid] && ankiCardSRS[cid].selected);
       cardsHtml += `
-        <div class="sam-card-body" onclick="samFlipCard(this)">
-          <div class="sam-card-front">${samRenderCloze(raw)}</div>
-          <div class="sam-card-hint">${hasCloze ? 'タップして答えを見る' : card.plain || ''}&nbsp;<span style="color:#a0aec0;font-size:10px">${card.deck||''}</span></div>
+        <div style="margin-bottom:6px">
+          <div class="sam-card-body" onclick="samFlipCard(this)" style="margin-bottom:0;border-radius:8px 8px 0 0;border-bottom:none">
+            <div class="sam-card-front">${samRenderCloze(raw)}</div>
+            <div class="sam-card-hint">${hasCloze ? 'タップして答えを見る' : card.plain || ''}&nbsp;<span style="color:#a0aec0;font-size:10px">${card.deck||''}</span></div>
+          </div>
+          <div style="background:${isSel?'#ebf8ff':'#f7fafc'};border:1px solid ${isSel?'#90cdf4':'#e2e8f0'};border-top:none;border-radius:0 0 8px 8px;padding:4px 10px;display:flex;align-items:center;justify-content:flex-end;gap:6px">
+            <label style="font-size:11px;cursor:pointer;color:${isSel?'#2b6cb0':'#718096'};display:flex;align-items:center;gap:4px;user-select:none">
+              <input type="checkbox" ${isSel?'checked':''} onchange="samToggleAnkiCard('${cid}',this)" style="accent-color:#2b6cb0;cursor:pointer">
+              ${isSel?'✓ 練習中':'練習に追加'}
+            </label>
+          </div>
         </div>`;
     }
 
@@ -7540,6 +7581,20 @@ function ankiFlipItem(cid) {
     el.innerHTML = _renderClozeAnki(card.raw || card.plain, true);
     el.dataset.revealed = '1';
     el.nextElementSibling.querySelector('span').textContent = 'タップして隠す';
+  }
+}
+
+function samToggleAnkiCard(cid, checkbox) {
+  ankiToggleSelect(cid);
+  // チェックボックスのラベルを即時更新
+  const label = checkbox.closest('label');
+  const wrap = checkbox.closest('div[style*="border-top:none"]');
+  if (checkbox.checked) {
+    if (label) { label.style.color = '#2b6cb0'; label.childNodes[label.childNodes.length-1].textContent = ' ✓ 練習中'; }
+    if (wrap) { wrap.style.background = '#ebf8ff'; wrap.style.borderColor = '#90cdf4'; }
+  } else {
+    if (label) { label.style.color = '#718096'; label.childNodes[label.childNodes.length-1].textContent = ' 練習に追加'; }
+    if (wrap) { wrap.style.background = '#f7fafc'; wrap.style.borderColor = '#e2e8f0'; }
   }
 }
 
