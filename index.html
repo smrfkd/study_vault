@@ -1425,7 +1425,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.25.6";
+const APP_VERSION = "v2026.04.25.8";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -4140,7 +4140,9 @@ function samFlipCard(el) {
 }
 
 function samOpenSlide(path, page) {
-  window.open('file://' + path + '#page=' + page, '_blank');
+  // 日本語・絵文字を含むパスをURLエンコード（スラッシュはそのまま）
+  const encoded = encodeURI(path);
+  window.open('file://' + encoded + '#page=' + page, '_blank');
 }
 
 function samFindSlides(conceptName) {
@@ -4190,7 +4192,7 @@ async function renderAnkiCards(q) {
   concepts.forEach((con, i) => {
     const p = PALETTES[i % PALETTES.length];
     const cards = con.cards || [];
-    const isGap = con.gap || cards.length === 0;
+    const isGap = cards.length === 0;
 
     // Cloze cards
     let cardsHtml = '';
@@ -7528,7 +7530,7 @@ function ankiFlipItem(cid) {
   const el = document.getElementById('anki-front-' + safe);
   if (!el) return;
   const isRevealed = el.dataset.revealed === '1';
-  const card = Object.values(ANKI_LINKS).flat().find(c => (c.id||c.plain) === cid);
+  const card = Object.values(ANKI_LINKS).filter(Array.isArray).flat().find(c => (c.id||c.plain) === cid);
   if (!card) return;
   if (isRevealed) {
     el.innerHTML = _renderClozeAnki(card.raw || card.plain, false);
