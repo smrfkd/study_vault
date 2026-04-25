@@ -7239,6 +7239,9 @@ function showTab(tab) {
     const navH = document.querySelector('.nav')?.offsetHeight || 48;
     mapTab.style.height = (window.innerHeight - headerH - navH) + 'px';
     // ロードして問題セレクタを初期化
+    // マップタブは常に最新のanki_links.jsonを読み込む
+    _ankiLinksLoaded = false;
+    _ankiLinksLoading = false;
     loadAnkiLinks().then(() => initKnowledgeMapTab());
   } else {
     if(contentDiv) contentDiv.style.display = '';
