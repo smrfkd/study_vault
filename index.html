@@ -1425,7 +1425,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.25.2";
+const APP_VERSION = "v2026.04.25.3";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -5944,6 +5944,38 @@ function submitNumericAnswer() {
         </div>
       </div>`;
   }
+
+  // 解説を全セクション表示で再レンダリング（studyModeで隠していた選択肢考察・ポイント等を表示）
+  const expEl = document.getElementById('qm-exp');
+  const expEditWrap = document.getElementById('qm-exp-edit-wrap');
+  if (expEl && !(expEditWrap && expEditWrap.style.display !== 'none')) {
+    expEl.innerHTML = renderExplanationStructured(q.explanation, { studyMode: false });
+  }
+  // 大分野・中分野バッジを表示
+  const catBadgeEl = document.getElementById('qm-category-reveal');
+  if (catBadgeEl) {
+    let catHtml = '';
+    if (q.category) catHtml += `<span class="badge badge-blue">${q.category}</span> `;
+    if (q.subcategory) catHtml += `<span class="badge badge-purple">${q.subcategory}</span>`;
+    catBadgeEl.innerHTML = catHtml;
+    catBadgeEl.style.display = catHtml ? 'block' : 'none';
+  }
+  // 前回の理解メモを表示
+  const prevMemo = document.getElementById('prev-feynman-memo');
+  if (prevMemo && q.feynmanNote) {
+    prevMemo.innerHTML = `<strong>前回の理解メモ：</strong>${escapeHtml(q.feynmanNote)}`;
+    prevMemo.style.display = 'block';
+  }
+  // タグ・オリジナル解説・Ankiカードを表示
+  renderQuestionTags(q);
+  _renderOriginalExp(q);
+  renderAnkiCards(q);
+  _updateAiQueueBtn(q);
+  // AIドラフトエディタをリセット
+  document.getElementById('ai-draft-editor').style.display = 'none';
+  document.getElementById('ai-draft-loading').style.display = 'none';
+  document.getElementById('ai-draft-status').textContent = '';
+  document.getElementById('ai-draft-text').value = '';
 }
 
 function highlightExplanationChoices() {
