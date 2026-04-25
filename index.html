@@ -5964,6 +5964,12 @@ function revealAnswer() {
   document.getElementById('ans-revealed').style.display = 'block';
   // 前回の理解メモを解説確認後に表示（問題解答中はヒントになるので非表示）
   const q = queue[qIdx];
+  // 解説を全セクション表示で再レンダリング（studyMode:trueで隠していた選択肢考察・ポイント等を表示）
+  const expEl = document.getElementById('qm-exp');
+  const expEditWrap = document.getElementById('qm-exp-edit-wrap');
+  if (expEl && !(expEditWrap && expEditWrap.style.display !== 'none')) {
+    expEl.innerHTML = renderExplanationStructured(q.explanation, { studyMode: false });
+  }
   const prevMemo = document.getElementById('prev-feynman-memo');
   if (prevMemo && q && q.feynmanNote) {
     prevMemo.innerHTML = `<strong>前回の理解メモ：</strong>${escapeHtml(q.feynmanNote)}`;
