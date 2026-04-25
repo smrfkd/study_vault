@@ -4162,7 +4162,12 @@ async function renderAnkiCards(q) {
 
   const conceptsInfo = ANKI_LINKS[q.id + '__concepts'];
   if (!conceptsInfo || !conceptsInfo.concepts || !conceptsInfo.concepts.length) {
-    matchArea.style.display = 'none';
+    // 未処理問題：準備中メッセージを表示
+    matchArea.innerHTML = `<div style="margin-top:14px;border-top:1px solid #e2e8f0;padding-top:10px;display:flex;align-items:center;gap:6px">
+      <span style="font-size:12px;font-weight:700;color:#553c9a">🗂️ 関連Ankiカード</span>
+      <span style="font-size:11px;color:#a0aec0">この問題は処理待ちです（夜間バッチで順次追加）</span>
+    </div>`;
+    matchArea.style.display = 'block';
     return;
   }
 
