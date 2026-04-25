@@ -278,6 +278,15 @@ select.form-input { cursor: pointer; }
   .filter-bottom-row button { width:100%; }
 }
 
+/* ANKI TAB */
+.anki-card-item { background:white; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px; margin-bottom:8px; cursor:pointer; transition:border-color 0.15s; }
+.anki-card-item:hover { border-color:#90cdf4; }
+.anki-card-item.anki-selected { border-color:#2b6cb0; background:#ebf8ff; }
+.anki-card-item.anki-due { border-left:3px solid #e53e3e; }
+.anki-filter-btn { padding:7px 16px; font-size:12px; font-weight:700; border:1.5px solid #e2e8f0; border-radius:20px; background:white; color:#718096; cursor:pointer; }
+.anki-filter-btn.active { background:#2b6cb0; color:white; border-color:#2b6cb0; }
+.anki-rate-btn { flex:1; padding:10px 6px; border:none; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; text-align:center; line-height:1.4; }
+
 /* COLORS */
 .acc-high { color: #38a169; }
 .acc-mid { color: #d69e2e; }
@@ -400,6 +409,8 @@ select.form-input { cursor: pointer; }
   <button class="nav-btn" onclick="showTab('dashboard')">ダッシュボード</button>
   <button class="nav-btn" onclick="showTab('manage')">管理</button>
   <button class="nav-btn" onclick="showTab('add')">問題追加</button>
+  <button class="nav-btn" onclick="showTab('anki')">🃏 Ankiカード</button>
+  <button class="nav-btn" onclick="showTab('map')">📚 知識マップ</button>
 </nav>
 
 <div class="content">
@@ -1261,8 +1272,78 @@ select.form-input { cursor: pointer; }
     </div>
   </div>
 
+  <!-- ANKI CARD TAB -->
+  <div id="tab-anki" class="tab-content">
+    <div class="content" style="max-width:800px">
+      <!-- Stats -->
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px">
+        <div class="stat-card" style="flex:1;min-width:100px;text-align:center">
+          <div class="stat-num" id="anki-stat-due" style="color:#e53e3e">0</div>
+          <div class="stat-label">今日の復習</div>
+        </div>
+        <div class="stat-card" style="flex:1;min-width:100px;text-align:center">
+          <div class="stat-num" id="anki-stat-sel" style="color:#2b6cb0">0</div>
+          <div class="stat-label">選択済み</div>
+        </div>
+        <div class="stat-card" style="flex:1;min-width:100px;text-align:center">
+          <div class="stat-num" id="anki-stat-total" style="color:#276749">0</div>
+          <div class="stat-label">全カード</div>
+        </div>
+      </div>
+
+      <!-- Filter + Practice buttons -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+        <button class="anki-filter-btn active" id="anki-f-all" onclick="_ankiSetFilter('all')">全カード</button>
+        <button class="anki-filter-btn" id="anki-f-due" onclick="_ankiSetFilter('due')">今日の復習</button>
+        <button class="anki-filter-btn" id="anki-f-sel" onclick="_ankiSetFilter('selected')">選択済み</button>
+        <div style="flex:1"></div>
+        <button onclick="startAnkiPractice(_ankiCurrentFilter)"
+          style="padding:8px 20px;background:#553c9a;color:white;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer">
+          ▶ 練習スタート
+        </button>
+      </div>
+
+      <!-- Card list -->
+      <div id="anki-card-list"></div>
+
+      <!-- Practice panel (hidden initially) -->
+      <div id="anki-practice-panel" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <button onclick="_ankiEndPractice()" style="background:none;border:none;font-size:13px;color:#718096;cursor:pointer">← 一覧に戻る</button>
+          <div style="flex:1;background:#e2e8f0;border-radius:20px;height:6px">
+            <div id="anki-prog-fill" style="background:#553c9a;height:6px;border-radius:20px;width:0%;transition:width 0.3s"></div>
+          </div>
+          <div id="anki-prog-text" style="font-size:12px;color:#718096">0/0</div>
+        </div>
+        <div style="background:white;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,0.1);padding:28px 24px;min-height:200px;margin-bottom:14px">
+          <div id="anki-p-meta" style="font-size:11px;color:#a0aec0;margin-bottom:10px"></div>
+          <div id="anki-p-front" style="font-size:15px;line-height:1.8;color:#2d3748"></div>
+        </div>
+        <button id="anki-reveal-btn" onclick="_ankiReveal()"
+          style="width:100%;padding:12px;background:#f7fafc;border:1.5px solid #e2e8f0;border-radius:9px;font-size:14px;font-weight:600;color:#4a5568;cursor:pointer;margin-bottom:10px">
+          タップして答えを見る
+        </button>
+        <div id="anki-rating-wrap" style="display:none;gap:8px">
+          <button class="anki-rate-btn" style="background:#fff5f5;color:#c53030" onclick="_ankiRate(1)">😓<br>Again<br><span style="font-size:10px;font-weight:400">1日後</span></button>
+          <button class="anki-rate-btn" style="background:#fffbeb;color:#b7791f" onclick="_ankiRate(3)">🤔<br>Hard<br><span style="font-size:10px;font-weight:400">3日後</span></button>
+          <button class="anki-rate-btn" style="background:#f0fff4;color:#276749" onclick="_ankiRate(7)">😊<br>Good<br><span style="font-size:10px;font-weight:400">7日後</span></button>
+          <button class="anki-rate-btn" style="background:#ebf8ff;color:#2b6cb0" onclick="_ankiRate(14)">🚀<br>Easy<br><span style="font-size:10px;font-weight:400">14日後</span></button>
+        </div>
+        <div id="anki-done-msg" style="display:none;text-align:center;padding:30px 20px">
+          <div style="font-size:40px;margin-bottom:10px">🎉</div>
+          <div style="font-size:17px;font-weight:800;margin-bottom:6px">練習完了！</div>
+          <div id="anki-done-count" style="font-size:13px;color:#718096;margin-bottom:16px"></div>
+          <button onclick="_ankiEndPractice()" style="background:#553c9a;color:white;border:none;border-radius:9px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer">一覧に戻る</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-anki -->
 
 </div><!-- /content -->
+
+<div id="tab-map" style="display:none;padding:0;overflow:hidden;">
+  <iframe id="map-iframe" style="width:100%;height:100%;border:none;display:block;" src=""></iframe>
+</div>
 
 <!-- EDIT MODAL -->
 <div class="modal-overlay" id="edit-modal" onclick="if(event.target===this)closeModal()">
@@ -1775,12 +1856,32 @@ async function syncFromCloud() {
         // moshiExams loaded from Firestore (no localStorage write)
       }
     }
+    await loadAnkiSRSFromCloud();
     _updateSyncStatus('同期済み ☁️', '#9ae6b4');
   } catch(e) {
     console.warn('[Firebase] 同期失敗:', e);
     _updateSyncStatus('同期エラー', '#feb2b2');
   }
 }
+
+// ===== Anki SRS Cloud Sync =====
+async function loadAnkiSRSFromCloud() {
+  if (!_db || !_userId) return;
+  try {
+    const doc = await _db.collection('users').doc(_userId).collection('data').doc('ankiSRS').get();
+    if (doc.exists && doc.data().cards) ankiCardSRS = doc.data().cards;
+  } catch(e) { console.warn('[AnkiSRS] load error', e); }
+}
+function saveAnkiSRSToCloud() {
+  if (!_db || !_userId || !_cloudSyncEnabled) return;
+  clearTimeout(_ankiSRSSaveTimer);
+  _ankiSRSSaveTimer = setTimeout(async () => {
+    try { await _db.collection('users').doc(_userId).collection('data').doc('ankiSRS').set({ cards: ankiCardSRS }); }
+    catch(e) { console.warn('[AnkiSRS] save error', e); }
+  }, 2000);
+}
+function getAnkiSRS() { return ankiCardSRS; }
+function updateAnkiSRS(data) { Object.assign(ankiCardSRS, data); saveAnkiSRSToCloud(); }
 
 // Firestoreの1MBドキュメント制限対策：150問ずつチャンクに分割して保存
 const CLOUD_CHUNK_SIZE = 150;
@@ -3930,6 +4031,9 @@ function _renderOriginalExp(q) {
 let ANKI_LINKS = {};
 let _ankiLinksLoaded = false;
 let _ankiLinksLoading = false;
+let ankiCardSRS = {}; // { cardId: { due, interval, selected } }
+let _ankiSRSSaveTimer = null;
+let _ankiCurrentFilter = 'all';
 
 async function loadAnkiLinks() {
   if (_ankiLinksLoaded || _ankiLinksLoading) return;
@@ -7091,7 +7195,7 @@ function closeModal() { document.getElementById('edit-modal').classList.remove('
 function showTab(tab) {
   document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab !== 'map') document.getElementById('tab-'+tab).classList.add('active');
   const nb = [...document.querySelectorAll('.nav-btn')].find(b=>b.getAttribute('onclick')?.includes("'"+tab+"'"));
   if(nb) nb.classList.add('active');
 
@@ -7099,6 +7203,210 @@ function showTab(tab) {
   if(tab==='study') updateStudyModes();
   if(tab==='analysis') renderAnalysis();
   if(tab==='manage') renderManageList();
+  if(tab==='anki') { loadAnkiLinksIfNeeded(); setTimeout(renderAnkiTab, 300); }
+  // Show/hide the main content wrapper and map tab
+  const contentDiv = document.querySelector('.content');
+  const mapTab = document.getElementById('tab-map');
+  if(tab==='map') {
+    if(contentDiv) contentDiv.style.display = 'none';
+    mapTab.style.display = 'block';
+    const iframe = document.getElementById('map-iframe');
+    if (!iframe.src || iframe.src === window.location.href) {
+      iframe.src = 'anki_map_preview.html';
+    }
+    // Fit iframe to remaining viewport below header+nav
+    const headerH = document.querySelector('.header')?.offsetHeight || 50;
+    const navH = document.querySelector('.nav')?.offsetHeight || 48;
+    mapTab.style.height = (window.innerHeight - headerH - navH) + 'px';
+    iframe.style.height = '100%';
+  } else {
+    if(contentDiv) contentDiv.style.display = '';
+    if(mapTab) mapTab.style.display = 'none';
+  }
+}
+
+// ===== ANKI TAB =====
+function _ankiGetAllCards() {
+  const seen = new Set(); const cards = [];
+  for (const [qid, arr] of Object.entries(ANKI_LINKS)) {
+    for (const c of (arr || [])) {
+      const cid = c.id || c.plain;
+      if (!seen.has(cid)) { seen.add(cid); cards.push({ ...c, qid }); }
+    }
+  }
+  return cards;
+}
+
+function _renderClozeAnki(raw, revealed=false) {
+  if (!raw) return '';
+  return raw.replace(/\{\{c\d+::(.*?)(?:::(.*?))?\}\}/g, (_, answer, hint) => {
+    const blank = hint || '___';
+    if (revealed) return `<span style="background:#276749;color:white;border-radius:4px;padding:1px 8px;font-weight:700">${answer}</span>`;
+    return `<span style="background:#bee3f8;color:#2b6cb0;border-radius:4px;padding:1px 8px;font-weight:700;display:inline-block;min-width:36px;text-align:center">${blank}</span>`;
+  }).replace(/Â /g, ' ');
+}
+
+function _ankiSetFilter(f) {
+  _ankiCurrentFilter = f;
+  ['all','due','sel'].forEach(x => {
+    const el = document.getElementById('anki-f-'+x);
+    if (el) el.classList.toggle('active', x === (f==='selected'?'sel':f));
+  });
+  renderAnkiTab();
+}
+
+function renderAnkiTab() {
+  const allCards = _ankiGetAllCards();
+  const todayStr = today();
+  const dueCards = allCards.filter(c => {
+    const srs = ankiCardSRS[c.id || c.plain];
+    return !srs?.due || srs.due <= todayStr;
+  });
+  const selCards = allCards.filter(c => ankiCardSRS[c.id || c.plain]?.selected);
+
+  set('anki-stat-due', dueCards.length);
+  set('anki-stat-sel', selCards.length);
+  set('anki-stat-total', allCards.length);
+
+  if (allCards.length === 0) {
+    document.getElementById('anki-card-list').innerHTML =
+      '<div style="text-align:center;padding:40px;color:#a0aec0;font-size:14px">Ankiカードがまだありません。<br>問題の選択肢確認でカードを登録してください。</div>';
+    return;
+  }
+
+  const filter = _ankiCurrentFilter;
+  let showCards = filter === 'due' ? dueCards : filter === 'selected' ? selCards : allCards;
+
+  if (showCards.length === 0) {
+    document.getElementById('anki-card-list').innerHTML =
+      '<div style="text-align:center;padding:30px;color:#a0aec0;font-size:13px">該当するカードがありません</div>';
+    return;
+  }
+
+  const html = showCards.map(c => {
+    const cid = c.id || c.plain;
+    const srs = ankiCardSRS[cid] || {};
+    const isDue = !srs.due || srs.due <= todayStr;
+    const isSel = !!srs.selected;
+    const dueBadge = srs.due
+      ? `<span style="font-size:10px;color:${isDue?'#c53030':'#a0aec0'}">${isDue?'📅 今日':'次回: '+srs.due}</span>`
+      : '';
+    const selBadge = isSel
+      ? `<span style="font-size:10px;background:#ebf8ff;color:#2b6cb0;border:1px solid #90cdf4;border-radius:10px;padding:1px 7px;font-weight:700">✓ 練習中</span>`
+      : '';
+    return `<div class="anki-card-item${isSel?' anki-selected':''}${isDue?' anki-due':''}" id="anki-item-${cid.replace(/[^a-z0-9]/gi,'_')}">
+      <div style="display:flex;align-items:flex-start;gap:8px">
+        <input type="checkbox" style="margin-top:3px;flex-shrink:0;accent-color:#2b6cb0;width:15px;height:15px;cursor:pointer"
+          ${isSel?'checked':''} onchange="ankiToggleSelect('${cid}')">
+        <div style="flex:1" onclick="ankiFlipItem('${cid}')">
+          <div id="anki-front-${cid.replace(/[^a-z0-9]/gi,'_')}" style="font-size:13px;line-height:1.7;color:#2d3748">
+            ${_renderClozeAnki(c.raw || c.plain, false)}
+          </div>
+          <div style="font-size:11px;color:#a0aec0;margin-top:4px;display:flex;align-items:center;flex-wrap:wrap;gap:6px">
+            <span>タップして答えを見る</span>${dueBadge}${selBadge}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('anki-card-list').innerHTML = html;
+}
+
+function ankiFlipItem(cid) {
+  const safe = cid.replace(/[^a-z0-9]/gi,'_');
+  const el = document.getElementById('anki-front-' + safe);
+  if (!el) return;
+  const isRevealed = el.dataset.revealed === '1';
+  const card = Object.values(ANKI_LINKS).flat().find(c => (c.id||c.plain) === cid);
+  if (!card) return;
+  if (isRevealed) {
+    el.innerHTML = _renderClozeAnki(card.raw || card.plain, false);
+    el.dataset.revealed = '0';
+    el.nextElementSibling.querySelector('span').textContent = 'タップして答えを見る';
+  } else {
+    el.innerHTML = _renderClozeAnki(card.raw || card.plain, true);
+    el.dataset.revealed = '1';
+    el.nextElementSibling.querySelector('span').textContent = 'タップして隠す';
+  }
+}
+
+function ankiToggleSelect(cid) {
+  if (!ankiCardSRS[cid]) ankiCardSRS[cid] = {};
+  ankiCardSRS[cid].selected = !ankiCardSRS[cid].selected;
+  saveAnkiSRSToCloud();
+  renderAnkiTab();
+}
+
+// ===== Practice mode =====
+let _ankiQueue = [], _ankiQueueIdx = 0, _ankiRevealed = false;
+
+function startAnkiPractice(filter) {
+  const allCards = _ankiGetAllCards();
+  const todayStr = today();
+  let pool;
+  if (filter === 'due') {
+    pool = allCards.filter(c => { const s=ankiCardSRS[c.id||c.plain]; return !s?.due||s.due<=todayStr; });
+  } else if (filter === 'selected') {
+    pool = allCards.filter(c => ankiCardSRS[c.id||c.plain]?.selected);
+  } else {
+    pool = [...allCards];
+  }
+  if (pool.length === 0) { toast('対象カードがありません', 'error'); return; }
+  _ankiQueue = pool.slice(0, 50);
+  _ankiQueueIdx = 0;
+  document.getElementById('anki-card-list').style.display = 'none';
+  document.getElementById('anki-practice-panel').style.display = 'block';
+  document.getElementById('anki-done-msg').style.display = 'none';
+  _ankiShowPracticeCard();
+}
+
+function _ankiShowPracticeCard() {
+  if (_ankiQueueIdx >= _ankiQueue.length) { _ankiPracticeDone(); return; }
+  const card = _ankiQueue[_ankiQueueIdx];
+  _ankiRevealed = false;
+  const pct = Math.round(_ankiQueueIdx / _ankiQueue.length * 100);
+  document.getElementById('anki-prog-fill').style.width = pct + '%';
+  document.getElementById('anki-prog-text').textContent = _ankiQueueIdx + '/' + _ankiQueue.length;
+  document.getElementById('anki-p-meta').textContent = (card.concept || '') ;
+  document.getElementById('anki-p-front').innerHTML = _renderClozeAnki(card.raw || card.plain, false);
+  document.getElementById('anki-reveal-btn').style.display = 'block';
+  document.getElementById('anki-rating-wrap').style.display = 'none';
+}
+
+function _ankiReveal() {
+  const card = _ankiQueue[_ankiQueueIdx];
+  document.getElementById('anki-p-front').innerHTML = _renderClozeAnki(card.raw || card.plain, true);
+  document.getElementById('anki-reveal-btn').style.display = 'none';
+  document.getElementById('anki-rating-wrap').style.display = 'flex';
+  _ankiRevealed = true;
+}
+
+function _ankiRate(interval) {
+  const card = _ankiQueue[_ankiQueueIdx];
+  const cid = card.id || card.plain;
+  if (!ankiCardSRS[cid]) ankiCardSRS[cid] = {};
+  const d = new Date(); d.setDate(d.getDate() + interval);
+  ankiCardSRS[cid].due = d.toISOString().slice(0,10);
+  ankiCardSRS[cid].interval = interval;
+  saveAnkiSRSToCloud();
+  _ankiQueueIdx++;
+  document.getElementById('anki-rating-wrap').style.display = 'none';
+  _ankiShowPracticeCard();
+}
+
+function _ankiPracticeDone() {
+  document.getElementById('anki-prog-fill').style.width = '100%';
+  document.getElementById('anki-prog-text').textContent = _ankiQueue.length + '/' + _ankiQueue.length;
+  document.getElementById('anki-reveal-btn').style.display = 'none';
+  document.getElementById('anki-done-msg').style.display = 'block';
+  document.getElementById('anki-done-count').textContent = _ankiQueue.length + '枚のカードを練習しました';
+}
+
+function _ankiEndPractice() {
+  document.getElementById('anki-card-list').style.display = 'block';
+  document.getElementById('anki-practice-panel').style.display = 'none';
+  renderAnkiTab();
 }
 
 function set(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
