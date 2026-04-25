@@ -379,7 +379,7 @@ select.form-input { cursor: pointer; }
 
 <!-- HEADER -->
 <header class="header">
-  <h1 id="hdr-title">📚 医師国試 自己分析ツール</h1>
+  <h1 id="hdr-title">📚 医師国試 自己分析ツール <span id="hdr-version" style="font-size:11px;font-weight:400;opacity:0.7;letter-spacing:0.5px"></span></h1>
 
   <!-- SESSION HEADER（学習中のみ表示） -->
   <div id="session-header" style="display:none;flex:1;align-items:center;gap:10px;margin:0;padding:0 8px;background:transparent;box-shadow:none;border-radius:0;">
@@ -1425,6 +1425,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
+const APP_VERSION = "v2026.04.25.2";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -8098,6 +8099,7 @@ deduplicateAttempts();
 updateHeader();
 renderDashboard();
 updateStudyModes();
+{ const vEl = document.getElementById("hdr-version"); if (vEl) vEl.textContent = APP_VERSION; }
 _initPWAManifest();
 // Ankiリンクを非同期でバックグラウンドロード（初回表示に影響しない）
 loadAnkiLinks();
