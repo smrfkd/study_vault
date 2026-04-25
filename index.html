@@ -116,7 +116,11 @@ select.form-input { cursor: pointer; }
 /* STUDY SESSION */
 .question-card { background: white; border-radius: 16px; padding: 0; box-shadow: 0 4px 16px rgba(0,0,0,0.1); display:flex; overflow:hidden; height:calc(100vh - 130px); }
 .qpanel-left  { flex:0 0 50%; overflow-y:auto; padding:24px 20px; border-right:1px solid #e2e8f0; }
-.qpanel-right { flex:1; overflow-y:auto; padding:24px 20px; background:#fafafa; }
+.qpanel-right { flex:1; overflow-y:auto; padding:24px 20px; background:#fafafa; transition:flex 0.2s; }
+.qpanel-slide { flex:0 0 40%; display:none; flex-direction:column; border-left:2px solid #e2e8f0; background:#f7fafc; overflow:hidden; transition:flex 0.2s; }
+.qpanel-slide.open { display:flex; }
+.qpanel-slide-header { background:white; border-bottom:1px solid #e2e8f0; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.qpanel-slide-iframe { flex:1; width:100%; border:none; display:block; }
 .qpanel-right-placeholder { display:flex; align-items:center; justify-content:center; height:100%; color:#cbd5e0; font-size:14px; pointer-events:none; }
 /* 学習モード選択 左右分割 */
 .study-mode-split { display:flex; gap:20px; align-items:flex-start; }
@@ -1094,6 +1098,15 @@ select.form-input { cursor: pointer; }
 
         </div>
         </div><!-- /qpanel-right -->
+        <!-- SLIDE PANEL (問題3:解説3:スライド4) -->
+        <div class="qpanel-slide" id="qpanel-slide">
+          <div class="qpanel-slide-header">
+            <div style="font-size:12px;font-weight:800;color:#1a365d;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="slide-panel-fname">📖 スライド</div>
+            <span style="background:#ebf8ff;color:#2b6cb0;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700;margin-right:8px" id="slide-panel-page"></span>
+            <button onclick="samCloseSlide()" style="border:none;background:none;cursor:pointer;font-size:16px;color:#a0aec0;padding:2px 4px">✕</button>
+          </div>
+          <iframe id="slide-iframe" class="qpanel-slide-iframe" src="" allowfullscreen></iframe>
+        </div>
       </div>
     </div>
 
@@ -1425,7 +1438,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.25.9";
+const APP_VERSION = "v2026.04.25.10";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -4140,40 +4153,45 @@ function samFlipCard(el) {
 }
 
 function samOpenSlide(path, page) {
-  // まず file:// で開くことを試みる
-  const encoded = encodeURI(path);
+  // anki_map_preview方式: セグメントごとにencodeURIComponent
+  const encoded = path.split('/').map(s => encodeURIComponent(s)).join('/');
   const url = 'file://' + encoded + '#page=' + page;
-  const a = document.createElement('a');
-  a.href = url; a.target = '_blank'; a.rel = 'noopener';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-  // 同時にinfo パネルも表示（ブラウザがブロックした場合の補助）
+
+  const panel = document.getElementById('qpanel-slide');
+  const iframe = document.getElementById('slide-iframe');
+  const fnameEl = document.getElementById('slide-panel-fname');
+  const pageEl  = document.getElementById('slide-panel-page');
+
   const fname = path.split('/').pop();
-  const dir = path.split('/').slice(-2, -1)[0] || '';
-  let panel = document.getElementById('sam-slide-panel');
-  if (!panel) {
-    panel = document.createElement('div');
-    panel.id = 'sam-slide-panel';
-    panel.style.cssText = 'position:fixed;bottom:20px;right:20px;background:white;border:1.5px solid #90cdf4;border-radius:12px;padding:14px 16px;box-shadow:0 4px 20px rgba(0,0,0,0.15);z-index:9999;max-width:380px;font-size:12px';
-    document.body.appendChild(panel);
+  const dir   = path.split('/').slice(-3, -1).join('/');
+
+  if (fnameEl) fnameEl.textContent = '📄 ' + (dir ? dir + '/' : '') + fname;
+  if (pageEl)  pageEl.textContent  = 'p.' + page;
+
+  // 同じページをもう一度クリックしたら閉じる
+  if (panel && panel.classList.contains('open') && iframe && iframe.getAttribute('data-url') === url) {
+    samCloseSlide(); return;
   }
-  panel.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <span style="font-weight:800;color:#2b6cb0;font-size:13px">📖 スライド</span>
-      <button onclick="this.closest('#sam-slide-panel').remove()" style="border:none;background:none;cursor:pointer;font-size:16px;color:#a0aec0;padding:0">✕</button>
-    </div>
-    <div style="color:#4a5568;margin-bottom:4px"><span style="color:#718096;font-size:11px">${dir}/</span><br><strong>${fname}</strong></div>
-    <div style="color:#553c9a;font-weight:700;margin-bottom:10px">p.${page}</div>
-    <div style="display:flex;gap:8px">
-      <button onclick="navigator.clipboard.writeText('${path.replace(/'/g,"\'")}').then(()=>{this.textContent='コピー済み✓';setTimeout(()=>this.textContent='パスをコピー',2000)})"
-        style="flex:1;padding:6px;background:#ebf8ff;border:1px solid #90cdf4;border-radius:7px;color:#2b6cb0;cursor:pointer;font-size:11px;font-weight:700">
-        📋 パスをコピー
-      </button>
-      <button onclick="window.open('${url}','_blank')"
-        style="flex:1;padding:6px;background:#faf5ff;border:1px solid #b794f4;border-radius:7px;color:#553c9a;cursor:pointer;font-size:11px;font-weight:700">
-        🔗 別タブで開く
-      </button>
-    </div>
-    <div style="font-size:10px;color:#a0aec0;margin-top:8px">ブラウザでブロックされた場合はパスをコピーしてFinderで開いてください</div>`;
+
+  if (iframe) { iframe.src = url; iframe.setAttribute('data-url', url); }
+  if (panel)  { panel.classList.add('open'); }
+
+  // 比率調整: qpanel-left 30% / qpanel-right 30% / qpanel-slide 40%
+  const left  = document.querySelector('.qpanel-left');
+  const right = document.querySelector('.qpanel-right');
+  if (left)  left.style.flex  = '0 0 30%';
+  if (right) right.style.flex = '0 0 30%';
+}
+
+function samCloseSlide() {
+  const panel  = document.getElementById('qpanel-slide');
+  const iframe = document.getElementById('slide-iframe');
+  if (panel)  panel.classList.remove('open');
+  if (iframe) { iframe.src = ''; iframe.removeAttribute('data-url'); }
+  const left  = document.querySelector('.qpanel-left');
+  const right = document.querySelector('.qpanel-right');
+  if (left)  left.style.flex  = '';
+  if (right) right.style.flex = '';
 }
 
 function samFindSlides(conceptName) {
