@@ -434,7 +434,7 @@ select.form-input { cursor: pointer; }
   <button class="nav-btn" onclick="showTab('manage')">管理</button>
   <button class="nav-btn" onclick="showTab('add')">問題追加</button>
   <button class="nav-btn" onclick="showTab('anki')">🃏 Ankiカード</button>
-  <button class="nav-btn" onclick="showTab('map')">📚 知識マップ</button>
+
 </nav>
 
 <div class="content">
@@ -1141,35 +1141,44 @@ select.form-input { cursor: pointer; }
       </div>
     </div>
 
-    <!-- 間違い原因分析 -->
-    <div class="card" style="border-top:4px solid #e53e3e">
-      <div class="card-title">🔎 間違い原因分析</div>
-      <div id="an-reason-content">
-        <div style="color:#a0aec0;font-size:13px">不正解の記録がたまると分析が表示されます</div>
+    <!-- 用語別弱点マップ -->
+    <div class="card" style="border-top:4px solid #2b6cb0">
+      <div class="card-title">🗺️ 用語別弱点マップ</div>
+      <div id="an-term-weakness">
+        <div style="color:#a0aec0;font-size:13px">不正解が記録されると用語ごとの弱点が表示されます</div>
       </div>
     </div>
 
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">📊 分野別詳細（正答率順）</div>
-        <div id="an-category-list"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">🎯 学習アドバイス</div>
-        <div id="an-advice"></div>
+    <!-- 重要度★別の正答率 -->
+    <div class="card" style="border-top:4px solid #d69e2e">
+      <div class="card-title">⭐ 重要度★別の正答率</div>
+      <div id="an-importance-stats">
+        <div style="color:#a0aec0;font-size:13px">問題を解くと重要度別の正答率が表示されます</div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-title">🔁 繰り返し間違える問題</div>
-      <div id="an-wrong-repeat"></div>
+
+    <!-- 学習アドバイス -->
+    <div class="card" style="border-top:4px solid #38a169">
+      <div class="card-title">🎯 学習アドバイス</div>
+      <div id="an-advice">
+        <div style="color:#a0aec0;font-size:13px">学習データが蓄積されるとアドバイスが表示されます</div>
+      </div>
     </div>
-    <div class="card">
-      <div class="card-title">🏆 得意分野（正答率80%以上）</div>
-      <div id="an-strong"></div>
+
+    <!-- 未出題の重要用語 -->
+    <div class="card" style="border-top:4px solid #553c9a">
+      <div class="card-title">📚 未出題の重要用語（★★★）</div>
+      <div id="an-unseen-terms">
+        <div style="color:#a0aec0;font-size:13px">term_dictionaryが読み込まれると表示されます</div>
+      </div>
     </div>
-    <div class="card">
-      <div class="card-title">📈 分野別進捗チャート</div>
-      <div style="position:relative;height:320px"><canvas id="chart-radar"></canvas></div>
+
+    <!-- セクション別分析 -->
+    <div class="card" style="border-top:4px solid #718096">
+      <div class="card-title">🗂️ セクション別分析（正答率低い順）</div>
+      <div id="an-section-stats">
+        <div style="color:#a0aec0;font-size:13px">問題を解くとセクション別の正答率が表示されます</div>
+      </div>
     </div>
   </div>
 
@@ -1374,9 +1383,7 @@ select.form-input { cursor: pointer; }
 
 </div><!-- /content -->
 
-<div id="tab-map" style="display:none;padding:0;overflow:hidden;">
-  <iframe id="map-iframe" style="width:100%;height:100%;border:none;display:block;" src=""></iframe>
-</div>
+
 
 <!-- EDIT MODAL -->
 <div class="modal-overlay" id="edit-modal" onclick="if(event.target===this)closeModal()">
@@ -1438,7 +1445,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.26.02";
+const APP_VERSION = "v2026.04.26.04";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -2474,11 +2481,6 @@ function importJSON() {
   } catch(e) { toast('JSONの形式が正しくありません', 'error'); }
 }
 
-function exportData() {
-  const j = JSON.stringify(questions, null, 2);
-  download(j, `kokushi_backup_${today()}.json`, 'application/json');
-  toast('エクスポートしました', 'success');
-}
 
 function resetProgress() {
   if (!confirm('学習記録をすべてリセットしますか？（問題は残ります）')) return;
@@ -5297,6 +5299,13 @@ function startStudy(mode, cat='') {
   else if (mode==='filter') {
     pool = _buildFilterPool().filter(q => !_filterExcludedIds.has(q.id));
   }
+  else if (mode==='term') {
+    const qtl = window._Q_TERM_LINKS;
+    if (qtl) {
+      const targetNums = new Set(Object.entries(qtl).filter(([n,keys])=>keys.includes(cat)).map(([n])=>n));
+      pool = questions.filter(q => targetNums.has(q.number));
+    }
+  }
 
   if (!pool.length) {
     if (mode==='review') { toast('🎉 今日の復習は全て完了しています！', 'success'); return; }
@@ -6837,8 +6846,13 @@ function renderWeaknessAnalysis() {
   </div>
 
   <div>
-    <div style="font-size:13px;font-weight:700;color:#4a5568;margin-bottom:10px">📋 全失点リスト（解答率データあり）</div>
-    <div style="overflow-x:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:#4a5568">📋 全失点リスト（${wrongWithData.length}件）</div>
+      <button onclick="this.closest('div').nextElementSibling.style.display=this.closest('div').nextElementSibling.style.display==='none'?'block':'none';this.textContent=this.textContent==='▼ 全て展開'?'▲ 折りたたむ':'▼ 全て展開'"
+        style="font-size:11px;padding:3px 10px;border:1px solid #e2e8f0;border-radius:5px;background:#f7fafc;cursor:pointer;color:#4a5568">▼ 全て展開</button>
+    </div>
+    <!-- 上位5件（常時表示） -->
+    <div style="overflow-x:auto;margin-bottom:4px">
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead>
           <tr style="background:#f7fafc;color:#4a5568">
@@ -6846,13 +6860,13 @@ function renderWeaknessAnalysis() {
             <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:700">分野</th>
             <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;font-weight:700">平均正解率</th>
             <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;font-weight:700">あなたの選択</th>
-            <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;font-weight:700">その選択の頻度</th>
+            <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;font-weight:700">その頻度</th>
             <th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;font-weight:700">誤答回数</th>
             <th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0;font-weight:700">判定</th>
           </tr>
         </thead>
         <tbody>
-          ${wrongWithData.slice().sort((a,b)=>b.avgCorrect-a.avgCorrect).map((w,i) => {
+          ${wrongWithData.slice().sort((a,b)=>b.avgCorrect-a.avgCorrect).slice(0,5).map((w,i) => {
             const diffLabel = w.avgCorrect >= 80 ? '🟢 易問' : w.avgCorrect >= 60 ? '🟡 標準' : '🔴 難問';
             const isCommon = w.wrongPct >= 10;
             const rowBg = i % 2 === 0 ? '#fff' : '#f7fafc';
@@ -6862,17 +6876,41 @@ function renderWeaknessAnalysis() {
               ? `<span style="background:#dd6b20;color:white;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:700">${w.wrongCount}回</span>`
               : `<span style="color:#718096;font-size:11px">${w.wrongCount}回</span>`;
             return `<tr style="background:${rowBg}">
-              <td style="padding:7px 8px;white-space:nowrap"><span onclick="jumpToQuestion('${w.qId}')" style="color:#2b6cb0;font-weight:700;cursor:pointer;text-decoration:underline;text-decoration-style:dotted" title="クリックで問題を表示">${w.qNum || '—'}</span></td>
+              <td style="padding:7px 8px;white-space:nowrap"><span onclick="jumpToQuestion('${w.qId}')" style="color:#2b6cb0;font-weight:700;cursor:pointer;text-decoration:underline;text-decoration-style:dotted">${w.qNum || '—'}</span></td>
               <td style="padding:7px 8px;color:#4a5568">${w.category}</td>
               <td style="padding:7px 8px;text-align:center;font-weight:700;color:${w.avgCorrect>=80?'#276749':w.avgCorrect>=60?'#744210':'#c53030'}">${w.avgCorrect.toFixed(1)}%</td>
               <td style="padding:7px 8px;text-align:center;color:#c53030;font-weight:700">${w.selectedChoices.join('・')}</td>
               <td style="padding:7px 8px;text-align:center;color:${isCommon?'#744210':'#c53030'}">${w.wrongPct > 0 ? w.wrongPct.toFixed(1)+'%' : '—'}</td>
               <td style="padding:7px 8px;text-align:center">${countBadge}</td>
-              <td style="padding:7px 8px">${diffLabel}${isCommon ? ' ⚠️共通ミス' : (w.wrongPct > 0 ? ' ⚡個別ミス' : '')}</td>
+              <td style="padding:7px 8px">${diffLabel}${isCommon ? ' ⚠️共通' : (w.wrongPct > 0 ? ' ⚡個別' : '')}</td>
             </tr>`;
           }).join('')}
         </tbody>
       </table>
+    </div>
+    <!-- 残り（折りたたみ） -->
+    <div style="display:none;overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px"><tbody>
+          ${wrongWithData.slice().sort((a,b)=>b.avgCorrect-a.avgCorrect).slice(5).map((w,i) => {
+            const diffLabel = w.avgCorrect >= 80 ? '🟢 易問' : w.avgCorrect >= 60 ? '🟡 標準' : '🔴 難問';
+            const isCommon = w.wrongPct >= 10;
+            const rowBg = (i+5) % 2 === 0 ? '#fff' : '#f7fafc';
+            const countBadge = w.wrongCount >= 3
+              ? `<span style="background:#c53030;color:white;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:700">${w.wrongCount}回</span>`
+              : w.wrongCount >= 2
+              ? `<span style="background:#dd6b20;color:white;border-radius:4px;padding:1px 5px;font-size:10px;font-weight:700">${w.wrongCount}回</span>`
+              : `<span style="color:#718096;font-size:11px">${w.wrongCount}回</span>`;
+            return `<tr style="background:${rowBg}">
+              <td style="padding:7px 8px;white-space:nowrap"><span onclick="jumpToQuestion('${w.qId}')" style="color:#2b6cb0;font-weight:700;cursor:pointer;text-decoration:underline;text-decoration-style:dotted">${w.qNum || '—'}</span></td>
+              <td style="padding:7px 8px;color:#4a5568">${w.category}</td>
+              <td style="padding:7px 8px;text-align:center;font-weight:700;color:${w.avgCorrect>=80?'#276749':w.avgCorrect>=60?'#744210':'#c53030'}">${w.avgCorrect.toFixed(1)}%</td>
+              <td style="padding:7px 8px;text-align:center;color:#c53030;font-weight:700">${w.selectedChoices.join('・')}</td>
+              <td style="padding:7px 8px;text-align:center;color:${isCommon?'#744210':'#c53030'}">${w.wrongPct > 0 ? w.wrongPct.toFixed(1)+'%' : '—'}</td>
+              <td style="padding:7px 8px;text-align:center">${countBadge}</td>
+              <td style="padding:7px 8px">${diffLabel}${isCommon ? ' ⚠️共通' : (w.wrongPct > 0 ? ' ⚡個別' : '')}</td>
+            </tr>`;
+          }).join('')}
+      </tbody></table>
     </div>
   </div>`;
 
@@ -6880,96 +6918,236 @@ function renderWeaknessAnalysis() {
 }
 
 // ========== ANALYSIS ==========
-function renderAnalysis() {
+async function renderAnalysis() {
   renderWeaknessAnalysis();
-  renderReasonAnalysis();
-  const cs = catStats();
-  const sorted = CATEGORIES
-    .filter(c => cs[c]&&cs[c].total>0)
-    .sort((a,b) => {
-      const aA = cs[a].att ? cs[a].correct/cs[a].att : 1;
-      const bA = cs[b].att ? cs[b].correct/cs[b].att : 1;
-      return aA - bA;
-    });
-
-  // Category list
-  document.getElementById('an-category-list').innerHTML = sorted.map(c => {
-    const s = cs[c];
-    const acc = s.att ? Math.round(s.correct/s.att*100) : null;
-    const col = acc===null?'#a0aec0':acc>=70?'#38a169':acc>=50?'#d69e2e':'#e53e3e';
-    return `<div class="cat-row">
-      <div class="cat-name">${c}</div>
-      <div class="cat-bar-wrap"><div class="cat-bar-fill" style="width:${acc||0}%;background:${col}"></div></div>
-      <div class="cat-pct" style="color:${col}">${acc!==null?acc+'%':'未'}</div>
-      <div class="cat-cnt">${s.att}/${s.total}問</div>
-    </div>`;
-  }).join('');
-
-  // Advice
-  const weakCats = sorted.filter(c=>cs[c].att>0&&cs[c].correct/cs[c].att<0.6).map(c=>({name:c,acc:Math.round(cs[c].correct/cs[c].att*100)}));
-  const midCats  = sorted.filter(c=>cs[c].att>0&&cs[c].correct/cs[c].att>=0.6&&cs[c].correct/cs[c].att<0.8);
-  const unatt    = sorted.filter(c=>cs[c].att===0&&cs[c].total>0);
-
-  let adv = '';
-  if (weakCats.length) {
-    adv += weakCats.map(c=>`<div class="advice-item advice-weak"><strong>⚠️ ${c.name}（${c.acc}%）</strong><br><span style="font-size:12px">正答率が低く要注意。教科書で基本を見直し、${c.name}の問題を集中的に繰り返しましょう。</span></div>`).join('');
-  }
-  if (midCats.length) {
-    adv += `<div class="advice-item advice-mid"><strong>📚 もう一息：</strong>${midCats.map(c=>c).join('、')}<br><span style="font-size:12px">60-80%台。あと少しで安心圏。頻出事項を再確認。</span></div>`;
-  }
-  if (unatt.length) {
-    adv += `<div class="advice-item" style="background:#f0fff4;border-left:4px solid #38a169"><strong>🆕 未挑戦：</strong>${unatt.join('、')}</div>`;
-  }
-  if (!adv) adv = '<div class="advice-item advice-good">全分野に学習データがあります。引き続き高い正答率を目指しましょう！</div>';
-  document.getElementById('an-advice').innerHTML = adv;
-
-  // Repeat-wrong
-  const rw = questions.filter(q=>q.attempts.length>=3&&q.attempts.slice(-3).every(a=>!a.ok)).slice(0,15);
-  document.getElementById('an-wrong-repeat').innerHTML = rw.length
-    ? rw.map(q=>`<div class="q-list-item" onclick="openEdit('${q.id}')">
-        <span class="badge badge-red">${q.category}</span>
-        <div class="q-text-preview">${q.question.slice(0,90)}</div>
-        <div class="q-acc acc-low">${q.attempts.length}回</div>
-      </div>`).join('')
-    : '<div style="color:#a0aec0;font-size:13px">繰り返し間違えている問題はまだありません</div>';
-
-  // Strong
-  const strong = CATEGORIES.filter(c=>cs[c]&&cs[c].att>=3&&cs[c].correct/cs[c].att>=0.8);
-  document.getElementById('an-strong').innerHTML = strong.length
-    ? strong.map(c=>{
-        const acc = Math.round(cs[c].correct/cs[c].att*100);
-        return `<span class="badge badge-green" style="margin:4px;padding:8px 14px;font-size:12px">${c} ${acc}%</span>`;
-      }).join('')
-    : '<div style="color:#a0aec0;font-size:13px">正答率80%以上の分野（3問以上）がまだありません</div>';
-
-  // Radar chart
-  renderRadar(cs);
+  await loadAnkiLinks();
+  await loadTermDictionary();
+  renderTermWeaknessMap();
+  renderImportanceStats();
+  renderTermAdvice();
+  renderUnseenTerms();
+  renderSectionStats();
 }
 
-function renderRadar(cs) {
-  const labels = CATEGORIES.filter(c=>cs[c]&&cs[c].total>0);
-  const data = labels.map(c => cs[c].att ? Math.round(cs[c].correct/cs[c].att*100) : 0);
-  const ctx = document.getElementById('chart-radar').getContext('2d');
-  if (charts.radar) charts.radar.destroy();
-  charts.radar = new Chart(ctx, {
-    type: 'radar',
-    data: {
-      labels,
-      datasets: [{
-        label: '正答率 (%)',
-        data,
-        backgroundColor: 'rgba(43,108,176,0.15)',
-        borderColor: '#2b6cb0',
-        pointBackgroundColor: '#2b6cb0',
-        pointRadius: 3
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      scales: { r: { beginAtZero:true, max:100, ticks:{stepSize:20, font:{size:10}}, pointLabels:{font:{size:10}} } },
-      plugins: { legend:{display:false} }
-    }
+// ========== 用語別弱点マップ ==========
+function renderTermWeaknessMap() {
+  const el = document.getElementById('an-term-weakness');
+  if (!el) return;
+  const qtl = window._Q_TERM_LINKS;
+  if (!qtl || !TERM_DICT) { el.innerHTML = '<div style="color:#a0aec0;font-size:13px">データ読み込み中...</div>'; return; }
+
+  const termStats = {};
+  questions.forEach(q => {
+    const tks = qtl[q.number] || [];
+    if (!tks.length || !q.attempts.length) return;
+    tks.forEach(tk => {
+      if (!termStats[tk]) termStats[tk] = { wrong:0, total:0 };
+      q.attempts.forEach(a => {
+        termStats[tk].total++;
+        if (!a.ok) termStats[tk].wrong++;
+      });
+    });
   });
+
+  const list = Object.entries(termStats)
+    .filter(([,s]) => s.wrong > 0)
+    .sort((a,b) => b[1].wrong - a[1].wrong)
+    .slice(0, 30);
+
+  if (!list.length) {
+    el.innerHTML = '<div style="color:#a0aec0;font-size:13px">不正解が記録されると用語ごとの弱点が表示されます</div>';
+    return;
+  }
+
+  el.innerHTML = list.map(([tk, s]) => {
+    const term = TERM_DICT.terms[tk];
+    const imp = term ? (term.importance || 0) : 0;
+    const stars = '★'.repeat(imp) + '☆'.repeat(Math.max(0,3-imp));
+    const acc = Math.round((s.total - s.wrong) / s.total * 100);
+    const accColor = acc >= 70 ? '#276749' : acc >= 50 ? '#744210' : '#c53030';
+    const starColor = imp >= 3 ? '#c53030' : imp >= 2 ? '#d69e2e' : '#a0aec0';
+    const enLabel = term && term.en ? `<span style="font-size:11px;color:#a0aec0;margin-left:4px">${term.en}</span>` : '';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:5px;background:#f7fafc;border-radius:8px;border:1px solid #e2e8f0">
+      <span style="font-size:11px;color:${starColor};font-weight:700;width:40px;flex-shrink:0;letter-spacing:-1px">${stars}</span>
+      <span style="font-size:13px;font-weight:700;color:#2d3748;flex:1;min-width:0">${tk}${enLabel}</span>
+      <span style="font-size:12px;font-weight:700;color:${accColor};white-space:nowrap">${s.wrong}回誤答 (${acc}%)</span>
+      <button onclick="startStudy('term','${tk.replace(/'/g,"\'")}')" style="padding:4px 10px;font-size:11px;background:#2b6cb0;color:white;border:none;border-radius:5px;cursor:pointer;white-space:nowrap;flex-shrink:0">▶ 解く</button>
+    </div>`;
+  }).join('');
+}
+
+// ========== 重要度★別の正答率 ==========
+function renderImportanceStats() {
+  const el = document.getElementById('an-importance-stats');
+  if (!el) return;
+  const qtl = window._Q_TERM_LINKS;
+  if (!qtl || !TERM_DICT) { el.innerHTML = '<div style="color:#a0aec0;font-size:13px">データ読み込み中...</div>'; return; }
+
+  const byImp = { 3:{correct:0,att:0}, 2:{correct:0,att:0}, 1:{correct:0,att:0}, 0:{correct:0,att:0} };
+  questions.forEach(q => {
+    const tks = qtl[q.number] || [];
+    const atts = q.attempts.filter(a => typeof a.ok !== 'undefined');
+    if (!atts.length || !tks.length) return;
+    let maxImp = 0;
+    tks.forEach(tk => { const t = TERM_DICT.terms[tk]; if (t && t.importance > maxImp) maxImp = t.importance; });
+    atts.forEach(a => { byImp[maxImp].att++; if (a.ok) byImp[maxImp].correct++; });
+  });
+
+  const impLabels = { 3:'★★★ 最重要', 2:'★★ 重要', 1:'★ 参考', 0:'★なし' };
+  const impColors = { 3:'#c53030', 2:'#d69e2e', 1:'#718096', 0:'#a0aec0' };
+  let cards = '';
+  [3,2,1,0].forEach(imp => {
+    const s = byImp[imp];
+    if (!s.att) return;
+    const acc = Math.round(s.correct / s.att * 100);
+    const barColor = acc >= 70 ? '#38a169' : acc >= 50 ? '#d69e2e' : '#e53e3e';
+    cards += `<div style="background:#f7fafc;border-radius:10px;padding:14px;border:1px solid #e2e8f0">
+      <div style="font-size:12px;font-weight:700;color:${impColors[imp]};margin-bottom:6px">${impLabels[imp]}</div>
+      <div style="font-size:28px;font-weight:800;color:${barColor}">${acc}%</div>
+      <div style="font-size:11px;color:#a0aec0;margin-top:2px">${s.correct}/${s.att}問正解</div>
+      <div style="height:5px;background:#e2e8f0;border-radius:3px;margin-top:8px;overflow:hidden">
+        <div style="height:100%;width:${acc}%;background:${barColor};border-radius:3px"></div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML = cards
+    ? `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">${cards}</div>`
+    : '<div style="color:#a0aec0;font-size:13px">問題を解くと重要度別の正答率が表示されます</div>';
+}
+
+// ========== 学習アドバイス（用語ベース） ==========
+function renderTermAdvice() {
+  const el = document.getElementById('an-advice');
+  if (!el) return;
+  const qtl = window._Q_TERM_LINKS;
+  if (!qtl || !TERM_DICT) { el.innerHTML = '<div style="color:#a0aec0;font-size:13px">データ読み込み中...</div>'; return; }
+
+  const byImp = { 3:{correct:0,att:0}, 2:{correct:0,att:0} };
+  const triedTerms = new Set();
+  questions.forEach(q => {
+    const tks = qtl[q.number] || [];
+    const atts = q.attempts.filter(a => typeof a.ok !== 'undefined');
+    tks.forEach(tk => { if (atts.length) triedTerms.add(tk); });
+    if (!atts.length || !tks.length) return;
+    let maxImp = 0;
+    tks.forEach(tk => { const t = TERM_DICT.terms[tk]; if (t && t.importance > maxImp) maxImp = t.importance; });
+    if (byImp[maxImp]) atts.forEach(a => { byImp[maxImp].att++; if (a.ok) byImp[maxImp].correct++; });
+  });
+
+  const imp3acc = byImp[3].att ? byImp[3].correct / byImp[3].att * 100 : null;
+  const imp2acc = byImp[2].att ? byImp[2].correct / byImp[2].att * 100 : null;
+  const unseen3 = Object.entries(TERM_DICT.terms).filter(([tk,v]) => v.importance===3 && !triedTerms.has(tk)).length;
+
+  const advices = [];
+  if (imp3acc !== null && imp3acc < 60) {
+    advices.push({ color:'#c53030', bg:'#fff5f5', text:`🚨 <strong>★★★用語の正答率が${Math.round(imp3acc)}%</strong>と低い状態です。国試頻出の最重要用語での失点は合否に直結します。用語別弱点マップの★★★用語から優先的に取り組んでください。` });
+  } else if (imp3acc !== null && imp3acc < 75) {
+    advices.push({ color:'#d69e2e', bg:'#fffbeb', text:`⚠️ <strong>★★★用語の正答率が${Math.round(imp3acc)}%</strong>です。あと一歩で安全圏。間違えた★★★問題を重点復習しましょう。` });
+  } else if (imp3acc !== null) {
+    advices.push({ color:'#276749', bg:'#f0fff4', text:`✅ <strong>★★★用語の正答率が${Math.round(imp3acc)}%</strong>と良好です。引き続き維持しながら★★用語の底上げを目指しましょう。` });
+  }
+  if (unseen3 > 0) {
+    advices.push({ color:'#553c9a', bg:'#faf5ff', text:`📚 <strong>未出題の★★★用語が${unseen3}件</strong>あります。まだ解いていない最重要用語が残っています。下の「未出題の重要用語」で確認してください。` });
+  }
+  if (imp2acc !== null && imp2acc < 60) {
+    advices.push({ color:'#c05621', bg:'#fffaf0', text:`📌 <strong>★★用語の正答率が${Math.round(imp2acc)}%</strong>です。★★★が安定したら★★用語の強化に取り組みましょう。` });
+  }
+  if (!advices.length) {
+    el.innerHTML = '<div style="color:#a0aec0;font-size:13px">学習データが蓄積されるとアドバイスが表示されます</div>';
+    return;
+  }
+  el.innerHTML = advices.map(a =>
+    `<div style="padding:12px 14px;background:${a.bg};border-left:4px solid ${a.color};border-radius:0 8px 8px 0;margin-bottom:10px;font-size:13px;line-height:1.7;color:#2d3748">${a.text}</div>`
+  ).join('');
+}
+
+// ========== 未出題の重要用語（★★★） ==========
+function renderUnseenTerms() {
+  const el = document.getElementById('an-unseen-terms');
+  if (!el) return;
+  if (!TERM_DICT) { el.innerHTML = '<div style="color:#a0aec0;font-size:13px">データ読み込み中...</div>'; return; }
+
+  const qtl = window._Q_TERM_LINKS || {};
+  const triedTerms = new Set();
+  questions.forEach(q => { if (q.attempts.length) (qtl[q.number]||[]).forEach(tk => triedTerms.add(tk)); });
+
+  const unseen = Object.entries(TERM_DICT.terms)
+    .filter(([tk,v]) => v.importance === 3 && !triedTerms.has(tk))
+    .sort((a,b) => (a[1].chapter||'').localeCompare(b[1].chapter||''));
+
+  if (!unseen.length) {
+    el.innerHTML = '<div style="color:#38a169;font-size:13px;padding:8px">✅ ★★★の重要用語はすべて出題済みです！</div>';
+    return;
+  }
+
+  const byChapter = {};
+  unseen.forEach(([tk,v]) => {
+    const ch = v.chapter || '?';
+    if (!byChapter[ch]) byChapter[ch] = [];
+    byChapter[ch].push(tk);
+  });
+
+  let html = `<div style="font-size:12px;color:#553c9a;margin-bottom:10px">未出題の★★★用語：<strong>${unseen.length}件</strong></div>`;
+  Object.entries(byChapter).slice(0,12).forEach(([ch, tks]) => {
+    html += `<div style="margin-bottom:10px">
+      <div style="font-size:11px;font-weight:700;color:#4a5568;margin-bottom:5px;padding:2px 8px;background:#edf2f7;border-radius:4px;display:inline-block">${ch}章（${tks.length}件）</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">
+        ${tks.slice(0,10).map(tk=>`<span style="font-size:11px;padding:3px 8px;background:#faf5ff;border:1px solid #d6bcfa;border-radius:12px;color:#553c9a">${tk}</span>`).join('')}
+        ${tks.length>10?`<span style="font-size:11px;color:#a0aec0;padding:3px">他${tks.length-10}件</span>`:''}
+      </div>
+    </div>`;
+  });
+  if (Object.keys(byChapter).length > 12) html += `<div style="font-size:11px;color:#a0aec0">他${Object.keys(byChapter).length-12}章...</div>`;
+  el.innerHTML = html;
+}
+
+// ========== セクション別分析 ==========
+function renderSectionStats() {
+  const el = document.getElementById('an-section-stats');
+  if (!el) return;
+  const qtl = window._Q_TERM_LINKS;
+  if (!qtl || !TERM_DICT) { el.innerHTML = '<div style="color:#a0aec0;font-size:13px">データ読み込み中...</div>'; return; }
+
+  const secStats = {};
+  questions.forEach(q => {
+    const tks = qtl[q.number] || [];
+    const atts = q.attempts.filter(a => typeof a.ok !== 'undefined');
+    if (!atts.length || !tks.length) return;
+    const secs = new Set();
+    tks.forEach(tk => {
+      const t = TERM_DICT.terms[tk];
+      if (t && t.section) secs.add(`${t.chapter}｜${t.section}`);
+    });
+    secs.forEach(sec => {
+      if (!secStats[sec]) secStats[sec] = { correct:0, att:0 };
+      atts.forEach(a => { secStats[sec].att++; if (a.ok) secStats[sec].correct++; });
+    });
+  });
+
+  const list = Object.entries(secStats)
+    .filter(([,s]) => s.att >= 2)
+    .map(([k,s]) => ({ key:k, acc:Math.round(s.correct/s.att*100), att:s.att, correct:s.correct }))
+    .sort((a,b) => a.acc - b.acc)
+    .slice(0, 25);
+
+  if (!list.length) {
+    el.innerHTML = '<div style="color:#a0aec0;font-size:13px">問題を解くとセクション別の正答率が表示されます（2問以上）</div>';
+    return;
+  }
+
+  let html = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+  html += '<thead><tr style="background:#f7fafc"><th style="padding:8px;text-align:left;border-bottom:2px solid #e2e8f0">章｜セクション</th><th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;width:80px">正答率</th><th style="padding:8px;text-align:center;border-bottom:2px solid #e2e8f0;width:70px">問数</th></tr></thead><tbody>';
+  list.forEach((s,i) => {
+    const [ch, sec] = s.key.split('｜');
+    const c = s.acc>=70?'#276749':s.acc>=50?'#744210':'#c53030';
+    html += `<tr style="background:${i%2===0?'#fff':'#f7fafc'}">
+      <td style="padding:7px 8px"><span style="font-size:10px;background:#edf2f7;padding:1px 5px;border-radius:3px;margin-right:5px;color:#4a5568">${ch}</span><span style="color:#2d3748">${sec}</span></td>
+      <td style="padding:7px 8px;text-align:center;font-weight:700;color:${c}">${s.acc}%</td>
+      <td style="padding:7px 8px;text-align:center;color:#718096">${s.correct}/${s.att}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
 }
 
 // ========== NOTES ==========
@@ -7552,25 +7730,6 @@ function showTab(tab) {
   if(tab==='analysis') renderAnalysis();
   if(tab==='manage') renderManageList();
   if(tab==='anki') { loadAnkiLinksIfNeeded(); setTimeout(renderAnkiTab, 300); }
-  // Show/hide the main content wrapper and map tab
-  const contentDiv = document.querySelector('.content');
-  const mapTab = document.getElementById('tab-map');
-  if(tab==='map') {
-    if(contentDiv) contentDiv.style.display = 'none';
-    mapTab.style.display = 'block';
-    const iframe = document.getElementById('map-iframe');
-    if (!iframe.src || iframe.src === window.location.href) {
-      iframe.src = 'anki_map_preview.html';
-    }
-    // Fit iframe to remaining viewport below header+nav
-    const headerH = document.querySelector('.header')?.offsetHeight || 50;
-    const navH = document.querySelector('.nav')?.offsetHeight || 48;
-    mapTab.style.height = (window.innerHeight - headerH - navH) + 'px';
-    iframe.style.height = '100%';
-  } else {
-    if(contentDiv) contentDiv.style.display = '';
-    if(mapTab) mapTab.style.display = 'none';
-  }
 }
 
 // ===== ANKI TAB =====
