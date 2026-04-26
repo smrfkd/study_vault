@@ -1438,7 +1438,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.25.10";
+const APP_VERSION = "v2026.04.26.02";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -4061,7 +4061,7 @@ function _renderOriginalExp(q) {
 
 // ========== ANKI CARDS ==========
 
-// 関連AnkiカードDB（anki_links.jsonから動的ロード）
+// 関連AnkiカードDB（q_term_links.jsonから動的ロード）
 let ANKI_LINKS = {};
 let _ankiLinksLoaded = false;
 let _ankiLinksLoading = false;
@@ -4080,7 +4080,7 @@ async function loadAnkiLinks() {
       console.log('[AnkiLinks] 埋め込みデータ使用:', Object.keys(data).length, '件');
     } else {
       try {
-        const res = await fetch('./anki_links.json');
+        const res = await fetch('./q_term_links.json');
         if (res.ok) {
           data = await res.json();
           console.log('[AnkiLinks] ファイルから読み込み:', Object.keys(data).length, '件');
@@ -4090,31 +4090,40 @@ async function loadAnkiLinks() {
       }
     }
     if (data) {
-      // 新フォーマット: data[qid] = { number, category, concepts: [{concept, description, cards, gap}] }
-      // 旧フォーマット: data[qid] = { number, cards: [{deck, plain, raw, relevance}] }
-      for (const [qid, info] of Object.entries(data)) {
-        if (info.concepts) {
-          // 新フォーマット: conceptsから全カードをフラット化してAnkiタブ用に格納
-          const flatCards = [];
-          for (const c of info.concepts) {
-            for (const card of (c.cards || [])) {
-              if (!flatCards.find(x => x.id === card.id)) {
-                flatCards.push({ ...card, relevance: c.concept + '：' + c.description });
+      if (data.questions) {
+        // v2形式: term_keysベース（q_term_links.json v2.0）
+        window._Q_TERM_LINKS = {};
+        for (const [qid, info] of Object.entries(data.questions)) {
+          if (info.number && Array.isArray(info.term_keys)) {
+            window._Q_TERM_LINKS[info.number] = info.term_keys;
+          }
+        }
+        console.log('[AnkiLinks] v2形式 term_keys読み込み完了:', Object.keys(window._Q_TERM_LINKS).length, '問');
+      } else {
+        // 旧形式: concepts[]ベース
+        // concepts形式: data[qid] = { number, concepts: [{concept, description, cards}] }
+        // cards形式:    data[qid] = { number, cards: [{deck, plain, raw}] }
+        for (const [qid, info] of Object.entries(data)) {
+          if (info && info.concepts) {
+            const flatCards = [];
+            for (const c of info.concepts) {
+              for (const card of (c.cards || [])) {
+                if (!flatCards.find(x => x.id === card.id)) {
+                  flatCards.push({ ...card, relevance: c.concept + '：' + c.description });
+                }
               }
             }
+            ANKI_LINKS[qid] = flatCards;
+            ANKI_LINKS[qid + '__concepts'] = info;
+          } else if (info && info.cards) {
+            ANKI_LINKS[qid] = info.cards;
           }
-          ANKI_LINKS[qid] = flatCards;
-          // concepts構造を保持（学習モード表示用）
-          ANKI_LINKS[qid + '__concepts'] = info;
-        } else if (info.cards) {
-          // 旧フォーマット互換
-          ANKI_LINKS[qid] = info.cards;
         }
       }
       _ankiLinksLoaded = true;
     }
   } catch(e) {
-    console.warn('anki_links.json 読み込み失敗:', e);
+    console.warn('q_term_links.json 読み込み失敗:', e);
   }
   _ankiLinksLoading = false;
 }
@@ -4212,9 +4221,51 @@ async function renderAnkiCards(q) {
   const matchArea = document.getElementById('anki-match-area');
   if (!matchArea || !q) return;
 
+  // ── v2形式: term_keysからランタイムでカードを検索 ──
+  const termKeys = window._Q_TERM_LINKS && q.number && window._Q_TERM_LINKS[q.number];
+  if (termKeys && termKeys.length > 0) {
+    await loadAnkiDeck();
+    await loadTermDictionary();
+    matchArea.innerHTML = '';
+    const builtConcepts = termKeys.map(tk => {
+      const term = TERM_DICT && TERM_DICT.terms && TERM_DICT.terms[tk];
+      const searchParts = [];
+      if (term && term.en) searchParts.push(term.en);
+      if (term && term.abbr) searchParts.push(term.abbr);
+      if (term && term.anki_search) searchParts.push(...term.anki_search);
+      const query = searchParts.join(' ');
+      const cards = query ? _filterDeck(query, 6) : [];
+      // スライド検索（slide_keysがあれば）
+      const slideKeys = (term && term.slide_keys && term.slide_keys.length)
+        ? term.slide_keys : [tk];
+      const slideMatches = slideKeys.flatMap(sk => samFindSlides(sk));
+      return { concept: tk, description: (term && term.en) || '', cards, _slideMatches: slideMatches };
+    });
+    const withCards = builtConcepts.filter(c => c.cards.length > 0 || c._slideMatches.length > 0);
+    if (withCards.length === 0) {
+      matchArea.innerHTML = `<div style="margin-top:14px;border-top:1px solid #e2e8f0;padding-top:10px;display:flex;align-items:center;gap:6px">
+        <span style="font-size:12px;font-weight:700;color:#553c9a">🗂️ 関連Ankiカード</span>
+        <span style="font-size:11px;color:#a0aec0">関連カードが見つかりませんでした（Anki未収録の可能性）</span>
+      </div>`;
+      matchArea.style.display = 'block';
+      return;
+    }
+    // builtConceptsを旧形式に変換して既存レンダリングロジックへ
+    const syntheticConceptsInfo = {
+      concepts: withCards.map(c => ({
+        concept: c.concept,
+        description: c.description,
+        cards: c.cards,
+        slides: {} // _slideMatchesは後段のsamFindSlidesで処理
+      }))
+    };
+    // 以降の共通レンダリングへ
+    return _renderConceptsHtml(q, syntheticConceptsInfo, matchArea);
+  }
+
+  // ── 旧形式: ANKI_LINKSからconceptsを取得 ──
   const conceptsInfo = ANKI_LINKS[q.id + '__concepts'];
   if (!conceptsInfo || !conceptsInfo.concepts || !conceptsInfo.concepts.length) {
-    // 未処理問題：準備中メッセージを表示
     matchArea.innerHTML = `<div style="margin-top:14px;border-top:1px solid #e2e8f0;padding-top:10px;display:flex;align-items:center;gap:6px">
       <span style="font-size:12px;font-weight:700;color:#553c9a">🗂️ 関連Ankiカード</span>
       <span style="font-size:11px;color:#a0aec0">この問題は処理待ちです（夜間バッチで順次追加）</span>
@@ -4222,7 +4273,11 @@ async function renderAnkiCards(q) {
     matchArea.style.display = 'block';
     return;
   }
+  return _renderConceptsHtml(q, conceptsInfo, matchArea);
+}
 
+// 共通レンダリング関数（旧・新フォーマット共用）
+function _renderConceptsHtml(q, conceptsInfo, matchArea) {
   const concepts = conceptsInfo.concepts;
   const PALETTES = [
     { color: '#553c9a', bg: '#faf5ff', border: '#b794f4' },
@@ -4519,6 +4574,29 @@ let ANKI_DECK_DATA = null;
 let _deckLoading = false;
 let _deckLoaded = false;
 
+// term_dictionary（v2形式用）
+let TERM_DICT = null;
+let _termDictLoaded = false;
+let _termDictLoading = false;
+
+async function loadTermDictionary() {
+  if (_termDictLoaded) return true;
+  if (_termDictLoading) {
+    while (_termDictLoading) await new Promise(r => setTimeout(r, 100));
+    return _termDictLoaded;
+  }
+  _termDictLoading = true;
+  try {
+    const res = await fetch('./term_dictionary.json');
+    if (res.ok) {
+      TERM_DICT = await res.json();
+      _termDictLoaded = true;
+    }
+  } catch(e) { console.warn('term_dictionary.json 読み込み失敗:', e); }
+  _termDictLoading = false;
+  return _termDictLoaded;
+}
+
 async function loadAnkiDeck() {
   if (_deckLoaded) return true;
   if (_deckLoading) {
@@ -4528,12 +4606,12 @@ async function loadAnkiDeck() {
   }
   _deckLoading = true;
   try {
-    const res = await fetch('./anki_deck.json');
+    const res = await fetch('./anki_cards.json');
     if (res.ok) {
       ANKI_DECK_DATA = await res.json();
       _deckLoaded = true;
     }
-  } catch(e) { console.warn('anki_deck.json 読み込み失敗:', e); }
+  } catch(e) { console.warn('anki_cards.json 読み込み失敗:', e); }
   _deckLoading = false;
   return _deckLoaded;
 }
@@ -4640,7 +4718,7 @@ async function runAnkiMatchForCurrent() {
   if (btnWrap) btnWrap.innerHTML = '<span style="font-size:12px;color:#a0aec0">🔄 デッキ読み込み中...</span>';
 
   const ok = await loadAnkiDeck();
-  if (!ok) { toast('anki_deck.json の読み込みに失敗しました', 'error'); return; }
+  if (!ok) { toast('anki_cards.json の読み込みに失敗しました', 'error'); return; }
 
   if (btnWrap) btnWrap.innerHTML = '<span style="font-size:12px;color:#a0aec0">🔍 キーワードフィルタ中...</span>';
   const queryText = (q.question || '') + ' ' + (q.explanation || '');
