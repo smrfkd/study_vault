@@ -1133,14 +1133,6 @@ select.form-input { cursor: pointer; }
   <!-- ==================== ANALYSIS ==================== -->
   <div id="tab-analysis" class="tab-content">
 
-    <!-- 弱点分析：母集団比較 -->
-    <div class="card" style="border-top:4px solid #805ad5">
-      <div class="card-title">🔬 弱点分析（母集団との比較）</div>
-      <div id="an-weakness-content">
-        <div style="color:#a0aec0;font-size:13px">解答率データがある問題で不正解が記録されると分析が表示されます</div>
-      </div>
-    </div>
-
     <!-- 用語別弱点マップ -->
     <div class="card" style="border-top:4px solid #2b6cb0">
       <div class="card-title">🗺️ 用語別弱点マップ</div>
@@ -1180,6 +1172,14 @@ select.form-input { cursor: pointer; }
         <div style="color:#a0aec0;font-size:13px">問題を解くとセクション別の正答率が表示されます</div>
       </div>
     </div>
+    <!-- 弱点分析：母集団比較 -->
+    <div class="card" style="border-top:4px solid #805ad5">
+      <div class="card-title">🔬 弱点分析（母集団との比較）</div>
+      <div id="an-weakness-content">
+        <div style="color:#a0aec0;font-size:13px">解答率データがある問題で不正解が記録されると分析が表示されます</div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ==================== NOTES ==================== -->
@@ -1445,7 +1445,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.26.05";
+const APP_VERSION = "v2026.04.26.06";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -4072,7 +4072,12 @@ let _ankiSRSSaveTimer = null;
 let _ankiCurrentFilter = 'all';
 
 async function loadAnkiLinks() {
-  if (_ankiLinksLoaded || _ankiLinksLoading) return;
+  if (_ankiLinksLoaded) return;
+  if (_ankiLinksLoading) {
+    // ロード中なら完了まで待つ
+    while (_ankiLinksLoading) await new Promise(r => setTimeout(r, 50));
+    return;
+  }
   _ankiLinksLoading = true;
   try {
     let data = null;
@@ -6935,7 +6940,9 @@ function renderTermWeaknessMap() {
   const el = document.getElementById('an-term-weakness');
   if (!el) return;
   const qtl = window._Q_TERM_LINKS;
-  if (!qtl || !TERM_DICT) { el.innerHTML = '<div style="color:#a0aec0;font-size:13px">データ読み込み中...</div>'; return; }
+  if (!qtl && !TERM_DICT) { el.innerHTML = '<div style="color:#a0aec0;font-size:13px">データ読み込み中... (qtl=' + !!qtl + ', dict=' + !!TERM_DICT + ')</div>'; return; }
+  if (!qtl) { el.innerHTML = '<div style="color:#e53e3e;font-size:13px">⚠️ q_term_links.json を読み込めませんでした（GitHubにコミット済みか確認してください）</div>'; return; }
+  if (!TERM_DICT) { el.innerHTML = '<div style="color:#a0aec0;font-size:13px">用語辞書読み込み中...</div>'; return; }
 
   const termStats = {};
   questions.forEach(q => {
