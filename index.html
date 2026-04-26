@@ -1445,7 +1445,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.26.04";
+const APP_VERSION = "v2026.04.26.05";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -4076,10 +4076,11 @@ async function loadAnkiLinks() {
   _ankiLinksLoading = true;
   try {
     let data = null;
-    // 埋め込みデータを優先（blob URL環境でfetchが失敗する場合の対策）
-    if (window._ANKI_LINKS_EMBEDDED && Object.keys(window._ANKI_LINKS_EMBEDDED).length > 0) {
+    // 埋め込みデータはv2形式（.questions あり）の場合のみ使用
+    // 旧形式の埋め込みデータがある場合はfetchを優先してv2を取得する
+    if (window._ANKI_LINKS_EMBEDDED && window._ANKI_LINKS_EMBEDDED.questions) {
       data = window._ANKI_LINKS_EMBEDDED;
-      console.log('[AnkiLinks] 埋め込みデータ使用:', Object.keys(data).length, '件');
+      console.log('[AnkiLinks] 埋め込みデータ(v2)使用:', Object.keys(data.questions).length, '件');
     } else {
       try {
         const res = await fetch('./q_term_links.json');
