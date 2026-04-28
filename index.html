@@ -4101,9 +4101,13 @@ async function loadAnkiLinks() {
       if (data.questions) {
         // v2形式: term_keysベース（q_term_links.json v2.0）
         window._Q_TERM_LINKS = {};
+        window._Q_TERM_REL = {};  // term_relevance: {qNumber: {termKey: 0-2}}
         for (const [qid, info] of Object.entries(data.questions)) {
           if (info.number && Array.isArray(info.term_keys)) {
             window._Q_TERM_LINKS[info.number] = info.term_keys;
+            if (info.term_relevance) {
+              window._Q_TERM_REL[info.number] = info.term_relevance;
+            }
           }
         }
         console.log('[AnkiLinks] v2形式 term_keys読み込み完了:', Object.keys(window._Q_TERM_LINKS).length, '問');
@@ -5307,8 +5311,21 @@ function startStudy(mode, cat='') {
   }
   else if (mode==='term') {
     const qtl = window._Q_TERM_LINKS;
+    const qtr = window._Q_TERM_REL;
+    const minRel = window._termMinRel ?? 1;
     if (qtl) {
-      const targetNums = new Set(Object.entries(qtl).filter(([n,keys])=>keys.includes(cat)).map(([n])=>n));
+      const targetNums = new Set(
+        Object.entries(qtl)
+          .filter(([n, keys]) => {
+            if (!keys.includes(cat)) return false;
+            // term_relevanceがある場合は閾値でフィルタ
+            if (qtr && qtr[n] && qtr[n][cat] !== undefined) {
+              return qtr[n][cat] >= minRel;
+            }
+            return true; // relevanceデータなければ含める
+          })
+          .map(([n]) => n)
+      );
       pool = questions.filter(q => targetNums.has(q.number));
     }
   }
@@ -6936,19 +6953,60 @@ async function renderAnalysis() {
 }
 
 // ========== 用語別弱点マップ ==========
+// 関連度設定（グローバル）: 2=主題のみ, 1=関連含む, 0=全問
+window._termMinRel = window._termMinRel ?? 1;
+
+function setTermMinRel(val) {
+  window._termMinRel = val;
+  renderTermWeaknessMap();
+}
+
+// term別の絞り込み後問題数を取得
+function _termQCount(tk, minRel) {
+  const qtl = window._Q_TERM_LINKS;
+  const qtr = window._Q_TERM_REL;
+  if (!qtl) return 0;
+  return Object.entries(qtl).filter(([n, keys]) => {
+    if (!keys.includes(tk)) return false;
+    if (qtr && qtr[n] && qtr[n][tk] !== undefined) return qtr[n][tk] >= minRel;
+    return true;
+  }).length;
+}
+
 function renderTermWeaknessMap() {
   const el = document.getElementById('an-term-weakness');
   if (!el) return;
   const qtl = window._Q_TERM_LINKS;
+  const qtr = window._Q_TERM_REL;
   if (!qtl && !TERM_DICT) { el.innerHTML = '<div style="color:#a0aec0;font-size:13px">データ読み込み中... (qtl=' + !!qtl + ', dict=' + !!TERM_DICT + ')</div>'; return; }
   if (!qtl) { el.innerHTML = '<div style="color:#e53e3e;font-size:13px">⚠️ q_term_links.json を読み込めませんでした（GitHubにコミット済みか確認してください）</div>'; return; }
   if (!TERM_DICT) { el.innerHTML = '<div style="color:#a0aec0;font-size:13px">用語辞書読み込み中...</div>'; return; }
+
+  const minRel = window._termMinRel ?? 1;
+
+  // 関連度トグルUI
+  const relLabels = { 2:'主題のみ', 1:'関連含む', 0:'全問' };
+  const relColors = { 2:'#276749', 1:'#2b6cb0', 0:'#718096' };
+  const toggleHtml = `<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+    <span style="font-size:12px;color:#718096;font-weight:600">出題範囲:</span>
+    ${[2,1,0].map(v => `<button onclick="setTermMinRel(${v})"
+      style="padding:4px 12px;font-size:12px;font-weight:700;border-radius:16px;border:1.5px solid ${minRel===v ? relColors[v] : '#e2e8f0'};
+             background:${minRel===v ? relColors[v] : 'white'};color:${minRel===v ? 'white' : '#718096'};cursor:pointer">
+      ${relLabels[v]}
+    </button>`).join('')}
+    <span style="font-size:11px;color:#a0aec0;margin-left:4px">
+      ${minRel===2?'主題として出題（問題のterm数≤4）':minRel===1?'関連として出題（term数≤8）':'紐づき全問を出題'}
+    </span>
+  </div>`;
 
   const termStats = {};
   questions.forEach(q => {
     const tks = qtl[q.number] || [];
     if (!tks.length || !q.attempts.length) return;
     tks.forEach(tk => {
+      // 関連度フィルタ
+      const rel = qtr && qtr[q.number] && qtr[q.number][tk] !== undefined ? qtr[q.number][tk] : 1;
+      if (rel < minRel) return;
       if (!termStats[tk]) termStats[tk] = { wrong:0, total:0 };
       q.attempts.forEach(a => {
         termStats[tk].total++;
@@ -6963,11 +7021,11 @@ function renderTermWeaknessMap() {
     .slice(0, 30);
 
   if (!list.length) {
-    el.innerHTML = '<div style="color:#a0aec0;font-size:13px">不正解が記録されると用語ごとの弱点が表示されます</div>';
+    el.innerHTML = toggleHtml + '<div style="color:#a0aec0;font-size:13px">不正解が記録されると用語ごとの弱点が表示されます</div>';
     return;
   }
 
-  el.innerHTML = list.map(([tk, s]) => {
+  el.innerHTML = toggleHtml + list.map(([tk, s]) => {
     const term = TERM_DICT.terms[tk];
     const imp = term ? (term.importance || 0) : 0;
     const stars = '★'.repeat(imp) + '☆'.repeat(Math.max(0,3-imp));
@@ -6975,11 +7033,13 @@ function renderTermWeaknessMap() {
     const accColor = acc >= 70 ? '#276749' : acc >= 50 ? '#744210' : '#c53030';
     const starColor = imp >= 3 ? '#c53030' : imp >= 2 ? '#d69e2e' : '#a0aec0';
     const enLabel = term && term.en ? `<span style="font-size:11px;color:#a0aec0;margin-left:4px">${term.en}</span>` : '';
+    const qCount = _termQCount(tk, minRel);
+    const tkEsc = tk.replace(/'/g, "\'");
     return `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:5px;background:#f7fafc;border-radius:8px;border:1px solid #e2e8f0">
       <span style="font-size:11px;color:${starColor};font-weight:700;width:40px;flex-shrink:0;letter-spacing:-1px">${stars}</span>
       <span style="font-size:13px;font-weight:700;color:#2d3748;flex:1;min-width:0">${tk}${enLabel}</span>
       <span style="font-size:12px;font-weight:700;color:${accColor};white-space:nowrap">${s.wrong}回誤答 (${acc}%)</span>
-      <button onclick="startStudy('term','${tk.replace(/'/g,"\'")}')" style="padding:4px 10px;font-size:11px;background:#2b6cb0;color:white;border:none;border-radius:5px;cursor:pointer;white-space:nowrap;flex-shrink:0">▶ 解く</button>
+      <button onclick="startStudy('term','${tkEsc}')" style="padding:4px 10px;font-size:11px;background:#2b6cb0;color:white;border:none;border-radius:5px;cursor:pointer;white-space:nowrap;flex-shrink:0">▶ ${qCount}問</button>
     </div>`;
   }).join('');
 }
