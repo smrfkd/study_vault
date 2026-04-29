@@ -1450,7 +1450,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.29.01";
+const APP_VERSION = "v2026.04.29.02";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -2143,6 +2143,8 @@ function _saveLocalBackup() {
         nextReview: q.nextReview,
         srInterval: q.srInterval,
         ankiDismissed: q.ankiDismissed,
+        dismissedConcepts: q.dismissedConcepts,
+        selectedConcepts: q.selectedConcepts,
         ankiLinks: q.ankiLinks,
         choiceImages: q.choiceImages,
         choiceNotes: q.choiceNotes,
@@ -4332,7 +4334,12 @@ async function renderAnkiCards(q) {
 
 // 共通レンダリング関数（旧・新フォーマット共用）
 function _renderConceptsHtml(q, conceptsInfo, matchArea) {
-  const concepts = conceptsInfo.concepts;
+  const allConcepts = conceptsInfo.concepts;
+  const dismissed = q.dismissedConcepts || [];
+  const selected  = q.selectedConcepts  || [];
+  // 非表示コンセプトを除外
+  const concepts = allConcepts.filter(c => !dismissed.includes(c.concept));
+
   const PALETTES = [
     { color: '#553c9a', bg: '#faf5ff', border: '#b794f4' },
     { color: '#2b6cb0', bg: '#ebf8ff', border: '#90cdf4' },
@@ -4341,16 +4348,28 @@ function _renderConceptsHtml(q, conceptsInfo, matchArea) {
     { color: '#744210', bg: '#fffbeb', border: '#f6e05e' },
   ];
 
+  const dismissedCount = dismissed.length;
+  const resetBtn = dismissedCount > 0
+    ? `<button onclick="samResetConcepts('${q.id}')" style="font-size:10px;color:#a0aec0;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;margin-left:4px">${dismissedCount}件を再表示</button>`
+    : '';
+
   let html = `<div style="margin-top:14px;border-top:1px solid #e2e8f0;padding-top:14px">
-    <div style="font-size:12px;font-weight:800;color:#553c9a;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+    <div style="font-size:12px;font-weight:800;color:#553c9a;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       🗂️ 関連Ankiカード・スライド
       <span style="font-size:10px;font-weight:400;color:#a0aec0">${concepts.filter(c=>(c.cards||[]).length>0).length}コンセプト・${concepts.reduce((n,c)=>n+(c.cards||[]).length,0)}枚</span>
+      ${resetBtn}
     </div>`;
+
+  if (concepts.length === 0) {
+    html += `<div style="font-size:11px;color:#a0aec0;padding:8px 0">すべてのコンセプトを非表示にしました。${resetBtn}</div>`;
+  }
 
   concepts.forEach((con, i) => {
     const p = PALETTES[i % PALETTES.length];
     const cards = con.cards || [];
     const isGap = cards.length === 0;
+    const isStar = selected.includes(con.concept);
+    const conceptJson = JSON.stringify(con.concept);
 
     // Cloze cards
     let cardsHtml = '';
@@ -4358,17 +4377,17 @@ function _renderConceptsHtml(q, conceptsInfo, matchArea) {
       const raw = card.raw || card.plain || '';
       const hasCloze = raw.includes('{{c');
       const cid = card.id || card.plain;
-      const isSel = !!(ankiCardSRS[cid] && ankiCardSRS[cid].selected);
+      const isSelCard = !!(ankiCardSRS[cid] && ankiCardSRS[cid].selected);
       cardsHtml += `
         <div style="margin-bottom:6px">
           <div class="sam-card-body" onclick="samFlipCard(this)" style="margin-bottom:0;border-radius:8px 8px 0 0;border-bottom:none">
             <div class="sam-card-front">${samRenderCloze(raw)}</div>
             <div class="sam-card-hint">${hasCloze ? 'タップして答えを見る' : card.plain || ''}&nbsp;<span style="color:#a0aec0;font-size:10px">${card.deck||''}</span></div>
           </div>
-          <div style="background:${isSel?'#ebf8ff':'#f7fafc'};border:1px solid ${isSel?'#90cdf4':'#e2e8f0'};border-top:none;border-radius:0 0 8px 8px;padding:4px 10px;display:flex;align-items:center;justify-content:flex-end;gap:6px">
-            <label style="font-size:11px;cursor:pointer;color:${isSel?'#2b6cb0':'#718096'};display:flex;align-items:center;gap:4px;user-select:none">
-              <input type="checkbox" ${isSel?'checked':''} onchange="samToggleAnkiCard('${cid}',this)" style="accent-color:#2b6cb0;cursor:pointer">
-              ${isSel?'✓ 練習中':'練習に追加'}
+          <div style="background:${isSelCard?'#ebf8ff':'#f7fafc'};border:1px solid ${isSelCard?'#90cdf4':'#e2e8f0'};border-top:none;border-radius:0 0 8px 8px;padding:4px 10px;display:flex;align-items:center;justify-content:flex-end;gap:6px">
+            <label style="font-size:11px;cursor:pointer;color:${isSelCard?'#2b6cb0':'#718096'};display:flex;align-items:center;gap:4px;user-select:none">
+              <input type="checkbox" ${isSelCard?'checked':''} onchange="samToggleAnkiCard('${cid}',this)" style="accent-color:#2b6cb0;cursor:pointer">
+              ${isSelCard?'✓ 練習中':'練習に追加'}
             </label>
           </div>
         </div>`;
@@ -4404,13 +4423,23 @@ function _renderConceptsHtml(q, conceptsInfo, matchArea) {
     }
 
     html += `
-      <div class="sam-concept-block" style="border-color:${p.border};background:${p.bg}">
-        <div class="sam-concept-header" style="color:${p.color}">
-          <span class="sam-concept-dot" style="background:${p.color}"></span>
-          ${escapeHtml(con.concept)}
-          ${isGap
-            ? '<span class="sam-gap-badge">カードなし</span>'
-            : `<span style="font-size:10px;font-weight:400;color:#a0aec0;margin-left:3px">${cards.length}枚</span>`}
+      <div class="sam-concept-block" style="border-color:${isStar?p.color:p.border};background:${p.bg};${isStar?'box-shadow:0 0 0 2px '+p.border+';':''}">
+        <div class="sam-concept-header" style="color:${p.color};justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:5px;flex:1;min-width:0">
+            <span class="sam-concept-dot" style="background:${p.color};flex-shrink:0"></span>
+            <span style="flex:1;min-width:0">${escapeHtml(con.concept)}</span>
+            ${isGap
+              ? '<span class="sam-gap-badge">カードなし</span>'
+              : `<span style="font-size:10px;font-weight:400;color:#a0aec0;margin-left:3px;flex-shrink:0">${cards.length}枚</span>`}
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px">
+            <button onclick="samToggleConceptSelect('${q.id}',${conceptJson})" title="${isStar?'スター解除':'重要コンセプトにマーク'}"
+              style="background:none;border:none;cursor:pointer;font-size:14px;padding:1px 3px;line-height:1;opacity:${isStar?'1':'0.35'};transition:opacity 0.15s"
+              onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='${isStar?'1':'0.35'}'">${isStar?'★':'☆'}</button>
+            <button onclick="samDismissConcept('${q.id}',${conceptJson})" title="このコンセプトを非表示"
+              style="background:none;border:none;cursor:pointer;font-size:13px;padding:1px 3px;line-height:1;color:#cbd5e0;opacity:0.5;transition:opacity 0.15s"
+              onmouseover="this.style.opacity='1';this.style.color='#e53e3e'" onmouseout="this.style.opacity='0.5';this.style.color='#cbd5e0'">×</button>
+          </div>
         </div>
         <div class="sam-concept-desc">${escapeHtml(con.description)}</div>
         ${cardsHtml}
@@ -4422,6 +4451,45 @@ function _renderConceptsHtml(q, conceptsInfo, matchArea) {
 
   matchArea.innerHTML = html;
   matchArea.style.display = 'block';
+}
+
+// コンセプトを非表示にする
+function samDismissConcept(qId, conceptName) {
+  const q = questions.find(x => x.id === qId);
+  if (!q) return;
+  if (!q.dismissedConcepts) q.dismissedConcepts = [];
+  if (!q.dismissedConcepts.includes(conceptName)) {
+    q.dismissedConcepts.push(conceptName);
+    save();
+    saveToCloud();
+  }
+  renderAnkiCards(q);
+}
+
+// コンセプトの非表示をリセット
+function samResetConcepts(qId) {
+  const q = questions.find(x => x.id === qId);
+  if (!q) return;
+  q.dismissedConcepts = [];
+  save();
+  saveToCloud();
+  renderAnkiCards(q);
+}
+
+// コンセプトのスター（重要マーク）をトグル
+function samToggleConceptSelect(qId, conceptName) {
+  const q = questions.find(x => x.id === qId);
+  if (!q) return;
+  if (!q.selectedConcepts) q.selectedConcepts = [];
+  const idx = q.selectedConcepts.indexOf(conceptName);
+  if (idx >= 0) {
+    q.selectedConcepts.splice(idx, 1);
+  } else {
+    q.selectedConcepts.push(conceptName);
+  }
+  save();
+  saveToCloud();
+  renderAnkiCards(q);
 }
 
 function dismissAnkiCard(qId, origIdx) {
