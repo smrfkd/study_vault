@@ -1103,9 +1103,14 @@ select.form-input { cursor: pointer; }
           <div class="qpanel-slide-header">
             <div style="font-size:12px;font-weight:800;color:#1a365d;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="slide-panel-fname">📖 スライド</div>
             <span style="background:#ebf8ff;color:#2b6cb0;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700;margin-right:8px" id="slide-panel-page"></span>
+            <a id="slide-open-link" href="#" target="_blank" title="新しいタブでPDFを開く" style="text-decoration:none;background:#ebf8ff;color:#2b6cb0;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;margin-right:6px;cursor:pointer;white-space:nowrap">🔗 開く</a>
             <button onclick="samCloseSlide()" style="border:none;background:none;cursor:pointer;font-size:16px;color:#a0aec0;padding:2px 4px">✕</button>
           </div>
           <iframe id="slide-iframe" class="qpanel-slide-iframe" src="" allowfullscreen></iframe>
+          <div id="slide-fallback" style="display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center;font-size:13px;color:#718096;flex:1">
+            <div>ブラウザのセキュリティ設定のため<br>ここにPDFを表示できません</div>
+            <a id="slide-fallback-link" href="#" target="_blank" style="background:#3182ce;color:white;border-radius:8px;padding:8px 18px;text-decoration:none;font-weight:700;font-size:13px">📂 PDFを開く</a>
+          </div>
         </div>
       </div>
     </div>
@@ -1445,7 +1450,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.28.01";
+const APP_VERSION = "v2026.04.29.01";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -4182,6 +4187,9 @@ function samOpenSlide(path, page) {
   const iframe = document.getElementById('slide-iframe');
   const fnameEl = document.getElementById('slide-panel-fname');
   const pageEl  = document.getElementById('slide-panel-page');
+  const openLink = document.getElementById('slide-open-link');
+  const fallback = document.getElementById('slide-fallback');
+  const fallbackLink = document.getElementById('slide-fallback-link');
 
   const fname = path.split('/').pop();
   const dir   = path.split('/').slice(-3, -1).join('/');
@@ -4189,12 +4197,39 @@ function samOpenSlide(path, page) {
   if (fnameEl) fnameEl.textContent = '📄 ' + (dir ? dir + '/' : '') + fname;
   if (pageEl)  pageEl.textContent  = 'p.' + page;
 
+  // 「🔗 開く」ボタンのリンクを更新
+  if (openLink) openLink.href = url;
+  if (fallbackLink) fallbackLink.href = url;
+
   // 同じページをもう一度クリックしたら閉じる
   if (panel && panel.classList.contains('open') && iframe && iframe.getAttribute('data-url') === url) {
     samCloseSlide(); return;
   }
 
-  if (iframe) { iframe.src = url; iframe.setAttribute('data-url', url); }
+  // iframe を一度リセットして読み込み
+  if (iframe) {
+    iframe.style.display = 'block';
+    if (fallback) fallback.style.display = 'none';
+    iframe.src = url;
+    iframe.setAttribute('data-url', url);
+
+    // ブラウザがfile://をブロックした場合はフォールバックUIを表示
+    clearTimeout(iframe._fallbackTimer);
+    iframe._fallbackTimer = setTimeout(() => {
+      try {
+        // contentDocument がnullまたはアクセス不可 → ブロックされている
+        const doc = iframe.contentDocument;
+        if (!doc || !doc.body || doc.body.innerHTML === '') {
+          iframe.style.display = 'none';
+          if (fallback) fallback.style.display = 'flex';
+        }
+      } catch(e) {
+        // SecurityError → ブロックされている
+        iframe.style.display = 'none';
+        if (fallback) fallback.style.display = 'flex';
+      }
+    }, 1500);
+  }
   if (panel)  { panel.classList.add('open'); }
 
   // 比率調整: qpanel-left 30% / qpanel-right 30% / qpanel-slide 40%
@@ -4207,8 +4242,15 @@ function samOpenSlide(path, page) {
 function samCloseSlide() {
   const panel  = document.getElementById('qpanel-slide');
   const iframe = document.getElementById('slide-iframe');
+  const fallback = document.getElementById('slide-fallback');
   if (panel)  panel.classList.remove('open');
-  if (iframe) { iframe.src = ''; iframe.removeAttribute('data-url'); }
+  if (iframe) {
+    clearTimeout(iframe._fallbackTimer);
+    iframe.style.display = 'block';
+    iframe.src = '';
+    iframe.removeAttribute('data-url');
+  }
+  if (fallback) fallback.style.display = 'none';
   const left  = document.querySelector('.qpanel-left');
   const right = document.querySelector('.qpanel-right');
   if (left)  left.style.flex  = '';
