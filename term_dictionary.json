@@ -31259,7 +31259,13 @@
       "importance": 0,
       "has_QB": false,
       "has_TOPICS": false,
-      "anki_search": [],
+      "anki_search": [
+        "ketamine",
+        "NMDA",
+        "dissociative",
+        "anesthesia",
+        "ketamine"
+      ],
       "slide_keys": [
         "ケタミン"
       ],
@@ -31277,7 +31283,12 @@
       "importance": 0,
       "has_QB": false,
       "has_TOPICS": false,
-      "anki_search": [],
+      "anki_search": [
+        "propofol",
+        "sedation",
+        "ICU",
+        "anesthesia"
+      ],
       "slide_keys": [
         "プロポフォール"
       ],
@@ -55287,10 +55298,7497 @@
       "parent": null,
       "notes": "",
       "source_book": "公衆衛生がみえる2024"
+    },
+    "ワルファリン": {
+      "ja": "ワルファリン",
+      "en": "warfarin",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗凝固薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "warfarin",
+        "anticoagulant"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗凝固薬"
+    },
+    "ヘパリン": {
+      "ja": "ヘパリン",
+      "en": "heparin",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗凝固薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "heparin",
+        "anticoagulant"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗凝固薬"
+    },
+    "アスピリン": {
+      "ja": "アスピリン",
+      "en": "aspirin",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗血小板薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "aspirin",
+        "antiplatelet",
+        "NSAIDs"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗血小板薬"
+    },
+    "クロピドグレル": {
+      "ja": "クロピドグレル",
+      "en": "clopidogrel",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗血小板薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "clopidogrel",
+        "antiplatelet",
+        "P2Y12"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗血小板薬"
+    },
+    "アピキサバン": {
+      "ja": "アピキサバン",
+      "en": "apixaban",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "DOAC",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "apixaban",
+        "DOAC",
+        "factor",
+        "Xa"
+      ],
+      "category": "薬剤",
+      "drug_effect": "DOAC"
+    },
+    "リバーロキサバン": {
+      "ja": "リバーロキサバン",
+      "en": "rivaroxaban",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "DOAC",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "rivaroxaban",
+        "DOAC",
+        "factor",
+        "Xa"
+      ],
+      "category": "薬剤",
+      "drug_effect": "DOAC"
+    },
+    "ダビガトラン": {
+      "ja": "ダビガトラン",
+      "en": "dabigatran",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "DOAC",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dabigatran",
+        "DOAC",
+        "direct",
+        "thrombin"
+      ],
+      "category": "薬剤",
+      "drug_effect": "DOAC"
+    },
+    "エドキサバン": {
+      "ja": "エドキサバン",
+      "en": "edoxaban",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "DOAC",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "edoxaban",
+        "DOAC",
+        "factor",
+        "Xa"
+      ],
+      "category": "薬剤",
+      "drug_effect": "DOAC"
+    },
+    "フロセミド": {
+      "ja": "フロセミド",
+      "en": "furosemide",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "ループ利尿薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "furosemide",
+        "loop",
+        "diuretic",
+        "Meniere",
+        "inner",
+        "ear"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ループ利尿薬"
+    },
+    "スピロノラクトン": {
+      "ja": "スピロノラクトン",
+      "en": "spironolactone",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗アルドステロン薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "spironolactone",
+        "aldosterone",
+        "antagonist"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗アルドステロン薬"
+    },
+    "ジゴキシン": {
+      "ja": "ジゴキシン",
+      "en": "digoxin",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "強心薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "digoxin",
+        "cardiac",
+        "glycoside",
+        "heart",
+        "failure"
+      ],
+      "category": "薬剤",
+      "drug_effect": "強心薬"
+    },
+    "アミオダロン": {
+      "ja": "アミオダロン",
+      "en": "amiodarone",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗不整脈薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "amiodarone",
+        "antiarrhythmic",
+        "class",
+        "III",
+        "VF",
+        "VT",
+        "cardiac",
+        "arrest",
+        "ACLS"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗不整脈薬"
+    },
+    "リドカイン": {
+      "ja": "リドカイン",
+      "en": "lidocaine",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗不整脈薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "lidocaine",
+        "antiarrhythmic",
+        "class",
+        "IB",
+        "local",
+        "anesthetic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗不整脈薬"
+    },
+    "アトロピン": {
+      "ja": "アトロピン",
+      "en": "atropine",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗コリン薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "atropine",
+        "anticholinergic",
+        "bradycardia",
+        "mydriatic",
+        "cycloplegia",
+        "organophosphate",
+        "antidote"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗コリン薬"
+    },
+    "ニトログリセリン": {
+      "ja": "ニトログリセリン",
+      "en": "nitroglycerin",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "硝酸薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "nitroglycerin",
+        "nitrate",
+        "angina"
+      ],
+      "category": "薬剤",
+      "drug_effect": "硝酸薬"
+    },
+    "ニフェジピン": {
+      "ja": "ニフェジピン",
+      "en": "nifedipine",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "Ca拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "nifedipine",
+        "calcium",
+        "channel",
+        "blocker"
+      ],
+      "category": "薬剤",
+      "drug_effect": "Ca拮抗薬"
+    },
+    "アムロジピン": {
+      "ja": "アムロジピン",
+      "en": "amlodipine",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "Ca拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "amlodipine",
+        "calcium",
+        "channel",
+        "blocker"
+      ],
+      "category": "薬剤",
+      "drug_effect": "Ca拮抗薬"
+    },
+    "エナラプリル": {
+      "ja": "エナラプリル",
+      "en": "enalapril",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "ACE阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "enalapril",
+        "ACE",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ACE阻害薬"
+    },
+    "カプトプリル": {
+      "ja": "カプトプリル",
+      "en": "captopril",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "ACE阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "captopril",
+        "ACE",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ACE阻害薬"
+    },
+    "ロサルタン": {
+      "ja": "ロサルタン",
+      "en": "losartan",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "ARB",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "losartan",
+        "ARB",
+        "angiotensin",
+        "receptor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ARB"
+    },
+    "カンデサルタン": {
+      "ja": "カンデサルタン",
+      "en": "candesartan",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "ARB",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "candesartan",
+        "ARB",
+        "angiotensin",
+        "receptor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ARB"
+    },
+    "カルベジロール": {
+      "ja": "カルベジロール",
+      "en": "carvedilol",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "β遮断薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "carvedilol",
+        "beta",
+        "blocker"
+      ],
+      "category": "薬剤",
+      "drug_effect": "β遮断薬"
+    },
+    "メトプロロール": {
+      "ja": "メトプロロール",
+      "en": "metoprolol",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "β遮断薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "metoprolol",
+        "beta",
+        "blocker"
+      ],
+      "category": "薬剤",
+      "drug_effect": "β遮断薬"
+    },
+    "プロプラノロール": {
+      "ja": "プロプラノロール",
+      "en": "propranolol",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "β遮断薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "propranolol",
+        "beta",
+        "blocker",
+        "infantile",
+        "hemangioma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "β遮断薬"
+    },
+    "アドレナリン": {
+      "ja": "アドレナリン",
+      "en": "epinephrine",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "カテコラミン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "epinephrine",
+        "adrenaline",
+        "catecholamine",
+        "cardiac",
+        "arrest",
+        "ACLS",
+        "resuscitation"
+      ],
+      "category": "薬剤",
+      "drug_effect": "カテコラミン"
+    },
+    "ノルアドレナリン": {
+      "ja": "ノルアドレナリン",
+      "en": "norepinephrine",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "カテコラミン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "norepinephrine",
+        "noradrenaline",
+        "catecholamine"
+      ],
+      "category": "薬剤",
+      "drug_effect": "カテコラミン"
+    },
+    "ドパミン": {
+      "ja": "ドパミン",
+      "en": "dopamine",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "カテコラミン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dopamine",
+        "catecholamine"
+      ],
+      "category": "薬剤",
+      "drug_effect": "カテコラミン"
+    },
+    "ドブタミン": {
+      "ja": "ドブタミン",
+      "en": "dobutamine",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "カテコラミン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dobutamine",
+        "catecholamine",
+        "inotrope"
+      ],
+      "category": "薬剤",
+      "drug_effect": "カテコラミン"
+    },
+    "tPA": {
+      "ja": "tPA",
+      "en": "tPA",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "血栓溶解薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "tPA",
+        "alteplase",
+        "tissue",
+        "plasminogen",
+        "activator",
+        "thrombolysis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "血栓溶解薬"
+    },
+    "ウロキナーゼ": {
+      "ja": "ウロキナーゼ",
+      "en": "urokinase",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "血栓溶解薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "urokinase",
+        "thrombolytic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "血栓溶解薬"
+    },
+    "シロスタゾール": {
+      "ja": "シロスタゾール",
+      "en": "cilostazol",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗血小板薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "cilostazol",
+        "antiplatelet",
+        "PDE3"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗血小板薬"
+    },
+    "アトルバスタチン": {
+      "ja": "アトルバスタチン",
+      "en": "atorvastatin",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "スタチン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "atorvastatin",
+        "statin",
+        "HMG-CoA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "スタチン"
+    },
+    "ロスバスタチン": {
+      "ja": "ロスバスタチン",
+      "en": "rosuvastatin",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "スタチン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "rosuvastatin",
+        "statin",
+        "HMG-CoA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "スタチン"
+    },
+    "プラバスタチン": {
+      "ja": "プラバスタチン",
+      "en": "pravastatin",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "スタチン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pravastatin",
+        "statin",
+        "HMG-CoA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "スタチン"
+    },
+    "ニコランジル": {
+      "ja": "ニコランジル",
+      "en": "nicorandil",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "硝酸薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "nicorandil",
+        "nitrate",
+        "K",
+        "channel",
+        "angina"
+      ],
+      "category": "薬剤",
+      "drug_effect": "硝酸薬"
+    },
+    "ベラパミル": {
+      "ja": "ベラパミル",
+      "en": "verapamil",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "Ca拮抗薬・抗不整脈",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "verapamil",
+        "calcium",
+        "channel",
+        "blocker",
+        "class",
+        "IV",
+        "antiarrhythmic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "Ca拮抗薬・抗不整脈"
+    },
+    "ジルチアゼム": {
+      "ja": "ジルチアゼム",
+      "en": "diltiazem",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "Ca拮抗薬・抗不整脈",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "diltiazem",
+        "calcium",
+        "channel",
+        "blocker",
+        "antiarrhythmic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "Ca拮抗薬・抗不整脈"
+    },
+    "フレカイニド": {
+      "ja": "フレカイニド",
+      "en": "flecainide",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗不整脈薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "flecainide",
+        "antiarrhythmic",
+        "class",
+        "IC"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗不整脈薬"
+    },
+    "プロカインアミド": {
+      "ja": "プロカインアミド",
+      "en": "procainamide",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗不整脈薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "procainamide",
+        "antiarrhythmic",
+        "class",
+        "IA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗不整脈薬"
+    },
+    "ソタロール": {
+      "ja": "ソタロール",
+      "en": "sotalol",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗不整脈薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sotalol",
+        "antiarrhythmic",
+        "beta",
+        "blocker"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗不整脈薬"
+    },
+    "インスリン": {
+      "ja": "インスリン",
+      "en": "insulin",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "インスリン製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "insulin",
+        "diabetes"
+      ],
+      "category": "薬剤",
+      "drug_effect": "インスリン製剤"
+    },
+    "グルカゴン": {
+      "ja": "グルカゴン",
+      "en": "glucagon",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "高血糖治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "glucagon",
+        "hypoglycemia"
+      ],
+      "category": "薬剤",
+      "drug_effect": "高血糖治療薬"
+    },
+    "メトホルミン": {
+      "ja": "メトホルミン",
+      "en": "metformin",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "ビグアナイド薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "metformin",
+        "biguanide",
+        "diabetes"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ビグアナイド薬"
+    },
+    "グリメピリド": {
+      "ja": "グリメピリド",
+      "en": "glimepiride",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "SU薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "glimepiride",
+        "sulfonylurea",
+        "SU",
+        "diabetes"
+      ],
+      "category": "薬剤",
+      "drug_effect": "SU薬"
+    },
+    "グリベンクラミド": {
+      "ja": "グリベンクラミド",
+      "en": "glibenclamide",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "SU薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "glibenclamide",
+        "glyburide",
+        "sulfonylurea"
+      ],
+      "category": "薬剤",
+      "drug_effect": "SU薬"
+    },
+    "シタグリプチン": {
+      "ja": "シタグリプチン",
+      "en": "sitagliptin",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "DPP-4阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sitagliptin",
+        "DPP-4",
+        "inhibitor",
+        "diabetes"
+      ],
+      "category": "薬剤",
+      "drug_effect": "DPP-4阻害薬"
+    },
+    "アログリプチン": {
+      "ja": "アログリプチン",
+      "en": "alogliptin",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "DPP-4阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "alogliptin",
+        "DPP-4",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "DPP-4阻害薬"
+    },
+    "エンパグリフロジン": {
+      "ja": "エンパグリフロジン",
+      "en": "empagliflozin",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "SGLT2阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "empagliflozin",
+        "SGLT2",
+        "inhibitor",
+        "diabetes"
+      ],
+      "category": "薬剤",
+      "drug_effect": "SGLT2阻害薬"
+    },
+    "ダパグリフロジン": {
+      "ja": "ダパグリフロジン",
+      "en": "dapagliflozin",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "SGLT2阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dapagliflozin",
+        "SGLT2",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "SGLT2阻害薬"
+    },
+    "リラグルチド": {
+      "ja": "リラグルチド",
+      "en": "liraglutide",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "GLP-1受容体作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "liraglutide",
+        "GLP-1",
+        "receptor",
+        "agonist"
+      ],
+      "category": "薬剤",
+      "drug_effect": "GLP-1受容体作動薬"
+    },
+    "セマグルチド": {
+      "ja": "セマグルチド",
+      "en": "semaglutide",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "GLP-1受容体作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "semaglutide",
+        "GLP-1",
+        "receptor",
+        "agonist"
+      ],
+      "category": "薬剤",
+      "drug_effect": "GLP-1受容体作動薬"
+    },
+    "ピオグリタゾン": {
+      "ja": "ピオグリタゾン",
+      "en": "pioglitazone",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "チアゾリジン薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pioglitazone",
+        "thiazolidinedione",
+        "PPAR-gamma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "チアゾリジン薬"
+    },
+    "アカルボース": {
+      "ja": "アカルボース",
+      "en": "acarbose",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "α-グルコシダーゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "acarbose",
+        "alpha-glucosidase",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "α-グルコシダーゼ阻害薬"
+    },
+    "プロピルチオウラシル": {
+      "ja": "プロピルチオウラシル",
+      "en": "propylthiouracil",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "抗甲状腺薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "propylthiouracil",
+        "PTU",
+        "antithyroid"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗甲状腺薬"
+    },
+    "チアマゾール": {
+      "ja": "チアマゾール",
+      "en": "thiamazole",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "抗甲状腺薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "thiamazole",
+        "methimazole",
+        "antithyroid"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗甲状腺薬"
+    },
+    "レボチロキシン": {
+      "ja": "レボチロキシン",
+      "en": "levothyroxine",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "甲状腺ホルモン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "levothyroxine",
+        "L-thyroxine",
+        "T4",
+        "hypothyroid"
+      ],
+      "category": "薬剤",
+      "drug_effect": "甲状腺ホルモン"
+    },
+    "ヒドロコルチゾン": {
+      "ja": "ヒドロコルチゾン",
+      "en": "hydrocortisone",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "ステロイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "hydrocortisone",
+        "cortisol",
+        "steroid",
+        "adrenal"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ステロイド"
+    },
+    "フルドロコルチゾン": {
+      "ja": "フルドロコルチゾン",
+      "en": "fludrocortisone",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "ミネラルコルチコイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "fludrocortisone",
+        "mineralocorticoid",
+        "adrenal"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ミネラルコルチコイド"
+    },
+    "オクトレオチド": {
+      "ja": "オクトレオチド",
+      "en": "octreotide",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "ソマトスタチンアナログ",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "octreotide",
+        "somatostatin",
+        "analog",
+        "acromegaly"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ソマトスタチンアナログ"
+    },
+    "デスモプレシン": {
+      "ja": "デスモプレシン",
+      "en": "desmopressin",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "ADHアナログ",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "desmopressin",
+        "DDAVP",
+        "ADH",
+        "diabetes",
+        "insipidus"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ADHアナログ"
+    },
+    "ブロモクリプチン": {
+      "ja": "ブロモクリプチン",
+      "en": "bromocriptine",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "ドパミン作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "bromocriptine",
+        "dopamine",
+        "agonist",
+        "prolactinoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ドパミン作動薬"
+    },
+    "カベルゴリン": {
+      "ja": "カベルゴリン",
+      "en": "cabergoline",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "ドパミン作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "cabergoline",
+        "dopamine",
+        "agonist",
+        "prolactinoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ドパミン作動薬"
+    },
+    "ゾレドロン酸": {
+      "ja": "ゾレドロン酸",
+      "en": "zoledronic",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "ビスホスホネート",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "zoledronic",
+        "acid",
+        "bisphosphonate",
+        "osteoporosis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ビスホスホネート"
+    },
+    "アレンドロン酸": {
+      "ja": "アレンドロン酸",
+      "en": "alendronate",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "ビスホスホネート",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "alendronate",
+        "bisphosphonate",
+        "osteoporosis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ビスホスホネート"
+    },
+    "デノスマブ": {
+      "ja": "デノスマブ",
+      "en": "denosumab",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "RANKL阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "denosumab",
+        "RANKL",
+        "inhibitor",
+        "osteoporosis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "RANKL阻害薬"
+    },
+    "テリパラチド": {
+      "ja": "テリパラチド",
+      "en": "teriparatide",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "副甲状腺ホルモン製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "teriparatide",
+        "PTH",
+        "analog",
+        "osteoporosis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "副甲状腺ホルモン製剤"
+    },
+    "シナカルセット": {
+      "ja": "シナカルセット",
+      "en": "cinacalcet",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "カルシミメティクス",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "cinacalcet",
+        "calcimimetic",
+        "hyperparathyroidism"
+      ],
+      "category": "薬剤",
+      "drug_effect": "カルシミメティクス"
+    },
+    "プレドニゾロン": {
+      "ja": "プレドニゾロン",
+      "en": "prednisolone",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "ステロイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "prednisolone",
+        "prednisone",
+        "corticosteroid",
+        "steroid",
+        "sudden",
+        "deafness",
+        "Bell's",
+        "palsy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ステロイド"
+    },
+    "メチルプレドニゾロン": {
+      "ja": "メチルプレドニゾロン",
+      "en": "methylprednisolone",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "ステロイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "methylprednisolone",
+        "pulse",
+        "steroid",
+        "solumedrol"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ステロイド"
+    },
+    "デキサメタゾン": {
+      "ja": "デキサメタゾン",
+      "en": "dexamethasone",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "ステロイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dexamethasone",
+        "steroid",
+        "glucocorticoid"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ステロイド"
+    },
+    "メトトレキサート": {
+      "ja": "メトトレキサート",
+      "en": "methotrexate",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "免疫抑制薬・抗リウマチ薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "methotrexate",
+        "MTX",
+        "DMARD",
+        "rheumatoid",
+        "psoriasis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫抑制薬・抗リウマチ薬"
+    },
+    "タクロリムス": {
+      "ja": "タクロリムス",
+      "en": "tacrolimus",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "免疫抑制薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "tacrolimus",
+        "FK506",
+        "calcineurin",
+        "inhibitor",
+        "topical",
+        "atopic",
+        "dermatitis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫抑制薬"
+    },
+    "シクロスポリン": {
+      "ja": "シクロスポリン",
+      "en": "cyclosporine",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "免疫抑制薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "cyclosporine",
+        "calcineurin",
+        "inhibitor",
+        "atopic",
+        "dermatitis",
+        "psoriasis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫抑制薬"
+    },
+    "シクロホスファミド": {
+      "ja": "シクロホスファミド",
+      "en": "cyclophosphamide",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "免疫抑制薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "cyclophosphamide",
+        "alkylating",
+        "agent",
+        "lupus",
+        "vasculitis",
+        "chemotherapy",
+        "lymphoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫抑制薬"
+    },
+    "アザチオプリン": {
+      "ja": "アザチオプリン",
+      "en": "azathioprine",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "免疫抑制薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "azathioprine",
+        "thiopurine",
+        "immunosuppressant",
+        "IBD",
+        "Crohn"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫抑制薬"
+    },
+    "ミコフェノール酸モフェチル": {
+      "ja": "ミコフェノール酸モフェチル",
+      "en": "mycophenolate",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "免疫抑制薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "mycophenolate",
+        "mofetil",
+        "MMF",
+        "immunosuppressant",
+        "lupus"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫抑制薬"
+    },
+    "ヒドロキシクロロキン": {
+      "ja": "ヒドロキシクロロキン",
+      "en": "hydroxychloroquine",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "抗マラリア薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "hydroxychloroquine",
+        "antimalarial",
+        "lupus"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗マラリア薬"
+    },
+    "インフリキシマブ": {
+      "ja": "インフリキシマブ",
+      "en": "infliximab",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "生物学的製剤・抗TNF",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "infliximab",
+        "anti-TNF",
+        "biological",
+        "RA",
+        "Crohn",
+        "IBD",
+        "ulcerative",
+        "colitis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤・抗TNF"
+    },
+    "エタネルセプト": {
+      "ja": "エタネルセプト",
+      "en": "etanercept",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "生物学的製剤・抗TNF",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "etanercept",
+        "anti-TNF",
+        "biological",
+        "RA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤・抗TNF"
+    },
+    "アダリムマブ": {
+      "ja": "アダリムマブ",
+      "en": "adalimumab",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "生物学的製剤・抗TNF",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "adalimumab",
+        "anti-TNF",
+        "biological",
+        "RA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤・抗TNF"
+    },
+    "アバタセプト": {
+      "ja": "アバタセプト",
+      "en": "abatacept",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "生物学的製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "abatacept",
+        "CTLA-4",
+        "biological",
+        "RA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤"
+    },
+    "トシリズマブ": {
+      "ja": "トシリズマブ",
+      "en": "tocilizumab",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "生物学的製剤・抗IL-6",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "tocilizumab",
+        "IL-6",
+        "receptor",
+        "inhibitor",
+        "RA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤・抗IL-6"
+    },
+    "リツキシマブ": {
+      "ja": "リツキシマブ",
+      "en": "rituximab",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "生物学的製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "rituximab",
+        "anti-CD20",
+        "B-cell",
+        "depletion",
+        "lymphoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤"
+    },
+    "コルヒチン": {
+      "ja": "コルヒチン",
+      "en": "colchicine",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "痛風治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "colchicine",
+        "gout",
+        "pericarditis",
+        "Behcet",
+        "dermatitis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "痛風治療薬"
+    },
+    "アロプリノール": {
+      "ja": "アロプリノール",
+      "en": "allopurinol",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "尿酸降下薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "allopurinol",
+        "xanthine",
+        "oxidase",
+        "gout",
+        "uric",
+        "acid"
+      ],
+      "category": "薬剤",
+      "drug_effect": "尿酸降下薬"
+    },
+    "フェブキソスタット": {
+      "ja": "フェブキソスタット",
+      "en": "febuxostat",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "尿酸降下薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "febuxostat",
+        "xanthine",
+        "oxidase",
+        "gout"
+      ],
+      "category": "薬剤",
+      "drug_effect": "尿酸降下薬"
+    },
+    "ベンズブロマロン": {
+      "ja": "ベンズブロマロン",
+      "en": "benzbromarone",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "尿酸降下薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "benzbromarone",
+        "uricosuric",
+        "gout"
+      ],
+      "category": "薬剤",
+      "drug_effect": "尿酸降下薬"
+    },
+    "ベリムマブ": {
+      "ja": "ベリムマブ",
+      "en": "belimumab",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "生物学的製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "belimumab",
+        "BLyS",
+        "lupus"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤"
+    },
+    "トルバプタン": {
+      "ja": "トルバプタン",
+      "en": "tolvaptan",
+      "abbr": null,
+      "chapter": "腎・泌尿器",
+      "section": "バソプレシン拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "tolvaptan",
+        "vasopressin",
+        "V2",
+        "receptor",
+        "antagonist",
+        "SIADH"
+      ],
+      "category": "薬剤",
+      "drug_effect": "バソプレシン拮抗薬"
+    },
+    "炭酸水素ナトリウム": {
+      "ja": "炭酸水素ナトリウム",
+      "en": "sodium",
+      "abbr": null,
+      "chapter": "腎・泌尿器",
+      "section": "アルカリ化薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sodium",
+        "bicarbonate",
+        "acidosis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アルカリ化薬"
+    },
+    "タムスロシン": {
+      "ja": "タムスロシン",
+      "en": "tamsulosin",
+      "abbr": null,
+      "chapter": "腎・泌尿器",
+      "section": "α1遮断薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "tamsulosin",
+        "alpha-1",
+        "blocker",
+        "BPH"
+      ],
+      "category": "薬剤",
+      "drug_effect": "α1遮断薬"
+    },
+    "シロドシン": {
+      "ja": "シロドシン",
+      "en": "silodosin",
+      "abbr": null,
+      "chapter": "腎・泌尿器",
+      "section": "α1遮断薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "silodosin",
+        "alpha-1",
+        "blocker",
+        "BPH"
+      ],
+      "category": "薬剤",
+      "drug_effect": "α1遮断薬"
+    },
+    "フィナステリド": {
+      "ja": "フィナステリド",
+      "en": "finasteride",
+      "abbr": null,
+      "chapter": "腎・泌尿器",
+      "section": "5α還元酵素阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "finasteride",
+        "5-alpha",
+        "reductase",
+        "inhibitor",
+        "BPH"
+      ],
+      "category": "薬剤",
+      "drug_effect": "5α還元酵素阻害薬"
+    },
+    "オキシブチニン": {
+      "ja": "オキシブチニン",
+      "en": "oxybutynin",
+      "abbr": null,
+      "chapter": "腎・泌尿器",
+      "section": "抗コリン薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "oxybutynin",
+        "anticholinergic",
+        "overactive",
+        "bladder"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗コリン薬"
+    },
+    "ミラベグロン": {
+      "ja": "ミラベグロン",
+      "en": "mirabegron",
+      "abbr": null,
+      "chapter": "腎・泌尿器",
+      "section": "β3作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "mirabegron",
+        "beta-3",
+        "agonist",
+        "overactive",
+        "bladder"
+      ],
+      "category": "薬剤",
+      "drug_effect": "β3作動薬"
+    },
+    "シルデナフィル": {
+      "ja": "シルデナフィル",
+      "en": "sildenafil",
+      "abbr": null,
+      "chapter": "腎・泌尿器",
+      "section": "PDE5阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sildenafil",
+        "PDE5",
+        "inhibitor",
+        "erectile",
+        "dysfunction",
+        "pulmonary",
+        "hypertension"
+      ],
+      "category": "薬剤",
+      "drug_effect": "PDE5阻害薬"
+    },
+    "ダルフェナシン": {
+      "ja": "ダルフェナシン",
+      "en": "darifenacin",
+      "abbr": null,
+      "chapter": "腎・泌尿器",
+      "section": "抗コリン薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "darifenacin",
+        "overactive",
+        "bladder"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗コリン薬"
+    },
+    "オメプラゾール": {
+      "ja": "オメプラゾール",
+      "en": "omeprazole",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "PPI",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "omeprazole",
+        "PPI",
+        "proton",
+        "pump",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "PPI"
+    },
+    "ランソプラゾール": {
+      "ja": "ランソプラゾール",
+      "en": "lansoprazole",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "PPI",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "lansoprazole",
+        "PPI",
+        "proton",
+        "pump",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "PPI"
+    },
+    "ラベプラゾール": {
+      "ja": "ラベプラゾール",
+      "en": "rabeprazole",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "PPI",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "rabeprazole",
+        "PPI",
+        "proton",
+        "pump",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "PPI"
+    },
+    "エソメプラゾール": {
+      "ja": "エソメプラゾール",
+      "en": "esomeprazole",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "PPI",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "esomeprazole",
+        "PPI",
+        "proton",
+        "pump",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "PPI"
+    },
+    "ファモチジン": {
+      "ja": "ファモチジン",
+      "en": "famotidine",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "H2ブロッカー",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "famotidine",
+        "H2",
+        "blocker",
+        "ranitidine",
+        "histamine"
+      ],
+      "category": "薬剤",
+      "drug_effect": "H2ブロッカー"
+    },
+    "スクラルファート": {
+      "ja": "スクラルファート",
+      "en": "sucralfate",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "胃粘膜保護薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sucralfate",
+        "mucosal",
+        "protectant",
+        "ulcer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "胃粘膜保護薬"
+    },
+    "ミソプロストール": {
+      "ja": "ミソプロストール",
+      "en": "misoprostol",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "胃粘膜保護薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "misoprostol",
+        "prostaglandin",
+        "E1",
+        "ulcer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "胃粘膜保護薬"
+    },
+    "メトクロプラミド": {
+      "ja": "メトクロプラミド",
+      "en": "metoclopramide",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "消化管運動促進薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "metoclopramide",
+        "prokinetic",
+        "dopamine",
+        "antagonist"
+      ],
+      "category": "薬剤",
+      "drug_effect": "消化管運動促進薬"
+    },
+    "ドンペリドン": {
+      "ja": "ドンペリドン",
+      "en": "domperidone",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "消化管運動促進薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "domperidone",
+        "prokinetic",
+        "antiemetic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "消化管運動促進薬"
+    },
+    "ロペラミド": {
+      "ja": "ロペラミド",
+      "en": "loperamide",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "止痢薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "loperamide",
+        "antidiarrheal",
+        "opioid"
+      ],
+      "category": "薬剤",
+      "drug_effect": "止痢薬"
+    },
+    "ウルソデオキシコール酸": {
+      "ja": "ウルソデオキシコール酸",
+      "en": "ursodeoxycholic",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "胆汁酸製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ursodeoxycholic",
+        "acid",
+        "UDCA",
+        "bile",
+        "acid",
+        "PBC"
+      ],
+      "category": "薬剤",
+      "drug_effect": "胆汁酸製剤"
+    },
+    "メサラジン": {
+      "ja": "メサラジン",
+      "en": "mesalazine",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "5-ASA製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "mesalazine",
+        "5-ASA",
+        "aminosalicylate",
+        "IBD",
+        "ulcerative",
+        "colitis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "5-ASA製剤"
+    },
+    "ラクツロース": {
+      "ja": "ラクツロース",
+      "en": "lactulose",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "緩下薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "lactulose",
+        "laxative",
+        "hepatic",
+        "encephalopathy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "緩下薬"
+    },
+    "酸化マグネシウム": {
+      "ja": "酸化マグネシウム",
+      "en": "magnesium",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "緩下薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "magnesium",
+        "oxide",
+        "laxative",
+        "constipation"
+      ],
+      "category": "薬剤",
+      "drug_effect": "緩下薬"
+    },
+    "リファキシミン": {
+      "ja": "リファキシミン",
+      "en": "rifaximin",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "抗菌薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "rifaximin",
+        "hepatic",
+        "encephalopathy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗菌薬"
+    },
+    "ソラフェニブ": {
+      "ja": "ソラフェニブ",
+      "en": "sorafenib",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "分子標的薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sorafenib",
+        "HCC",
+        "hepatocellular",
+        "carcinoma",
+        "targeted"
+      ],
+      "category": "薬剤",
+      "drug_effect": "分子標的薬"
+    },
+    "レンバチニブ": {
+      "ja": "レンバチニブ",
+      "en": "lenvatinib",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "分子標的薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "lenvatinib",
+        "HCC",
+        "targeted"
+      ],
+      "category": "薬剤",
+      "drug_effect": "分子標的薬"
+    },
+    "サルブタモール": {
+      "ja": "サルブタモール",
+      "en": "salbutamol",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "短時間作用型β2刺激薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "salbutamol",
+        "albuterol",
+        "SABA",
+        "beta-2",
+        "agonist",
+        "asthma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "短時間作用型β2刺激薬"
+    },
+    "サルメテロール": {
+      "ja": "サルメテロール",
+      "en": "salmeterol",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "長時間作用型β2刺激薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "salmeterol",
+        "LABA",
+        "long-acting",
+        "beta-2",
+        "asthma",
+        "COPD"
+      ],
+      "category": "薬剤",
+      "drug_effect": "長時間作用型β2刺激薬"
+    },
+    "フォルモテロール": {
+      "ja": "フォルモテロール",
+      "en": "formoterol",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "長時間作用型β2刺激薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "formoterol",
+        "LABA",
+        "long-acting",
+        "beta-2",
+        "COPD",
+        "asthma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "長時間作用型β2刺激薬"
+    },
+    "チオトロピウム": {
+      "ja": "チオトロピウム",
+      "en": "tiotropium",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "長時間作用型抗コリン薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "tiotropium",
+        "LAMA",
+        "long-acting",
+        "anticholinergic",
+        "COPD"
+      ],
+      "category": "薬剤",
+      "drug_effect": "長時間作用型抗コリン薬"
+    },
+    "イプラトロピウム": {
+      "ja": "イプラトロピウム",
+      "en": "ipratropium",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "短時間作用型抗コリン薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ipratropium",
+        "SAMA",
+        "short-acting",
+        "anticholinergic",
+        "COPD"
+      ],
+      "category": "薬剤",
+      "drug_effect": "短時間作用型抗コリン薬"
+    },
+    "フルチカゾン": {
+      "ja": "フルチカゾン",
+      "en": "fluticasone",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "吸入ステロイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "fluticasone",
+        "ICS",
+        "inhaled",
+        "corticosteroid",
+        "asthma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "吸入ステロイド"
+    },
+    "ブデソニド": {
+      "ja": "ブデソニド",
+      "en": "budesonide",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "吸入ステロイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "budesonide",
+        "ICS",
+        "inhaled",
+        "corticosteroid",
+        "asthma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "吸入ステロイド"
+    },
+    "テオフィリン": {
+      "ja": "テオフィリン",
+      "en": "theophylline",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "キサンチン薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "theophylline",
+        "xanthine",
+        "bronchodilator",
+        "asthma",
+        "COPD"
+      ],
+      "category": "薬剤",
+      "drug_effect": "キサンチン薬"
+    },
+    "モンテルカスト": {
+      "ja": "モンテルカスト",
+      "en": "montelukast",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "ロイコトリエン受容体拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "montelukast",
+        "leukotriene",
+        "receptor",
+        "antagonist",
+        "asthma",
+        "allergic",
+        "rhinitis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ロイコトリエン受容体拮抗薬"
+    },
+    "オマリズマブ": {
+      "ja": "オマリズマブ",
+      "en": "omalizumab",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "抗IgE抗体",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "omalizumab",
+        "anti-IgE",
+        "biological",
+        "asthma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗IgE抗体"
+    },
+    "ニルバジピン": {
+      "ja": "ニルバジピン",
+      "en": "nilvadipine",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "Ca拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "nilvadipine",
+        "calcium",
+        "channel",
+        "blocker",
+        "pulmonary"
+      ],
+      "category": "薬剤",
+      "drug_effect": "Ca拮抗薬"
+    },
+    "アセチルシステイン": {
+      "ja": "アセチルシステイン",
+      "en": "acetylcysteine",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "去痰薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "acetylcysteine",
+        "NAC",
+        "mucolytic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "去痰薬"
+    },
+    "ニボルマブ": {
+      "ja": "ニボルマブ",
+      "en": "nivolumab",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "免疫チェックポイント阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "nivolumab",
+        "PD-1",
+        "checkpoint",
+        "inhibitor",
+        "lung",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫チェックポイント阻害薬"
+    },
+    "ペムブロリズマブ": {
+      "ja": "ペムブロリズマブ",
+      "en": "pembrolizumab",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "免疫チェックポイント阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pembrolizumab",
+        "PD-1",
+        "checkpoint",
+        "lung",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫チェックポイント阻害薬"
+    },
+    "ゲフィチニブ": {
+      "ja": "ゲフィチニブ",
+      "en": "gefitinib",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "EGFR阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "gefitinib",
+        "EGFR",
+        "tyrosine",
+        "kinase",
+        "lung",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "EGFR阻害薬"
+    },
+    "オシメルチニブ": {
+      "ja": "オシメルチニブ",
+      "en": "osimertinib",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "EGFR阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "osimertinib",
+        "EGFR",
+        "T790M",
+        "lung",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "EGFR阻害薬"
+    },
+    "クリゾチニブ": {
+      "ja": "クリゾチニブ",
+      "en": "crizotinib",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "ALK阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "crizotinib",
+        "ALK",
+        "inhibitor",
+        "lung",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ALK阻害薬"
+    },
+    "エポプロステノール": {
+      "ja": "エポプロステノール",
+      "en": "epoprostenol",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "プロスタサイクリン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "epoprostenol",
+        "prostacyclin",
+        "pulmonary",
+        "hypertension"
+      ],
+      "category": "薬剤",
+      "drug_effect": "プロスタサイクリン"
+    },
+    "ピルフェニドン": {
+      "ja": "ピルフェニドン",
+      "en": "pirfenidone",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "抗線維化薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pirfenidone",
+        "IPF",
+        "pulmonary",
+        "fibrosis",
+        "antifibrotic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗線維化薬"
+    },
+    "ニンテダニブ": {
+      "ja": "ニンテダニブ",
+      "en": "nintedanib",
+      "abbr": null,
+      "chapter": "呼吸器",
+      "section": "抗線維化薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "nintedanib",
+        "IPF",
+        "pulmonary",
+        "fibrosis",
+        "antifibrotic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗線維化薬"
+    },
+    "ペニシリンG": {
+      "ja": "ペニシリンG",
+      "en": "penicillin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "ペニシリン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "penicillin",
+        "G",
+        "beta-lactam",
+        "bactericidal"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ペニシリン系"
+    },
+    "アモキシシリン": {
+      "ja": "アモキシシリン",
+      "en": "amoxicillin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "ペニシリン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "amoxicillin",
+        "penicillin",
+        "aminopenicillin",
+        "otitis",
+        "media",
+        "pneumonia"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ペニシリン系"
+    },
+    "アンピシリン": {
+      "ja": "アンピシリン",
+      "en": "ampicillin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "ペニシリン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ampicillin",
+        "penicillin",
+        "aminopenicillin"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ペニシリン系"
+    },
+    "ピペラシリン": {
+      "ja": "ピペラシリン",
+      "en": "piperacillin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "ペニシリン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "piperacillin",
+        "antipseudomonal",
+        "penicillin"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ペニシリン系"
+    },
+    "セファゾリン": {
+      "ja": "セファゾリン",
+      "en": "cefazolin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "第1世代セフェム",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "cefazolin",
+        "cephalosporin",
+        "first",
+        "generation"
+      ],
+      "category": "薬剤",
+      "drug_effect": "第1世代セフェム"
+    },
+    "セフォタキシム": {
+      "ja": "セフォタキシム",
+      "en": "cefotaxime",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "第3世代セフェム",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "cefotaxime",
+        "cephalosporin",
+        "third",
+        "generation",
+        "meningitis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "第3世代セフェム"
+    },
+    "セフトリアキソン": {
+      "ja": "セフトリアキソン",
+      "en": "ceftriaxone",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "第3世代セフェム",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ceftriaxone",
+        "cephalosporin",
+        "third",
+        "generation"
+      ],
+      "category": "薬剤",
+      "drug_effect": "第3世代セフェム"
+    },
+    "セフタジジム": {
+      "ja": "セフタジジム",
+      "en": "ceftazidime",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "第3世代セフェム",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ceftazidime",
+        "cephalosporin",
+        "third",
+        "pseudomonas"
+      ],
+      "category": "薬剤",
+      "drug_effect": "第3世代セフェム"
+    },
+    "セフェピム": {
+      "ja": "セフェピム",
+      "en": "cefepime",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "第4世代セフェム",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "cefepime",
+        "cephalosporin",
+        "fourth",
+        "generation"
+      ],
+      "category": "薬剤",
+      "drug_effect": "第4世代セフェム"
+    },
+    "イミペネム": {
+      "ja": "イミペネム",
+      "en": "imipenem",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "カルバペネム系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "imipenem",
+        "carbapenem",
+        "broad-spectrum"
+      ],
+      "category": "薬剤",
+      "drug_effect": "カルバペネム系"
+    },
+    "メロペネム": {
+      "ja": "メロペネム",
+      "en": "meropenem",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "カルバペネム系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "meropenem",
+        "carbapenem",
+        "broad-spectrum",
+        "meningitis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "カルバペネム系"
+    },
+    "アズトレオナム": {
+      "ja": "アズトレオナム",
+      "en": "aztreonam",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "モノバクタム系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "aztreonam",
+        "monobactam",
+        "gram-negative"
+      ],
+      "category": "薬剤",
+      "drug_effect": "モノバクタム系"
+    },
+    "バンコマイシン": {
+      "ja": "バンコマイシン",
+      "en": "vancomycin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "グリコペプチド系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "vancomycin",
+        "glycopeptide",
+        "MRSA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "グリコペプチド系"
+    },
+    "テイコプラニン": {
+      "ja": "テイコプラニン",
+      "en": "teicoplanin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "グリコペプチド系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "teicoplanin",
+        "glycopeptide",
+        "MRSA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "グリコペプチド系"
+    },
+    "リネゾリド": {
+      "ja": "リネゾリド",
+      "en": "linezolid",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "オキサゾリジノン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "linezolid",
+        "oxazolidinone",
+        "MRSA",
+        "VRE"
+      ],
+      "category": "薬剤",
+      "drug_effect": "オキサゾリジノン系"
+    },
+    "ダプトマイシン": {
+      "ja": "ダプトマイシン",
+      "en": "daptomycin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "環状脂肪族ペプチド系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "daptomycin",
+        "lipopeptide",
+        "MRSA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "環状脂肪族ペプチド系"
+    },
+    "クリンダマイシン": {
+      "ja": "クリンダマイシン",
+      "en": "clindamycin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "リンコサミド系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "clindamycin",
+        "lincosamide",
+        "anaerobe"
+      ],
+      "category": "薬剤",
+      "drug_effect": "リンコサミド系"
+    },
+    "エリスロマイシン": {
+      "ja": "エリスロマイシン",
+      "en": "erythromycin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "マクロライド系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "erythromycin",
+        "macrolide",
+        "atypical"
+      ],
+      "category": "薬剤",
+      "drug_effect": "マクロライド系"
+    },
+    "アジスロマイシン": {
+      "ja": "アジスロマイシン",
+      "en": "azithromycin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "マクロライド系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "azithromycin",
+        "macrolide",
+        "atypical",
+        "community"
+      ],
+      "category": "薬剤",
+      "drug_effect": "マクロライド系"
+    },
+    "クラリスロマイシン": {
+      "ja": "クラリスロマイシン",
+      "en": "clarithromycin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "マクロライド系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "clarithromycin",
+        "macrolide",
+        "H",
+        "pylori"
+      ],
+      "category": "薬剤",
+      "drug_effect": "マクロライド系"
+    },
+    "ドキシサイクリン": {
+      "ja": "ドキシサイクリン",
+      "en": "doxycycline",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "テトラサイクリン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "doxycycline",
+        "tetracycline",
+        "intracellular",
+        "atypical"
+      ],
+      "category": "薬剤",
+      "drug_effect": "テトラサイクリン系"
+    },
+    "ミノサイクリン": {
+      "ja": "ミノサイクリン",
+      "en": "minocycline",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "テトラサイクリン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "minocycline",
+        "tetracycline"
+      ],
+      "category": "薬剤",
+      "drug_effect": "テトラサイクリン系"
+    },
+    "レボフロキサシン": {
+      "ja": "レボフロキサシン",
+      "en": "levofloxacin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "フルオロキノロン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "levofloxacin",
+        "fluoroquinolone",
+        "respiratory"
+      ],
+      "category": "薬剤",
+      "drug_effect": "フルオロキノロン系"
+    },
+    "シプロフロキサシン": {
+      "ja": "シプロフロキサシン",
+      "en": "ciprofloxacin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "フルオロキノロン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ciprofloxacin",
+        "fluoroquinolone",
+        "gram-negative"
+      ],
+      "category": "薬剤",
+      "drug_effect": "フルオロキノロン系"
+    },
+    "ST合剤": {
+      "ja": "ST合剤",
+      "en": "trimethoprim",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "サルファ薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "trimethoprim",
+        "sulfamethoxazole",
+        "TMP-SMX",
+        "cotrimoxazole",
+        "PCP"
+      ],
+      "category": "薬剤",
+      "drug_effect": "サルファ薬"
+    },
+    "メトロニダゾール": {
+      "ja": "メトロニダゾール",
+      "en": "metronidazole",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "ニトロイミダゾール系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "metronidazole",
+        "anaerobe",
+        "Clostridium",
+        "protozoa"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ニトロイミダゾール系"
+    },
+    "イソニアジド": {
+      "ja": "イソニアジド",
+      "en": "isoniazid",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗結核薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "isoniazid",
+        "INH",
+        "tuberculosis",
+        "TB"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗結核薬"
+    },
+    "リファンピシン": {
+      "ja": "リファンピシン",
+      "en": "rifampicin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗結核薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "rifampicin",
+        "rifampin",
+        "tuberculosis",
+        "TB",
+        "rifamycin"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗結核薬"
+    },
+    "エタンブトール": {
+      "ja": "エタンブトール",
+      "en": "ethambutol",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗結核薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ethambutol",
+        "tuberculosis",
+        "TB"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗結核薬"
+    },
+    "ピラジナミド": {
+      "ja": "ピラジナミド",
+      "en": "pyrazinamide",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗結核薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pyrazinamide",
+        "tuberculosis",
+        "TB"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗結核薬"
+    },
+    "ストレプトマイシン": {
+      "ja": "ストレプトマイシン",
+      "en": "streptomycin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "アミノグリコシド系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "streptomycin",
+        "aminoglycoside",
+        "tuberculosis",
+        "TB"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アミノグリコシド系"
+    },
+    "ゲンタマイシン": {
+      "ja": "ゲンタマイシン",
+      "en": "gentamicin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "アミノグリコシド系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "gentamicin",
+        "aminoglycoside",
+        "gram-negative",
+        "ototoxic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アミノグリコシド系"
+    },
+    "アミカシン": {
+      "ja": "アミカシン",
+      "en": "amikacin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "アミノグリコシド系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "amikacin",
+        "aminoglycoside"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アミノグリコシド系"
+    },
+    "アシクロビル": {
+      "ja": "アシクロビル",
+      "en": "acyclovir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗ウイルス薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "acyclovir",
+        "herpes",
+        "HSV",
+        "VZV",
+        "antiviral",
+        "neonatal"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗ウイルス薬"
+    },
+    "バラシクロビル": {
+      "ja": "バラシクロビル",
+      "en": "valacyclovir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗ウイルス薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "valacyclovir",
+        "herpes",
+        "HSV",
+        "VZV",
+        "prodrug"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗ウイルス薬"
+    },
+    "ガンシクロビル": {
+      "ja": "ガンシクロビル",
+      "en": "ganciclovir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗CMV薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ganciclovir",
+        "CMV",
+        "cytomegalovirus",
+        "antiviral"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗CMV薬"
+    },
+    "ホスカルネット": {
+      "ja": "ホスカルネット",
+      "en": "foscarnet",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗ウイルス薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "foscarnet",
+        "CMV",
+        "HSV",
+        "antiviral"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗ウイルス薬"
+    },
+    "オセルタミビル": {
+      "ja": "オセルタミビル",
+      "en": "oseltamivir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗インフルエンザ薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "oseltamivir",
+        "tamiflu",
+        "neuraminidase",
+        "influenza"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗インフルエンザ薬"
+    },
+    "バロキサビル": {
+      "ja": "バロキサビル",
+      "en": "baloxavir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗インフルエンザ薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "baloxavir",
+        "xofluza",
+        "cap-dependent",
+        "endonuclease",
+        "influenza"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗インフルエンザ薬"
+    },
+    "ザナミビル": {
+      "ja": "ザナミビル",
+      "en": "zanamivir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗インフルエンザ薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "zanamivir",
+        "neuraminidase",
+        "inhibitor",
+        "influenza"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗インフルエンザ薬"
+    },
+    "エンテカビル": {
+      "ja": "エンテカビル",
+      "en": "entecavir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗HBV薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "entecavir",
+        "hepatitis",
+        "B",
+        "HBV",
+        "antiviral"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗HBV薬"
+    },
+    "テノホビル": {
+      "ja": "テノホビル",
+      "en": "tenofovir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗HBV・HIV薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "tenofovir",
+        "HBV",
+        "HIV",
+        "antiviral"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗HBV・HIV薬"
+    },
+    "リバビリン": {
+      "ja": "リバビリン",
+      "en": "ribavirin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗HCV薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ribavirin",
+        "HCV",
+        "hepatitis",
+        "C",
+        "antiviral"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗HCV薬"
+    },
+    "ソホスブビル": {
+      "ja": "ソホスブビル",
+      "en": "sofosbuvir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗HCV薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sofosbuvir",
+        "NS5B",
+        "HCV",
+        "DAA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗HCV薬"
+    },
+    "グレカプレビル": {
+      "ja": "グレカプレビル",
+      "en": "glecaprevir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗HCV薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "glecaprevir",
+        "NS3",
+        "HCV",
+        "DAA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗HCV薬"
+    },
+    "フルコナゾール": {
+      "ja": "フルコナゾール",
+      "en": "fluconazole",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "アゾール系抗真菌薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "fluconazole",
+        "azole",
+        "antifungal",
+        "Candida"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アゾール系抗真菌薬"
+    },
+    "ボリコナゾール": {
+      "ja": "ボリコナゾール",
+      "en": "voriconazole",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "アゾール系抗真菌薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "voriconazole",
+        "azole",
+        "antifungal",
+        "Aspergillus"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アゾール系抗真菌薬"
+    },
+    "イトラコナゾール": {
+      "ja": "イトラコナゾール",
+      "en": "itraconazole",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "アゾール系抗真菌薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "itraconazole",
+        "azole",
+        "antifungal"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アゾール系抗真菌薬"
+    },
+    "ミカファンギン": {
+      "ja": "ミカファンギン",
+      "en": "micafungin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "エキノカンジン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "micafungin",
+        "echinocandin",
+        "Candida",
+        "Aspergillus"
+      ],
+      "category": "薬剤",
+      "drug_effect": "エキノカンジン系"
+    },
+    "カスポファンギン": {
+      "ja": "カスポファンギン",
+      "en": "caspofungin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "エキノカンジン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "caspofungin",
+        "echinocandin"
+      ],
+      "category": "薬剤",
+      "drug_effect": "エキノカンジン系"
+    },
+    "アムホテリシンB": {
+      "ja": "アムホテリシンB",
+      "en": "amphotericin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "ポリエン系抗真菌薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "amphotericin",
+        "B",
+        "polyene",
+        "antifungal",
+        "fungicidal"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ポリエン系抗真菌薬"
+    },
+    "ペンタミジン": {
+      "ja": "ペンタミジン",
+      "en": "pentamidine",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗原虫薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pentamidine",
+        "PCP",
+        "Pneumocystis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗原虫薬"
+    },
+    "クロロキン": {
+      "ja": "クロロキン",
+      "en": "chloroquine",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗マラリア薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "chloroquine",
+        "antimalarial"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗マラリア薬"
+    },
+    "アルテミシニン": {
+      "ja": "アルテミシニン",
+      "en": "artemisinin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗マラリア薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "artemisinin",
+        "antimalarial"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗マラリア薬"
+    },
+    "エリスロポエチン": {
+      "ja": "エリスロポエチン",
+      "en": "erythropoietin",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "造血薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "erythropoietin",
+        "EPO",
+        "anemia",
+        "CKD"
+      ],
+      "category": "薬剤",
+      "drug_effect": "造血薬"
+    },
+    "ダルベポエチン": {
+      "ja": "ダルベポエチン",
+      "en": "darbepoetin",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "造血薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "darbepoetin",
+        "alfa",
+        "EPO",
+        "anemia"
+      ],
+      "category": "薬剤",
+      "drug_effect": "造血薬"
+    },
+    "フィルグラスチム": {
+      "ja": "フィルグラスチム",
+      "en": "filgrastim",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "G-CSF",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "filgrastim",
+        "G-CSF",
+        "granulocyte",
+        "colony",
+        "stimulating"
+      ],
+      "category": "薬剤",
+      "drug_effect": "G-CSF"
+    },
+    "鉄剤": {
+      "ja": "鉄剤",
+      "en": "iron",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "鉄剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "iron",
+        "ferrous",
+        "sulfate",
+        "iron",
+        "deficiency",
+        "anemia"
+      ],
+      "category": "薬剤",
+      "drug_effect": "鉄剤"
+    },
+    "ビタミンB12": {
+      "ja": "ビタミンB12",
+      "en": "vitamin",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "ビタミン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "vitamin",
+        "B12",
+        "cyanocobalamin",
+        "cobalamin",
+        "pernicious",
+        "anemia"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ビタミン"
+    },
+    "葉酸": {
+      "ja": "葉酸",
+      "en": "folic",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "葉酸",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "folic",
+        "acid",
+        "folate",
+        "megaloblastic",
+        "anemia"
+      ],
+      "category": "薬剤",
+      "drug_effect": "葉酸"
+    },
+    "エルトロンボパグ": {
+      "ja": "エルトロンボパグ",
+      "en": "eltrombopag",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "血小板増多薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "eltrombopag",
+        "thrombopoietin",
+        "TPO-RA",
+        "ITP"
+      ],
+      "category": "薬剤",
+      "drug_effect": "血小板増多薬"
+    },
+    "ロミプロスチム": {
+      "ja": "ロミプロスチム",
+      "en": "romiplostim",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "血小板増多薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "romiplostim",
+        "thrombopoietin",
+        "TPO-RA",
+        "ITP"
+      ],
+      "category": "薬剤",
+      "drug_effect": "血小板増多薬"
+    },
+    "ボルテゾミブ": {
+      "ja": "ボルテゾミブ",
+      "en": "bortezomib",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "プロテアソーム阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "bortezomib",
+        "proteasome",
+        "inhibitor",
+        "myeloma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "プロテアソーム阻害薬"
+    },
+    "レナリドミド": {
+      "ja": "レナリドミド",
+      "en": "lenalidomide",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "免疫調節薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "lenalidomide",
+        "thalidomide",
+        "analog",
+        "myeloma",
+        "MDS"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫調節薬"
+    },
+    "イマチニブ": {
+      "ja": "イマチニブ",
+      "en": "imatinib",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "分子標的薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "imatinib",
+        "BCR-ABL",
+        "TKI",
+        "CML",
+        "GIST"
+      ],
+      "category": "薬剤",
+      "drug_effect": "分子標的薬"
+    },
+    "ダサチニブ": {
+      "ja": "ダサチニブ",
+      "en": "dasatinib",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "分子標的薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dasatinib",
+        "BCR-ABL",
+        "TKI",
+        "CML"
+      ],
+      "category": "薬剤",
+      "drug_effect": "分子標的薬"
+    },
+    "ヒドロキシウレア": {
+      "ja": "ヒドロキシウレア",
+      "en": "hydroxyurea",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "抗腫瘍薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "hydroxyurea",
+        "ribonucleotide",
+        "reductase",
+        "CML"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗腫瘍薬"
+    },
+    "デフェラシロクス": {
+      "ja": "デフェラシロクス",
+      "en": "deferasirox",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "鉄キレート薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "deferasirox",
+        "iron",
+        "chelator",
+        "transfusion"
+      ],
+      "category": "薬剤",
+      "drug_effect": "鉄キレート薬"
+    },
+    "デフェロキサミン": {
+      "ja": "デフェロキサミン",
+      "en": "deferoxamine",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "鉄キレート薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "deferoxamine",
+        "iron",
+        "chelation",
+        "acute",
+        "overdose"
+      ],
+      "category": "薬剤",
+      "drug_effect": "鉄キレート薬"
+    },
+    "ドキソルビシン": {
+      "ja": "ドキソルビシン",
+      "en": "doxorubicin",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "アントラサイクリン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "doxorubicin",
+        "anthracycline",
+        "chemotherapy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アントラサイクリン系"
+    },
+    "ビンクリスチン": {
+      "ja": "ビンクリスチン",
+      "en": "vincristine",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "ビンカアルカロイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "vincristine",
+        "vinca",
+        "alkaloid",
+        "chemotherapy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ビンカアルカロイド"
+    },
+    "シタラビン": {
+      "ja": "シタラビン",
+      "en": "cytarabine",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "代謝拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "cytarabine",
+        "ara-C",
+        "AML",
+        "leukemia"
+      ],
+      "category": "薬剤",
+      "drug_effect": "代謝拮抗薬"
+    },
+    "ドネペジル": {
+      "ja": "ドネペジル",
+      "en": "donepezil",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "コリンエステラーゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "donepezil",
+        "acetylcholinesterase",
+        "inhibitor",
+        "AChEI",
+        "dementia",
+        "Alzheimer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "コリンエステラーゼ阻害薬"
+    },
+    "ガランタミン": {
+      "ja": "ガランタミン",
+      "en": "galantamine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "コリンエステラーゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "galantamine",
+        "AChEI",
+        "dementia"
+      ],
+      "category": "薬剤",
+      "drug_effect": "コリンエステラーゼ阻害薬"
+    },
+    "リバスチグミン": {
+      "ja": "リバスチグミン",
+      "en": "rivastigmine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "コリンエステラーゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "rivastigmine",
+        "AChEI",
+        "dementia"
+      ],
+      "category": "薬剤",
+      "drug_effect": "コリンエステラーゼ阻害薬"
+    },
+    "メマンチン": {
+      "ja": "メマンチン",
+      "en": "memantine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "NMDA受容体拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "memantine",
+        "NMDA",
+        "antagonist",
+        "dementia",
+        "Alzheimer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "NMDA受容体拮抗薬"
+    },
+    "レボドパ": {
+      "ja": "レボドパ",
+      "en": "levodopa",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "パーキンソン病治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "levodopa",
+        "L-DOPA",
+        "Parkinson",
+        "carbidopa"
+      ],
+      "category": "薬剤",
+      "drug_effect": "パーキンソン病治療薬"
+    },
+    "カルビドパ": {
+      "ja": "カルビドパ",
+      "en": "carbidopa",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "パーキンソン病治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "carbidopa",
+        "decarboxylase",
+        "inhibitor",
+        "Parkinson",
+        "levodopa"
+      ],
+      "category": "薬剤",
+      "drug_effect": "パーキンソン病治療薬"
+    },
+    "プラミペキソール": {
+      "ja": "プラミペキソール",
+      "en": "pramipexole",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "ドパミン作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pramipexole",
+        "dopamine",
+        "agonist",
+        "D2",
+        "D3",
+        "Parkinson"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ドパミン作動薬"
+    },
+    "ロピニロール": {
+      "ja": "ロピニロール",
+      "en": "ropinirole",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "ドパミン作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ropinirole",
+        "dopamine",
+        "agonist",
+        "Parkinson"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ドパミン作動薬"
+    },
+    "エンタカポン": {
+      "ja": "エンタカポン",
+      "en": "entacapone",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "COMT阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "entacapone",
+        "COMT",
+        "inhibitor",
+        "Parkinson"
+      ],
+      "category": "薬剤",
+      "drug_effect": "COMT阻害薬"
+    },
+    "セレギリン": {
+      "ja": "セレギリン",
+      "en": "selegiline",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "MAO-B阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "selegiline",
+        "MAO-B",
+        "inhibitor",
+        "Parkinson"
+      ],
+      "category": "薬剤",
+      "drug_effect": "MAO-B阻害薬"
+    },
+    "アマンタジン": {
+      "ja": "アマンタジン",
+      "en": "amantadine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "ドパミン放出促進薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "amantadine",
+        "NMDA",
+        "Parkinson",
+        "influenza"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ドパミン放出促進薬"
+    },
+    "バルプロ酸": {
+      "ja": "バルプロ酸",
+      "en": "valproic",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "抗てんかん薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "valproic",
+        "acid",
+        "valproate",
+        "epilepsy",
+        "bipolar",
+        "migraine"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗てんかん薬"
+    },
+    "カルバマゼピン": {
+      "ja": "カルバマゼピン",
+      "en": "carbamazepine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "抗てんかん薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "carbamazepine",
+        "epilepsy",
+        "trigeminal",
+        "neuralgia"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗てんかん薬"
+    },
+    "フェニトイン": {
+      "ja": "フェニトイン",
+      "en": "phenytoin",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "抗てんかん薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "phenytoin",
+        "epilepsy",
+        "status",
+        "epilepticus",
+        "Na",
+        "channel"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗てんかん薬"
+    },
+    "フェノバルビタール": {
+      "ja": "フェノバルビタール",
+      "en": "phenobarbital",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "バルビツール酸系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "phenobarbital",
+        "barbiturate",
+        "epilepsy",
+        "sedative",
+        "neonatal",
+        "seizure"
+      ],
+      "category": "薬剤",
+      "drug_effect": "バルビツール酸系"
+    },
+    "ラモトリギン": {
+      "ja": "ラモトリギン",
+      "en": "lamotrigine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "抗てんかん薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "lamotrigine",
+        "epilepsy",
+        "bipolar",
+        "Na",
+        "channel"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗てんかん薬"
+    },
+    "レベチラセタム": {
+      "ja": "レベチラセタム",
+      "en": "levetiracetam",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "抗てんかん薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "levetiracetam",
+        "epilepsy",
+        "SV2A"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗てんかん薬"
+    },
+    "クロバザム": {
+      "ja": "クロバザム",
+      "en": "clobazam",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "ベンゾジアゼピン系抗てんかん薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "clobazam",
+        "benzodiazepine",
+        "epilepsy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ベンゾジアゼピン系抗てんかん薬"
+    },
+    "スマトリプタン": {
+      "ja": "スマトリプタン",
+      "en": "sumatriptan",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "トリプタン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sumatriptan",
+        "triptan",
+        "5-HT1B",
+        "migraine"
+      ],
+      "category": "薬剤",
+      "drug_effect": "トリプタン系"
+    },
+    "エレトリプタン": {
+      "ja": "エレトリプタン",
+      "en": "eletriptan",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "トリプタン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "eletriptan",
+        "triptan",
+        "migraine"
+      ],
+      "category": "薬剤",
+      "drug_effect": "トリプタン系"
+    },
+    "アセタゾラミド": {
+      "ja": "アセタゾラミド",
+      "en": "acetazolamide",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "炭酸脱水酵素阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "acetazolamide",
+        "carbonic",
+        "anhydrase",
+        "altitude",
+        "pseudotumor",
+        "glaucoma",
+        "IOP"
+      ],
+      "category": "薬剤",
+      "drug_effect": "炭酸脱水酵素阻害薬"
+    },
+    "エダラボン": {
+      "ja": "エダラボン",
+      "en": "edaravone",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "神経保護薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "edaravone",
+        "free",
+        "radical",
+        "scavenger",
+        "ALS",
+        "stroke",
+        "neuroprotection"
+      ],
+      "category": "薬剤",
+      "drug_effect": "神経保護薬"
+    },
+    "リルゾール": {
+      "ja": "リルゾール",
+      "en": "riluzole",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "ALS治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "riluzole",
+        "ALS",
+        "glutamate"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ALS治療薬"
+    },
+    "ナタリズマブ": {
+      "ja": "ナタリズマブ",
+      "en": "natalizumab",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "多発性硬化症治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "natalizumab",
+        "anti-alpha4",
+        "integrin",
+        "MS",
+        "multiple",
+        "sclerosis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "多発性硬化症治療薬"
+    },
+    "インターフェロンβ": {
+      "ja": "インターフェロンβ",
+      "en": "interferon",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "多発性硬化症治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "interferon",
+        "beta",
+        "MS",
+        "multiple",
+        "sclerosis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "多発性硬化症治療薬"
+    },
+    "チザニジン": {
+      "ja": "チザニジン",
+      "en": "tizanidine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "筋弛緩薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "tizanidine",
+        "alpha-2",
+        "agonist",
+        "spasticity"
+      ],
+      "category": "薬剤",
+      "drug_effect": "筋弛緩薬"
+    },
+    "バクロフェン": {
+      "ja": "バクロフェン",
+      "en": "baclofen",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "筋弛緩薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "baclofen",
+        "GABA-B",
+        "agonist",
+        "spasticity"
+      ],
+      "category": "薬剤",
+      "drug_effect": "筋弛緩薬"
+    },
+    "ジアゼパム": {
+      "ja": "ジアゼパム",
+      "en": "diazepam",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "ベンゾジアゼピン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "diazepam",
+        "benzodiazepine",
+        "status",
+        "epilepticus",
+        "sedation",
+        "anxiolytic",
+        "sedative"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ベンゾジアゼピン系"
+    },
+    "ハロペリドール": {
+      "ja": "ハロペリドール",
+      "en": "haloperidol",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "定型抗精神病薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "haloperidol",
+        "typical",
+        "antipsychotic",
+        "D2",
+        "blocker"
+      ],
+      "category": "薬剤",
+      "drug_effect": "定型抗精神病薬"
+    },
+    "クロルプロマジン": {
+      "ja": "クロルプロマジン",
+      "en": "chlorpromazine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "定型抗精神病薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "chlorpromazine",
+        "typical",
+        "antipsychotic",
+        "phenothiazine"
+      ],
+      "category": "薬剤",
+      "drug_effect": "定型抗精神病薬"
+    },
+    "リスペリドン": {
+      "ja": "リスペリドン",
+      "en": "risperidone",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "非定型抗精神病薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "risperidone",
+        "atypical",
+        "antipsychotic",
+        "SDA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "非定型抗精神病薬"
+    },
+    "オランザピン": {
+      "ja": "オランザピン",
+      "en": "olanzapine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "非定型抗精神病薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "olanzapine",
+        "atypical",
+        "antipsychotic",
+        "MARTA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "非定型抗精神病薬"
+    },
+    "クエチアピン": {
+      "ja": "クエチアピン",
+      "en": "quetiapine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "非定型抗精神病薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "quetiapine",
+        "atypical",
+        "antipsychotic",
+        "MARTA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "非定型抗精神病薬"
+    },
+    "アリピプラゾール": {
+      "ja": "アリピプラゾール",
+      "en": "aripiprazole",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "非定型抗精神病薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "aripiprazole",
+        "atypical",
+        "antipsychotic",
+        "partial",
+        "dopamine",
+        "agonist"
+      ],
+      "category": "薬剤",
+      "drug_effect": "非定型抗精神病薬"
+    },
+    "クロザピン": {
+      "ja": "クロザピン",
+      "en": "clozapine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "非定型抗精神病薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "clozapine",
+        "atypical",
+        "antipsychotic",
+        "treatment",
+        "resistant",
+        "agranulocytosis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "非定型抗精神病薬"
+    },
+    "パリペリドン": {
+      "ja": "パリペリドン",
+      "en": "paliperidone",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "非定型抗精神病薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "paliperidone",
+        "atypical",
+        "antipsychotic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "非定型抗精神病薬"
+    },
+    "リチウム": {
+      "ja": "リチウム",
+      "en": "lithium",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "気分安定薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "lithium",
+        "mood",
+        "stabilizer",
+        "bipolar",
+        "mania"
+      ],
+      "category": "薬剤",
+      "drug_effect": "気分安定薬"
+    },
+    "フルオキセチン": {
+      "ja": "フルオキセチン",
+      "en": "fluoxetine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "SSRI",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "fluoxetine",
+        "SSRI",
+        "antidepressant"
+      ],
+      "category": "薬剤",
+      "drug_effect": "SSRI"
+    },
+    "パロキセチン": {
+      "ja": "パロキセチン",
+      "en": "paroxetine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "SSRI",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "paroxetine",
+        "SSRI",
+        "antidepressant",
+        "anxiety",
+        "OCD"
+      ],
+      "category": "薬剤",
+      "drug_effect": "SSRI"
+    },
+    "セルトラリン": {
+      "ja": "セルトラリン",
+      "en": "sertraline",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "SSRI",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sertraline",
+        "SSRI",
+        "antidepressant"
+      ],
+      "category": "薬剤",
+      "drug_effect": "SSRI"
+    },
+    "エスシタロプラム": {
+      "ja": "エスシタロプラム",
+      "en": "escitalopram",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "SSRI",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "escitalopram",
+        "SSRI",
+        "antidepressant"
+      ],
+      "category": "薬剤",
+      "drug_effect": "SSRI"
+    },
+    "フルボキサミン": {
+      "ja": "フルボキサミン",
+      "en": "fluvoxamine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "SSRI",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "fluvoxamine",
+        "SSRI",
+        "OCD"
+      ],
+      "category": "薬剤",
+      "drug_effect": "SSRI"
+    },
+    "ベンラファキシン": {
+      "ja": "ベンラファキシン",
+      "en": "venlafaxine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "SNRI",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "venlafaxine",
+        "SNRI",
+        "antidepressant"
+      ],
+      "category": "薬剤",
+      "drug_effect": "SNRI"
+    },
+    "デュロキセチン": {
+      "ja": "デュロキセチン",
+      "en": "duloxetine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "SNRI",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "duloxetine",
+        "SNRI",
+        "antidepressant",
+        "pain"
+      ],
+      "category": "薬剤",
+      "drug_effect": "SNRI"
+    },
+    "ミルタザピン": {
+      "ja": "ミルタザピン",
+      "en": "mirtazapine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "NaSSA",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "mirtazapine",
+        "NaSSA",
+        "antidepressant",
+        "alpha-2"
+      ],
+      "category": "薬剤",
+      "drug_effect": "NaSSA"
+    },
+    "アミトリプチリン": {
+      "ja": "アミトリプチリン",
+      "en": "amitriptyline",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "三環系抗うつ薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "amitriptyline",
+        "tricyclic",
+        "TCA",
+        "antidepressant"
+      ],
+      "category": "薬剤",
+      "drug_effect": "三環系抗うつ薬"
+    },
+    "イミプラミン": {
+      "ja": "イミプラミン",
+      "en": "imipramine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "三環系抗うつ薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "imipramine",
+        "tricyclic",
+        "TCA",
+        "enuresis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "三環系抗うつ薬"
+    },
+    "ノルトリプチリン": {
+      "ja": "ノルトリプチリン",
+      "en": "nortriptyline",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "三環系抗うつ薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "nortriptyline",
+        "tricyclic",
+        "TCA",
+        "antidepressant"
+      ],
+      "category": "薬剤",
+      "drug_effect": "三環系抗うつ薬"
+    },
+    "ロラゼパム": {
+      "ja": "ロラゼパム",
+      "en": "lorazepam",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "ベンゾジアゼピン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "lorazepam",
+        "benzodiazepine",
+        "anxiolytic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ベンゾジアゼピン系"
+    },
+    "アルプラゾラム": {
+      "ja": "アルプラゾラム",
+      "en": "alprazolam",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "ベンゾジアゼピン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "alprazolam",
+        "benzodiazepine",
+        "anxiety",
+        "panic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ベンゾジアゼピン系"
+    },
+    "トリアゾラム": {
+      "ja": "トリアゾラム",
+      "en": "triazolam",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "ベンゾジアゼピン系睡眠薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "triazolam",
+        "benzodiazepine",
+        "hypnotic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ベンゾジアゼピン系睡眠薬"
+    },
+    "ニトラゼパム": {
+      "ja": "ニトラゼパム",
+      "en": "nitrazepam",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "ベンゾジアゼピン系睡眠薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "nitrazepam",
+        "benzodiazepine",
+        "hypnotic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ベンゾジアゼピン系睡眠薬"
+    },
+    "ゾルピデム": {
+      "ja": "ゾルピデム",
+      "en": "zolpidem",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "非ベンゾジアゼピン系睡眠薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "zolpidem",
+        "non-benzodiazepine",
+        "Z-drug",
+        "hypnotic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "非ベンゾジアゼピン系睡眠薬"
+    },
+    "エスゾピクロン": {
+      "ja": "エスゾピクロン",
+      "en": "eszopiclone",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "非ベンゾジアゼピン系睡眠薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "eszopiclone",
+        "Z-drug",
+        "hypnotic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "非ベンゾジアゼピン系睡眠薬"
+    },
+    "スボレキサント": {
+      "ja": "スボレキサント",
+      "en": "suvorexant",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "オレキシン受容体拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "suvorexant",
+        "orexin",
+        "receptor",
+        "antagonist",
+        "hypnotic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "オレキシン受容体拮抗薬"
+    },
+    "レンボレキサント": {
+      "ja": "レンボレキサント",
+      "en": "lemborexant",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "オレキシン受容体拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "lemborexant",
+        "orexin",
+        "receptor",
+        "antagonist",
+        "hypnotic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "オレキシン受容体拮抗薬"
+    },
+    "メチルフェニデート": {
+      "ja": "メチルフェニデート",
+      "en": "methylphenidate",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "ADHD治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "methylphenidate",
+        "ADHD",
+        "stimulant",
+        "dopamine",
+        "reuptake"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ADHD治療薬"
+    },
+    "アトモキセチン": {
+      "ja": "アトモキセチン",
+      "en": "atomoxetine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "ADHD治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "atomoxetine",
+        "ADHD",
+        "norepinephrine",
+        "reuptake"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ADHD治療薬"
+    },
+    "ナルメフェン": {
+      "ja": "ナルメフェン",
+      "en": "nalmefene",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "アルコール依存症治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "nalmefene",
+        "opioid",
+        "antagonist",
+        "partial",
+        "agonist",
+        "alcohol"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アルコール依存症治療薬"
+    },
+    "ジスルフィラム": {
+      "ja": "ジスルフィラム",
+      "en": "disulfiram",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "抗酒薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "disulfiram",
+        "aldehyde",
+        "dehydrogenase",
+        "alcohol",
+        "aversion"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗酒薬"
+    },
+    "ナロキソン": {
+      "ja": "ナロキソン",
+      "en": "naloxone",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "オピオイド拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "naloxone",
+        "opioid",
+        "antagonist",
+        "reversal",
+        "antidote"
+      ],
+      "category": "薬剤",
+      "drug_effect": "オピオイド拮抗薬"
+    },
+    "ブプレノルフィン": {
+      "ja": "ブプレノルフィン",
+      "en": "buprenorphine",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "オピオイド部分作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "buprenorphine",
+        "partial",
+        "opioid",
+        "agonist",
+        "withdrawal"
+      ],
+      "category": "薬剤",
+      "drug_effect": "オピオイド部分作動薬"
+    },
+    "メサドン": {
+      "ja": "メサドン",
+      "en": "methadone",
+      "abbr": null,
+      "chapter": "精神科",
+      "section": "オピオイド作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "methadone",
+        "opioid",
+        "agonist",
+        "maintenance"
+      ],
+      "category": "薬剤",
+      "drug_effect": "オピオイド作動薬"
+    },
+    "オキシトシン": {
+      "ja": "オキシトシン",
+      "en": "oxytocin",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "子宮収縮薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "oxytocin",
+        "uterotonic",
+        "labor",
+        "induction"
+      ],
+      "category": "薬剤",
+      "drug_effect": "子宮収縮薬"
+    },
+    "エルゴメトリン": {
+      "ja": "エルゴメトリン",
+      "en": "ergometrine",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "子宮収縮薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ergometrine",
+        "ergot",
+        "postpartum",
+        "hemorrhage"
+      ],
+      "category": "薬剤",
+      "drug_effect": "子宮収縮薬"
+    },
+    "リトドリン": {
+      "ja": "リトドリン",
+      "en": "ritodrine",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "子宮収縮抑制薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ritodrine",
+        "beta-2",
+        "tocolytic",
+        "preterm"
+      ],
+      "category": "薬剤",
+      "drug_effect": "子宮収縮抑制薬"
+    },
+    "プロゲステロン": {
+      "ja": "プロゲステロン",
+      "en": "progesterone",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "ホルモン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "progesterone",
+        "luteal",
+        "phase",
+        "luteinizing"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ホルモン"
+    },
+    "エストラジオール": {
+      "ja": "エストラジオール",
+      "en": "estradiol",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "ホルモン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "estradiol",
+        "estrogen",
+        "HRT",
+        "hormone",
+        "replacement"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ホルモン"
+    },
+    "クロミフェン": {
+      "ja": "クロミフェン",
+      "en": "clomiphene",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "排卵誘発薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "clomiphene",
+        "clomid",
+        "ovulation",
+        "induction",
+        "SERM"
+      ],
+      "category": "薬剤",
+      "drug_effect": "排卵誘発薬"
+    },
+    "硫酸マグネシウム": {
+      "ja": "硫酸マグネシウム",
+      "en": "magnesium",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "子癇・子宮収縮抑制",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "magnesium",
+        "sulfate",
+        "eclampsia",
+        "preeclampsia",
+        "tocolytic",
+        "seizure"
+      ],
+      "category": "薬剤",
+      "drug_effect": "子癇・子宮収縮抑制"
+    },
+    "ヒドララジン": {
+      "ja": "ヒドララジン",
+      "en": "hydralazine",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "降圧薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "hydralazine",
+        "hypertension",
+        "pregnancy",
+        "vasodilator"
+      ],
+      "category": "薬剤",
+      "drug_effect": "降圧薬"
+    },
+    "ラベタロール": {
+      "ja": "ラベタロール",
+      "en": "labetalol",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "降圧薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "labetalol",
+        "alpha",
+        "beta",
+        "blocker",
+        "hypertension",
+        "pregnancy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "降圧薬"
+    },
+    "レボノルゲストレル": {
+      "ja": "レボノルゲストレル",
+      "en": "levonorgestrel",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "緊急避妊薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "levonorgestrel",
+        "emergency",
+        "contraception",
+        "morning",
+        "after"
+      ],
+      "category": "薬剤",
+      "drug_effect": "緊急避妊薬"
+    },
+    "タモキシフェン": {
+      "ja": "タモキシフェン",
+      "en": "tamoxifen",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "抗エストロゲン薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "tamoxifen",
+        "SERM",
+        "anti-estrogen",
+        "breast",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗エストロゲン薬"
+    },
+    "レトロゾール": {
+      "ja": "レトロゾール",
+      "en": "letrozole",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "アロマターゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "letrozole",
+        "aromatase",
+        "inhibitor",
+        "breast",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アロマターゼ阻害薬"
+    },
+    "アナストロゾール": {
+      "ja": "アナストロゾール",
+      "en": "anastrozole",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "アロマターゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "anastrozole",
+        "aromatase",
+        "inhibitor",
+        "breast",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アロマターゼ阻害薬"
+    },
+    "トラスツズマブ": {
+      "ja": "トラスツズマブ",
+      "en": "trastuzumab",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "抗HER2抗体",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "trastuzumab",
+        "herceptin",
+        "HER2",
+        "breast",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗HER2抗体"
+    },
+    "GnRHアゴニスト": {
+      "ja": "GnRHアゴニスト",
+      "en": "GnRH",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "GnRHアゴニスト",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "GnRH",
+        "agonist",
+        "leuprolide",
+        "endometriosis",
+        "prostate",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "GnRHアゴニスト"
+    },
+    "ダナゾール": {
+      "ja": "ダナゾール",
+      "en": "danazol",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "男性ホルモン誘導体",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "danazol",
+        "androgen",
+        "endometriosis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "男性ホルモン誘導体"
+    },
+    "ビタミンK": {
+      "ja": "ビタミンK",
+      "en": "vitamin",
+      "abbr": null,
+      "chapter": "小児科",
+      "section": "ビタミン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "vitamin",
+        "K",
+        "phytonadione",
+        "hemorrhagic",
+        "disease",
+        "newborn",
+        "warfarin",
+        "reversal",
+        "anticoagulant",
+        "reversal"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ビタミン"
+    },
+    "サーファクタント": {
+      "ja": "サーファクタント",
+      "en": "surfactant",
+      "abbr": null,
+      "chapter": "小児科",
+      "section": "肺サーファクタント",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "surfactant",
+        "RDS",
+        "respiratory",
+        "distress",
+        "syndrome",
+        "neonatal"
+      ],
+      "category": "薬剤",
+      "drug_effect": "肺サーファクタント"
+    },
+    "カフェイン": {
+      "ja": "カフェイン",
+      "en": "caffeine",
+      "abbr": null,
+      "chapter": "小児科",
+      "section": "キサンチン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "caffeine",
+        "methylxanthine",
+        "apnea",
+        "prematurity"
+      ],
+      "category": "薬剤",
+      "drug_effect": "キサンチン系"
+    },
+    "インドメタシン": {
+      "ja": "インドメタシン",
+      "en": "indomethacin",
+      "abbr": null,
+      "chapter": "小児科",
+      "section": "NSAIDs",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "indomethacin",
+        "PDA",
+        "patent",
+        "ductus",
+        "arteriosus",
+        "NSAIDs",
+        "gout"
+      ],
+      "category": "薬剤",
+      "drug_effect": "NSAIDs"
+    },
+    "イブプロフェン": {
+      "ja": "イブプロフェン",
+      "en": "ibuprofen",
+      "abbr": null,
+      "chapter": "小児科",
+      "section": "NSAIDs",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ibuprofen",
+        "PDA",
+        "NSAIDs"
+      ],
+      "category": "薬剤",
+      "drug_effect": "NSAIDs"
+    },
+    "免疫グロブリン": {
+      "ja": "免疫グロブリン",
+      "en": "immunoglobulin",
+      "abbr": null,
+      "chapter": "小児科",
+      "section": "免疫グロブリン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "immunoglobulin",
+        "IVIG",
+        "Kawasaki",
+        "ITP"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫グロブリン"
+    },
+    "ペニシリン": {
+      "ja": "ペニシリン",
+      "en": "penicillin",
+      "abbr": null,
+      "chapter": "小児科",
+      "section": "ペニシリン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "penicillin",
+        "streptococcal",
+        "rheumatic",
+        "fever",
+        "prophylaxis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ペニシリン系"
+    },
+    "デュピルマブ": {
+      "ja": "デュピルマブ",
+      "en": "dupilumab",
+      "abbr": null,
+      "chapter": "皮膚科",
+      "section": "生物学的製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dupilumab",
+        "IL-4",
+        "IL-13",
+        "anti",
+        "atopic",
+        "dermatitis",
+        "biological"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤"
+    },
+    "イソトレチノイン": {
+      "ja": "イソトレチノイン",
+      "en": "isotretinoin",
+      "abbr": null,
+      "chapter": "皮膚科",
+      "section": "レチノイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "isotretinoin",
+        "retinoid",
+        "acne",
+        "vitamin",
+        "A"
+      ],
+      "category": "薬剤",
+      "drug_effect": "レチノイド"
+    },
+    "アシトレチン": {
+      "ja": "アシトレチン",
+      "en": "acitretin",
+      "abbr": null,
+      "chapter": "皮膚科",
+      "section": "レチノイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "acitretin",
+        "retinoid",
+        "psoriasis",
+        "vitamin",
+        "A"
+      ],
+      "category": "薬剤",
+      "drug_effect": "レチノイド"
+    },
+    "ダプソン": {
+      "ja": "ダプソン",
+      "en": "dapsone",
+      "abbr": null,
+      "chapter": "皮膚科",
+      "section": "サルファ薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dapsone",
+        "dermatitis",
+        "herpetiformis",
+        "leprosy",
+        "sulfa"
+      ],
+      "category": "薬剤",
+      "drug_effect": "サルファ薬"
+    },
+    "セクキヌマブ": {
+      "ja": "セクキヌマブ",
+      "en": "secukinumab",
+      "abbr": null,
+      "chapter": "皮膚科",
+      "section": "生物学的製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "secukinumab",
+        "IL-17",
+        "psoriasis",
+        "biological"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤"
+    },
+    "ウステキヌマブ": {
+      "ja": "ウステキヌマブ",
+      "en": "ustekinumab",
+      "abbr": null,
+      "chapter": "皮膚科",
+      "section": "生物学的製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ustekinumab",
+        "IL-12",
+        "IL-23",
+        "psoriasis",
+        "biological"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤"
+    },
+    "ラタノプロスト": {
+      "ja": "ラタノプロスト",
+      "en": "latanoprost",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "プロスタグランジン製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "latanoprost",
+        "prostaglandin",
+        "F2",
+        "glaucoma",
+        "IOP"
+      ],
+      "category": "薬剤",
+      "drug_effect": "プロスタグランジン製剤"
+    },
+    "チモロール": {
+      "ja": "チモロール",
+      "en": "timolol",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "β遮断薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "timolol",
+        "beta",
+        "blocker",
+        "glaucoma",
+        "topical",
+        "IOP"
+      ],
+      "category": "薬剤",
+      "drug_effect": "β遮断薬"
+    },
+    "ブリモニジン": {
+      "ja": "ブリモニジン",
+      "en": "brimonidine",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "α2作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "brimonidine",
+        "alpha-2",
+        "agonist",
+        "glaucoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "α2作動薬"
+    },
+    "ピロカルピン": {
+      "ja": "ピロカルピン",
+      "en": "pilocarpine",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "縮瞳薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pilocarpine",
+        "muscarinic",
+        "miotic",
+        "glaucoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "縮瞳薬"
+    },
+    "ラニビズマブ": {
+      "ja": "ラニビズマブ",
+      "en": "ranibizumab",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "抗VEGF薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ranibizumab",
+        "anti-VEGF",
+        "AMD",
+        "wet",
+        "macular",
+        "degeneration"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗VEGF薬"
+    },
+    "アフリベルセプト": {
+      "ja": "アフリベルセプト",
+      "en": "aflibercept",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "抗VEGF薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "aflibercept",
+        "anti-VEGF",
+        "VEGF",
+        "trap",
+        "AMD"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗VEGF薬"
+    },
+    "ベバシズマブ": {
+      "ja": "ベバシズマブ",
+      "en": "bevacizumab",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "抗VEGF薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "bevacizumab",
+        "anti-VEGF",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗VEGF薬"
+    },
+    "ベタヒスチン": {
+      "ja": "ベタヒスチン",
+      "en": "betahistine",
+      "abbr": null,
+      "chapter": "耳鼻咽喉科",
+      "section": "内耳循環改善薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "betahistine",
+        "Meniere",
+        "vertigo",
+        "histamine"
+      ],
+      "category": "薬剤",
+      "drug_effect": "内耳循環改善薬"
+    },
+    "セレコキシブ": {
+      "ja": "セレコキシブ",
+      "en": "celecoxib",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "COX-2選択的阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "celecoxib",
+        "COX-2",
+        "selective",
+        "NSAIDs"
+      ],
+      "category": "薬剤",
+      "drug_effect": "COX-2選択的阻害薬"
+    },
+    "ロキソプロフェン": {
+      "ja": "ロキソプロフェン",
+      "en": "loxoprofen",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "NSAIDs",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "loxoprofen",
+        "NSAIDs",
+        "pain",
+        "anti-inflammatory"
+      ],
+      "category": "薬剤",
+      "drug_effect": "NSAIDs"
+    },
+    "ジクロフェナク": {
+      "ja": "ジクロフェナク",
+      "en": "diclofenac",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "NSAIDs",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "diclofenac",
+        "NSAIDs",
+        "pain"
+      ],
+      "category": "薬剤",
+      "drug_effect": "NSAIDs"
+    },
+    "ナプロキセン": {
+      "ja": "ナプロキセン",
+      "en": "naproxen",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "NSAIDs",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "naproxen",
+        "NSAIDs"
+      ],
+      "category": "薬剤",
+      "drug_effect": "NSAIDs"
+    },
+    "トラマドール": {
+      "ja": "トラマドール",
+      "en": "tramadol",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "弱オピオイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "tramadol",
+        "weak",
+        "opioid",
+        "pain"
+      ],
+      "category": "薬剤",
+      "drug_effect": "弱オピオイド"
+    },
+    "モルヒネ": {
+      "ja": "モルヒネ",
+      "en": "morphine",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "オピオイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "morphine",
+        "opioid",
+        "mu",
+        "receptor",
+        "pain",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "オピオイド"
+    },
+    "オキシコドン": {
+      "ja": "オキシコドン",
+      "en": "oxycodone",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "オピオイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "oxycodone",
+        "opioid",
+        "pain"
+      ],
+      "category": "薬剤",
+      "drug_effect": "オピオイド"
+    },
+    "フェンタニル": {
+      "ja": "フェンタニル",
+      "en": "fentanyl",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "オピオイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "fentanyl",
+        "opioid",
+        "transdermal",
+        "patch",
+        "pain"
+      ],
+      "category": "薬剤",
+      "drug_effect": "オピオイド"
+    },
+    "プレガバリン": {
+      "ja": "プレガバリン",
+      "en": "pregabalin",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "神経障害性疼痛治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pregabalin",
+        "calcium",
+        "channel",
+        "neuropathic",
+        "pain"
+      ],
+      "category": "薬剤",
+      "drug_effect": "神経障害性疼痛治療薬"
+    },
+    "ガバペンチン": {
+      "ja": "ガバペンチン",
+      "en": "gabapentin",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "神経障害性疼痛治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "gabapentin",
+        "calcium",
+        "channel",
+        "neuropathic",
+        "pain",
+        "epilepsy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "神経障害性疼痛治療薬"
+    },
+    "エトドラク": {
+      "ja": "エトドラク",
+      "en": "etodolac",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "NSAIDs",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "etodolac",
+        "COX-2",
+        "NSAIDs"
+      ],
+      "category": "薬剤",
+      "drug_effect": "NSAIDs"
+    },
+    "フルマゼニル": {
+      "ja": "フルマゼニル",
+      "en": "flumazenil",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "ベンゾジアゼピン拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "flumazenil",
+        "benzodiazepine",
+        "reversal",
+        "antidote"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ベンゾジアゼピン拮抗薬"
+    },
+    "プロタミン": {
+      "ja": "プロタミン",
+      "en": "protamine",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "ヘパリン拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "protamine",
+        "heparin",
+        "reversal",
+        "antidote"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ヘパリン拮抗薬"
+    },
+    "アセトアミノフェン": {
+      "ja": "アセトアミノフェン",
+      "en": "acetaminophen",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "解熱鎮痛薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "acetaminophen",
+        "paracetamol",
+        "antipyretic",
+        "analgesic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "解熱鎮痛薬"
+    },
+    "N-アセチルシステイン": {
+      "ja": "N-アセチルシステイン",
+      "en": "N-acetylcysteine",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "アセトアミノフェン中毒解毒薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "N-acetylcysteine",
+        "NAC",
+        "acetaminophen",
+        "overdose",
+        "antidote"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アセトアミノフェン中毒解毒薬"
+    },
+    "ミダゾラム": {
+      "ja": "ミダゾラム",
+      "en": "midazolam",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "鎮静薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "midazolam",
+        "benzodiazepine",
+        "sedation",
+        "ICU"
+      ],
+      "category": "薬剤",
+      "drug_effect": "鎮静薬"
+    },
+    "デクスメデトミジン": {
+      "ja": "デクスメデトミジン",
+      "en": "dexmedetomidine",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "α2作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dexmedetomidine",
+        "alpha-2",
+        "agonist",
+        "sedation",
+        "ICU"
+      ],
+      "category": "薬剤",
+      "drug_effect": "α2作動薬"
+    },
+    "ロクロニウム": {
+      "ja": "ロクロニウム",
+      "en": "rocuronium",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "筋弛緩薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "rocuronium",
+        "neuromuscular",
+        "blocking",
+        "agent",
+        "NMBA"
+      ],
+      "category": "薬剤",
+      "drug_effect": "筋弛緩薬"
+    },
+    "スキサメトニウム": {
+      "ja": "スキサメトニウム",
+      "en": "succinylcholine",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "脱分極性筋弛緩薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "succinylcholine",
+        "suxamethonium",
+        "depolarizing",
+        "NMBA",
+        "RSI"
+      ],
+      "category": "薬剤",
+      "drug_effect": "脱分極性筋弛緩薬"
+    },
+    "重炭酸ナトリウム": {
+      "ja": "重炭酸ナトリウム",
+      "en": "sodium",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "アルカリ化薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sodium",
+        "bicarbonate",
+        "metabolic",
+        "acidosis",
+        "TCA",
+        "overdose"
+      ],
+      "category": "薬剤",
+      "drug_effect": "アルカリ化薬"
+    },
+    "チオ硫酸ナトリウム": {
+      "ja": "チオ硫酸ナトリウム",
+      "en": "sodium",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "シアン中毒解毒薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sodium",
+        "thiosulfate",
+        "cyanide",
+        "antidote"
+      ],
+      "category": "薬剤",
+      "drug_effect": "シアン中毒解毒薬"
+    },
+    "プラリドキシム": {
+      "ja": "プラリドキシム",
+      "en": "pralidoxime",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "有機リン中毒解毒薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pralidoxime",
+        "2-PAM",
+        "organophosphate",
+        "antidote"
+      ],
+      "category": "薬剤",
+      "drug_effect": "有機リン中毒解毒薬"
+    },
+    "デスフェラール": {
+      "ja": "デスフェラール",
+      "en": "desferrioxamine",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "鉄中毒解毒薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "desferrioxamine",
+        "deferoxamine",
+        "iron",
+        "toxicity"
+      ],
+      "category": "薬剤",
+      "drug_effect": "鉄中毒解毒薬"
+    },
+    "ベタメタゾン": {
+      "ja": "ベタメタゾン",
+      "en": "betamethasone",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "ステロイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "betamethasone",
+        "steroid",
+        "glucocorticoid",
+        "fetal",
+        "lung",
+        "maturity"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ステロイド"
+    },
+    "トリアムシノロン": {
+      "ja": "トリアムシノロン",
+      "en": "triamcinolone",
+      "abbr": null,
+      "chapter": "膠原病・免疫",
+      "section": "ステロイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "triamcinolone",
+        "steroid",
+        "injection"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ステロイド"
+    },
+    "フルオシノロン": {
+      "ja": "フルオシノロン",
+      "en": "fluocinolone",
+      "abbr": null,
+      "chapter": "皮膚科",
+      "section": "ステロイド",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "fluocinolone",
+        "topical",
+        "steroid"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ステロイド"
+    },
+    "ビソプロロール": {
+      "ja": "ビソプロロール",
+      "en": "bisoprolol",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "β遮断薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "bisoprolol",
+        "beta",
+        "blocker",
+        "heart",
+        "failure"
+      ],
+      "category": "薬剤",
+      "drug_effect": "β遮断薬"
+    },
+    "テルミサルタン": {
+      "ja": "テルミサルタン",
+      "en": "telmisartan",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "ARB",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "telmisartan",
+        "ARB"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ARB"
+    },
+    "バルサルタン": {
+      "ja": "バルサルタン",
+      "en": "valsartan",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "ARB",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "valsartan",
+        "ARB"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ARB"
+    },
+    "イルベサルタン": {
+      "ja": "イルベサルタン",
+      "en": "irbesartan",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "ARB",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "irbesartan",
+        "ARB"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ARB"
+    },
+    "イバブラジン": {
+      "ja": "イバブラジン",
+      "en": "ivabradine",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "洞結節抑制薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ivabradine",
+        "If",
+        "channel",
+        "heart",
+        "failure"
+      ],
+      "category": "薬剤",
+      "drug_effect": "洞結節抑制薬"
+    },
+    "サクビトリル": {
+      "ja": "サクビトリル",
+      "en": "sacubitril",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "ARNi",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sacubitril",
+        "valsartan",
+        "entresto",
+        "ARNi",
+        "heart",
+        "failure"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ARNi"
+    },
+    "エプレレノン": {
+      "ja": "エプレレノン",
+      "en": "eplerenone",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "抗アルドステロン薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "eplerenone",
+        "aldosterone",
+        "antagonist"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗アルドステロン薬"
+    },
+    "ニトロプルシド": {
+      "ja": "ニトロプルシド",
+      "en": "sodium",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "血管拡張薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sodium",
+        "nitroprusside",
+        "vasodilator"
+      ],
+      "category": "薬剤",
+      "drug_effect": "血管拡張薬"
+    },
+    "ミルリノン": {
+      "ja": "ミルリノン",
+      "en": "milrinone",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "強心薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "milrinone",
+        "PDE3",
+        "inotrope"
+      ],
+      "category": "薬剤",
+      "drug_effect": "強心薬"
+    },
+    "ランジオロール": {
+      "ja": "ランジオロール",
+      "en": "landiolol",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "β遮断薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "landiolol",
+        "beta",
+        "blocker",
+        "IV"
+      ],
+      "category": "薬剤",
+      "drug_effect": "β遮断薬"
+    },
+    "ソマトロピン": {
+      "ja": "ソマトロピン",
+      "en": "somatropin",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "成長ホルモン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "somatropin",
+        "growth",
+        "hormone",
+        "GH"
+      ],
+      "category": "薬剤",
+      "drug_effect": "成長ホルモン"
+    },
+    "コルチコトロピン": {
+      "ja": "コルチコトロピン",
+      "en": "corticotropin",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "ACTH",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "corticotropin",
+        "ACTH"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ACTH"
+    },
+    "ミトタン": {
+      "ja": "ミトタン",
+      "en": "mitotane",
+      "abbr": null,
+      "chapter": "内分泌・代謝",
+      "section": "副腎皮質癌治療薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "mitotane",
+        "adrenocortical",
+        "carcinoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "副腎皮質癌治療薬"
+    },
+    "エボロクマブ": {
+      "ja": "エボロクマブ",
+      "en": "evolocumab",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "PCSK9阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "evolocumab",
+        "PCSK9",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "PCSK9阻害薬"
+    },
+    "アリロクマブ": {
+      "ja": "アリロクマブ",
+      "en": "alirocumab",
+      "abbr": null,
+      "chapter": "循環器",
+      "section": "PCSK9阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "alirocumab",
+        "PCSK9",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "PCSK9阻害薬"
+    },
+    "コレスチラミン": {
+      "ja": "コレスチラミン",
+      "en": "cholestyramine",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "陰イオン交換樹脂",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "cholestyramine",
+        "bile",
+        "acid",
+        "sequestrant"
+      ],
+      "category": "薬剤",
+      "drug_effect": "陰イオン交換樹脂"
+    },
+    "スルファサラジン": {
+      "ja": "スルファサラジン",
+      "en": "sulfasalazine",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "サラゾスルファピリジン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sulfasalazine",
+        "5-ASA",
+        "rheumatoid",
+        "IBD"
+      ],
+      "category": "薬剤",
+      "drug_effect": "サラゾスルファピリジン"
+    },
+    "ベドリズマブ": {
+      "ja": "ベドリズマブ",
+      "en": "vedolizumab",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "生物学的製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "vedolizumab",
+        "integrin",
+        "IBD"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤"
+    },
+    "テルリプレシン": {
+      "ja": "テルリプレシン",
+      "en": "terlipressin",
+      "abbr": null,
+      "chapter": "消化器",
+      "section": "バソプレシンアナログ",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "terlipressin",
+        "vasopressin",
+        "hepatorenal"
+      ],
+      "category": "薬剤",
+      "drug_effect": "バソプレシンアナログ"
+    },
+    "スルバクタム": {
+      "ja": "スルバクタム",
+      "en": "sulbactam",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "β-ラクタマーゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "sulbactam",
+        "beta-lactamase",
+        "inhibitor"
+      ],
+      "category": "薬剤",
+      "drug_effect": "β-ラクタマーゼ阻害薬"
+    },
+    "タゾバクタム": {
+      "ja": "タゾバクタム",
+      "en": "tazobactam",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "β-ラクタマーゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "tazobactam",
+        "piperacillin",
+        "beta-lactamase"
+      ],
+      "category": "薬剤",
+      "drug_effect": "β-ラクタマーゼ阻害薬"
+    },
+    "クラブラン酸": {
+      "ja": "クラブラン酸",
+      "en": "clavulanic",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "β-ラクタマーゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "clavulanic",
+        "acid",
+        "amoxicillin",
+        "beta-lactamase"
+      ],
+      "category": "薬剤",
+      "drug_effect": "β-ラクタマーゼ阻害薬"
+    },
+    "コリスチン": {
+      "ja": "コリスチン",
+      "en": "colistin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "ポリミキシン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "colistin",
+        "polymyxin",
+        "E",
+        "MDR",
+        "gram-negative"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ポリミキシン系"
+    },
+    "フォスホマイシン": {
+      "ja": "フォスホマイシン",
+      "en": "fosfomycin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "ホスホマイシン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "fosfomycin",
+        "cell",
+        "wall",
+        "UTI"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ホスホマイシン系"
+    },
+    "リファブチン": {
+      "ja": "リファブチン",
+      "en": "rifabutin",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "リファマイシン系",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "rifabutin",
+        "MAC",
+        "rifamycin",
+        "HIV"
+      ],
+      "category": "薬剤",
+      "drug_effect": "リファマイシン系"
+    },
+    "エファビレンツ": {
+      "ja": "エファビレンツ",
+      "en": "efavirenz",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗HIV薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "efavirenz",
+        "NNRTI",
+        "HIV"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗HIV薬"
+    },
+    "エムトリシタビン": {
+      "ja": "エムトリシタビン",
+      "en": "emtricitabine",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗HIV薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "emtricitabine",
+        "FTC",
+        "NRTI",
+        "HIV"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗HIV薬"
+    },
+    "ラルテグラビル": {
+      "ja": "ラルテグラビル",
+      "en": "raltegravir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗HIV薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "raltegravir",
+        "integrase",
+        "inhibitor",
+        "HIV"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗HIV薬"
+    },
+    "アバカビル": {
+      "ja": "アバカビル",
+      "en": "abacavir",
+      "abbr": null,
+      "chapter": "感染症",
+      "section": "抗HIV薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "abacavir",
+        "NRTI",
+        "HIV",
+        "HLA-B5701"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗HIV薬"
+    },
+    "メトラゾン": {
+      "ja": "メトラゾン",
+      "en": "metolazone",
+      "abbr": null,
+      "chapter": "腎・泌尿器",
+      "section": "チアジド系利尿薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "metolazone",
+        "thiazide",
+        "diuretic"
+      ],
+      "category": "薬剤",
+      "drug_effect": "チアジド系利尿薬"
+    },
+    "エサキセレノン": {
+      "ja": "エサキセレノン",
+      "en": "esaxerenone",
+      "abbr": null,
+      "chapter": "腎・泌尿器",
+      "section": "ミネラルコルチコイド受容体拮抗薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "esaxerenone",
+        "aldosterone",
+        "antagonist",
+        "CKD"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ミネラルコルチコイド受容体拮抗薬"
+    },
+    "ゾニサミド": {
+      "ja": "ゾニサミド",
+      "en": "zonisamide",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "抗てんかん薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "zonisamide",
+        "epilepsy",
+        "Parkinson",
+        "Japan"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗てんかん薬"
+    },
+    "ペランパネル": {
+      "ja": "ペランパネル",
+      "en": "perampanel",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "抗てんかん薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "perampanel",
+        "AMPA",
+        "epilepsy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗てんかん薬"
+    },
+    "ラコサミド": {
+      "ja": "ラコサミド",
+      "en": "lacosamide",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "抗てんかん薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "lacosamide",
+        "Na",
+        "channel",
+        "epilepsy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗てんかん薬"
+    },
+    "エゾガビン": {
+      "ja": "エゾガビン",
+      "en": "ezogabine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "抗てんかん薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ezogabine",
+        "K",
+        "channel",
+        "epilepsy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗てんかん薬"
+    },
+    "オクスカルバゼピン": {
+      "ja": "オクスカルバゼピン",
+      "en": "oxcarbazepine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "抗てんかん薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "oxcarbazepine",
+        "Na",
+        "channel",
+        "epilepsy"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗てんかん薬"
+    },
+    "ロチゴチン": {
+      "ja": "ロチゴチン",
+      "en": "rotigotine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "ドパミン作動薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "rotigotine",
+        "dopamine",
+        "agonist",
+        "transdermal",
+        "Parkinson"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ドパミン作動薬"
+    },
+    "サフィナミド": {
+      "ja": "サフィナミド",
+      "en": "safinamide",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "MAO-B阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "safinamide",
+        "MAO-B",
+        "Parkinson"
+      ],
+      "category": "薬剤",
+      "drug_effect": "MAO-B阻害薬"
+    },
+    "ビペリデン": {
+      "ja": "ビペリデン",
+      "en": "biperiden",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "抗コリン薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "biperiden",
+        "anticholinergic",
+        "Parkinson"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗コリン薬"
+    },
+    "エドロホニウム": {
+      "ja": "エドロホニウム",
+      "en": "edrophonium",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "コリンエステラーゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "edrophonium",
+        "Tensilon",
+        "myasthenia",
+        "gravis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "コリンエステラーゼ阻害薬"
+    },
+    "ピリドスチグミン": {
+      "ja": "ピリドスチグミン",
+      "en": "pyridostigmine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "コリンエステラーゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pyridostigmine",
+        "myasthenia",
+        "gravis",
+        "AChEI"
+      ],
+      "category": "薬剤",
+      "drug_effect": "コリンエステラーゼ阻害薬"
+    },
+    "ネオスチグミン": {
+      "ja": "ネオスチグミン",
+      "en": "neostigmine",
+      "abbr": null,
+      "chapter": "神経",
+      "section": "コリンエステラーゼ阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "neostigmine",
+        "myasthenia",
+        "AChEI"
+      ],
+      "category": "薬剤",
+      "drug_effect": "コリンエステラーゼ阻害薬"
+    },
+    "ジノプロストン": {
+      "ja": "ジノプロストン",
+      "en": "dinoprostone",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "プロスタグランジン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dinoprostone",
+        "prostaglandin",
+        "E2",
+        "labor",
+        "induction",
+        "cervical",
+        "ripening"
+      ],
+      "category": "薬剤",
+      "drug_effect": "プロスタグランジン"
+    },
+    "カルボプロスト": {
+      "ja": "カルボプロスト",
+      "en": "carboprost",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "プロスタグランジン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "carboprost",
+        "prostaglandin",
+        "postpartum",
+        "hemorrhage"
+      ],
+      "category": "薬剤",
+      "drug_effect": "プロスタグランジン"
+    },
+    "ミフェプリストン": {
+      "ja": "ミフェプリストン",
+      "en": "mifepristone",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "抗プロゲスチン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "mifepristone",
+        "antiprogestin",
+        "RU-486"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗プロゲスチン"
+    },
+    "セトロレリクス": {
+      "ja": "セトロレリクス",
+      "en": "cetrorelix",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "GnRHアンタゴニスト",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "cetrorelix",
+        "GnRH",
+        "antagonist",
+        "IVF"
+      ],
+      "category": "薬剤",
+      "drug_effect": "GnRHアンタゴニスト"
+    },
+    "ゴセレリン": {
+      "ja": "ゴセレリン",
+      "en": "goserelin",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "GnRHアゴニスト",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "goserelin",
+        "GnRH",
+        "agonist",
+        "endometriosis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "GnRHアゴニスト"
+    },
+    "リュープロレリン": {
+      "ja": "リュープロレリン",
+      "en": "leuprorelin",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "GnRHアゴニスト",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "leuprorelin",
+        "GnRH",
+        "agonist",
+        "endometriosis",
+        "prostate"
+      ],
+      "category": "薬剤",
+      "drug_effect": "GnRHアゴニスト"
+    },
+    "メドロキシプロゲステロン": {
+      "ja": "メドロキシプロゲステロン",
+      "en": "medroxyprogesterone",
+      "abbr": null,
+      "chapter": "産婦人科",
+      "section": "プロゲスチン",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "medroxyprogesterone",
+        "MPA",
+        "endometrial",
+        "cancer"
+      ],
+      "category": "薬剤",
+      "drug_effect": "プロゲスチン"
+    },
+    "ダラツムマブ": {
+      "ja": "ダラツムマブ",
+      "en": "daratumumab",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "生物学的製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "daratumumab",
+        "anti-CD38",
+        "myeloma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤"
+    },
+    "イキサゾミブ": {
+      "ja": "イキサゾミブ",
+      "en": "ixazomib",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "プロテアソーム阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ixazomib",
+        "proteasome",
+        "inhibitor",
+        "oral",
+        "myeloma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "プロテアソーム阻害薬"
+    },
+    "カルフィルゾミブ": {
+      "ja": "カルフィルゾミブ",
+      "en": "carfilzomib",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "プロテアソーム阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "carfilzomib",
+        "proteasome",
+        "inhibitor",
+        "myeloma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "プロテアソーム阻害薬"
+    },
+    "ポマリドミド": {
+      "ja": "ポマリドミド",
+      "en": "pomalidomide",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "免疫調節薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "pomalidomide",
+        "IMiD",
+        "myeloma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫調節薬"
+    },
+    "ニロチニブ": {
+      "ja": "ニロチニブ",
+      "en": "nilotinib",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "分子標的薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "nilotinib",
+        "BCR-ABL",
+        "TKI",
+        "CML"
+      ],
+      "category": "薬剤",
+      "drug_effect": "分子標的薬"
+    },
+    "ポナチニブ": {
+      "ja": "ポナチニブ",
+      "en": "ponatinib",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "分子標的薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ponatinib",
+        "BCR-ABL",
+        "T315I",
+        "CML"
+      ],
+      "category": "薬剤",
+      "drug_effect": "分子標的薬"
+    },
+    "イブルチニブ": {
+      "ja": "イブルチニブ",
+      "en": "ibrutinib",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "BTK阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "ibrutinib",
+        "BTK",
+        "inhibitor",
+        "CLL",
+        "lymphoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "BTK阻害薬"
+    },
+    "ベネトクラクス": {
+      "ja": "ベネトクラクス",
+      "en": "venetoclax",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "BCL-2阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "venetoclax",
+        "BCL-2",
+        "inhibitor",
+        "CLL",
+        "AML"
+      ],
+      "category": "薬剤",
+      "drug_effect": "BCL-2阻害薬"
+    },
+    "オビヌツズマブ": {
+      "ja": "オビヌツズマブ",
+      "en": "obinutuzumab",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "生物学的製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "obinutuzumab",
+        "anti-CD20",
+        "CLL"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤"
+    },
+    "ミドスタウリン": {
+      "ja": "ミドスタウリン",
+      "en": "midostaurin",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "分子標的薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "midostaurin",
+        "FLT3",
+        "AML"
+      ],
+      "category": "薬剤",
+      "drug_effect": "分子標的薬"
+    },
+    "アザシチジン": {
+      "ja": "アザシチジン",
+      "en": "azacitidine",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "低メチル化薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "azacitidine",
+        "hypomethylating",
+        "MDS",
+        "AML"
+      ],
+      "category": "薬剤",
+      "drug_effect": "低メチル化薬"
+    },
+    "デシタビン": {
+      "ja": "デシタビン",
+      "en": "decitabine",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "低メチル化薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "decitabine",
+        "hypomethylating",
+        "MDS"
+      ],
+      "category": "薬剤",
+      "drug_effect": "低メチル化薬"
+    },
+    "エロツズマブ": {
+      "ja": "エロツズマブ",
+      "en": "elotuzumab",
+      "abbr": null,
+      "chapter": "血液",
+      "section": "生物学的製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "elotuzumab",
+        "SLAMF7",
+        "myeloma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "生物学的製剤"
+    },
+    "ミゾリビン": {
+      "ja": "ミゾリビン",
+      "en": "mizoribine",
+      "abbr": null,
+      "chapter": "小児科",
+      "section": "免疫抑制薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "mizoribine",
+        "purine",
+        "synthesis",
+        "inhibitor",
+        "nephrotic",
+        "Japan"
+      ],
+      "category": "薬剤",
+      "drug_effect": "免疫抑制薬"
+    },
+    "パリビズマブ": {
+      "ja": "パリビズマブ",
+      "en": "palivizumab",
+      "abbr": null,
+      "chapter": "小児科",
+      "section": "抗RSV抗体",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "palivizumab",
+        "RSV",
+        "prophylaxis",
+        "premature"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗RSV抗体"
+    },
+    "L-アスパラギナーゼ": {
+      "ja": "L-アスパラギナーゼ",
+      "en": "L-asparaginase",
+      "abbr": null,
+      "chapter": "小児科",
+      "section": "抗腫瘍薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "L-asparaginase",
+        "ALL",
+        "leukemia"
+      ],
+      "category": "薬剤",
+      "drug_effect": "抗腫瘍薬"
+    },
+    "メロキシカム": {
+      "ja": "メロキシカム",
+      "en": "meloxicam",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "NSAIDs",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "meloxicam",
+        "COX-2",
+        "preferential",
+        "NSAIDs"
+      ],
+      "category": "薬剤",
+      "drug_effect": "NSAIDs"
+    },
+    "エトリコキシブ": {
+      "ja": "エトリコキシブ",
+      "en": "etoricoxib",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "NSAIDs",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "etoricoxib",
+        "COX-2",
+        "NSAIDs"
+      ],
+      "category": "薬剤",
+      "drug_effect": "NSAIDs"
+    },
+    "ヒアルロン酸": {
+      "ja": "ヒアルロン酸",
+      "en": "hyaluronic",
+      "abbr": null,
+      "chapter": "整形外科",
+      "section": "関節内注射",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "hyaluronic",
+        "acid",
+        "injection",
+        "osteoarthritis"
+      ],
+      "category": "薬剤",
+      "drug_effect": "関節内注射"
+    },
+    "ヒドロキソコバラミン": {
+      "ja": "ヒドロキソコバラミン",
+      "en": "hydroxocobalamin",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "シアン中毒解毒薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "hydroxocobalamin",
+        "cyanide",
+        "antidote"
+      ],
+      "category": "薬剤",
+      "drug_effect": "シアン中毒解毒薬"
+    },
+    "亜硝酸アミル": {
+      "ja": "亜硝酸アミル",
+      "en": "amyl",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "解毒薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "amyl",
+        "nitrite",
+        "cyanide",
+        "hydrogen",
+        "sulfide",
+        "antidote"
+      ],
+      "category": "薬剤",
+      "drug_effect": "解毒薬"
+    },
+    "メチレンブルー": {
+      "ja": "メチレンブルー",
+      "en": "methylene",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "解毒薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "methylene",
+        "blue",
+        "methemoglobin",
+        "antidote"
+      ],
+      "category": "薬剤",
+      "drug_effect": "解毒薬"
+    },
+    "デキストラン": {
+      "ja": "デキストラン",
+      "en": "dextran",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "膠質輸液",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dextran",
+        "volume",
+        "expander",
+        "colloid"
+      ],
+      "category": "薬剤",
+      "drug_effect": "膠質輸液"
+    },
+    "アルブミン製剤": {
+      "ja": "アルブミン製剤",
+      "en": "albumin",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "膠質輸液",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "albumin",
+        "colloid",
+        "volume",
+        "expansion"
+      ],
+      "category": "薬剤",
+      "drug_effect": "膠質輸液"
+    },
+    "活性炭": {
+      "ja": "活性炭",
+      "en": "activated",
+      "abbr": null,
+      "chapter": "救急・集中治療",
+      "section": "消化管除染",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "activated",
+        "charcoal",
+        "oral",
+        "poisoning",
+        "decontamination"
+      ],
+      "category": "薬剤",
+      "drug_effect": "消化管除染"
+    },
+    "ブリンゾラミド": {
+      "ja": "ブリンゾラミド",
+      "en": "brinzolamide",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "炭酸脱水酵素阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "brinzolamide",
+        "carbonic",
+        "anhydrase",
+        "inhibitor",
+        "topical",
+        "glaucoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "炭酸脱水酵素阻害薬"
+    },
+    "ドルゾラミド": {
+      "ja": "ドルゾラミド",
+      "en": "dorzolamide",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "炭酸脱水酵素阻害薬",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "dorzolamide",
+        "carbonic",
+        "anhydrase",
+        "inhibitor",
+        "glaucoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "炭酸脱水酵素阻害薬"
+    },
+    "トラボプロスト": {
+      "ja": "トラボプロスト",
+      "en": "travoprost",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "プロスタグランジン製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "travoprost",
+        "prostaglandin",
+        "glaucoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "プロスタグランジン製剤"
+    },
+    "ビマトプロスト": {
+      "ja": "ビマトプロスト",
+      "en": "bimatoprost",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "プロスタグランジン製剤",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "bimatoprost",
+        "prostaglandin",
+        "glaucoma"
+      ],
+      "category": "薬剤",
+      "drug_effect": "プロスタグランジン製剤"
+    },
+    "フルオロメトロン": {
+      "ja": "フルオロメトロン",
+      "en": "fluorometholone",
+      "abbr": null,
+      "chapter": "眼科",
+      "section": "ステロイド点眼",
+      "importance": 2,
+      "has_QB": true,
+      "has_TOPICS": false,
+      "anki_search": [
+        "fluorometholone",
+        "topical",
+        "steroid",
+        "eye"
+      ],
+      "category": "薬剤",
+      "drug_effect": "ステロイド点眼"
     }
   },
   "schema_version": "2.2",
   "schema_notes": "chapter: イヤーノートはA-Nコード（A消化管/B肝胆膵/C循環器/D代謝内分泌/E腎泌尿/F免疫膠原病/G血液/H感染症/I呼吸器/J神経/K中毒/L救急/M麻酔科/N老年医学）。小児科・産婦人科・マイナーはレビューブックベースで分野名をそのまま使用。source_book: どの参考書から採取したか。anki_search: Ankiカード検索用英語キーワード（手動補完）。",
   "last_updated": "2026-04-26",
-  "description": "メシュラン全25章を取り込み済み（3062件追加）"
+  "description": "メシュラン全25章を取り込み済み（3062件追加）",
+  "updated": "2026-04-29"
 }

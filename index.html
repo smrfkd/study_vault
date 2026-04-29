@@ -1450,7 +1450,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.29.03";
+const APP_VERSION = "v2026.04.29.06";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -4336,12 +4336,12 @@ function _renderConceptsHtml(q, conceptsInfo, matchArea) {
   let html = `<div style="margin-top:14px;border-top:1px solid #e2e8f0;padding-top:14px">
     <div style="font-size:12px;font-weight:800;color:#553c9a;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       🗂️ 関連Ankiカード・スライド
-      <span style="font-size:10px;font-weight:400;color:#a0aec0">${concepts.filter(c=>(c.cards||[]).length>0).length}コンセプト・${concepts.reduce((n,c)=>n+(c.cards||[]).length,0)}枚</span>
+      <span style="font-size:10px;font-weight:400;color:#a0aec0">${concepts.filter(c=>(c.cards||[]).length>0).length}キーワード・${concepts.reduce((n,c)=>n+(c.cards||[]).length,0)}枚</span>
       ${resetBtn}
     </div>`;
 
   if (concepts.length === 0) {
-    html += `<div style="font-size:11px;color:#a0aec0;padding:8px 0">すべてのコンセプトを非表示にしました。${resetBtn}</div>`;
+    html += `<div style="font-size:11px;color:#a0aec0;padding:8px 0">すべてのキーワードを非表示にしました。${resetBtn}</div>`;
   }
 
   concepts.forEach((con, i) => {
