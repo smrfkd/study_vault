@@ -1450,7 +1450,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.04.29.06";
+const APP_VERSION = "v2026.05.04.01";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -1902,6 +1902,25 @@ async function syncFromCloud() {
         // moshiExams loaded from Firestore (no localStorage write)
       }
     }
+    // シードデータ（初回のみ自動追加）
+    const MOSHI_SEEDS = [
+      {
+        id: 'seed-medic-spring-2026',
+        name: 'メディックメディア医師国試プレ模試（春）',
+        date: '2026-04-27',
+        correct: 175,
+        total: 250,
+        memo: '必修85/100(85%)・一般臨床90/150(60%) ｜ 全国4738位/5698人・上位83% ｜ 判定: 一般D / 必修B ｜ 禁忌肢0/7 ｜ 弱点: 血液14%・循環器56%・眼科20%・耳鼻20%・中毒0%・麻酔0%・精神40%・皮膚40%'
+      }
+    ];
+    let _seeded = false;
+    for (const seed of MOSHI_SEEDS) {
+      if (!moshiExams.some(e => e.id === seed.id)) {
+        moshiExams.push(seed);
+        _seeded = true;
+      }
+    }
+    if (_seeded) await saveMoshiToCloud();
     await loadAnkiSRSFromCloud();
     _updateSyncStatus('同期済み ☁️', '#9ae6b4');
   } catch(e) {
@@ -2166,6 +2185,7 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
 let moshiExams = [];
 
 const MOSHI_CATALOG = [
+  { id: 'medic-spring-2026', name: 'メディックメディア医師国試プレ模試（春）', defaultTotal: 250 },
   { id: 'meck-spring-2026',  name: 'メック春模試 2026',           defaultTotal: 180 },
   { id: 'tecom-1',           name: '第1回 国試チャレンジ模擬試験', defaultTotal: 200 },
   { id: 'tecom-3',           name: '第3回 国試予想模擬試験',       defaultTotal: 200 },
@@ -7898,6 +7918,16 @@ function _ankiGetAllCards() {
     for (const c of arr) {
       const cid = c.id || c.plain;
       if (!seen.has(cid)) { seen.add(cid); cards.push({ ...c, qid }); }
+    }
+  }
+  // v2形式(ANKI_DECK_DATA)からselected/SRS済みのカードも追加
+  if (ANKI_DECK_DATA && ANKI_DECK_DATA.cards) {
+    for (const c of ANKI_DECK_DATA.cards) {
+      const cid = c.id || c.plain;
+      if (!seen.has(cid) && ankiCardSRS[cid]) {
+        seen.add(cid);
+        cards.push({ ...c });
+      }
     }
   }
   return cards;
