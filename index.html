@@ -2102,6 +2102,14 @@ function migrateTagNames() {
     }
   });
 
+  // ワンタイム修正: 117A37の正解をbに設定
+  questions.forEach(q => {
+    if (q.number === '117A37' && q.answer !== 'b') {
+      q.answer = 'b';
+      changed = true;
+    }
+  });
+
   if (changed) save();
 }
 function save() {
