@@ -1450,7 +1450,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.05.05.01";
+const APP_VERSION = "v2026.05.05.02";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -3840,7 +3840,7 @@ function _renderChoiceCheckPanel() {
   const skipAction = _choiceCheckIsWrong ? 'commitReason()' : 'recordAnswer(true)';
   const skipHtml = ratedCount < total ? `<div style="text-align:center;margin:14px 0 8px">
     <button onclick="${skipAction}"
-      style="font-size:14px;font-weight:700;padding:8px 26px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer;width:100%">
+      style="font-size:14px;font-weight:700;padding:16px 26px;background:#276749;color:white;border:none;border-radius:8px;cursor:pointer;width:100%">
       スキップして次の問題へ →
     </button>
     <div style="font-size:11px;color:#a0aec0;margin-top:5px">スキップ → 通常インターバル</div>
@@ -3852,8 +3852,8 @@ function _renderChoiceCheckPanel() {
       <span style="font-size:12px;color:#718096">${ratedCount} / ${total} 確認済</span>
     </div>
     ${cardsHtml}
-    ${skipHtml}
     ${pointHtml}
+    ${skipHtml}
     ${ctx?.popHTML || ''}
     <div id="choice-check-finalize"></div>
   </div>`;
