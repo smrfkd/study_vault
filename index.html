@@ -2102,10 +2102,11 @@ function migrateTagNames() {
     }
   });
 
-  // ワンタイム修正: 117A37の正解をbに設定
+  // ワンタイム修正: 正解フィールド修正
+  const _fixes = { '117A37': 'b', '117B15': 'c', '117A61': 'b', '116F9': 'b' };
   questions.forEach(q => {
-    if (q.number === '117A37' && q.answer !== 'b') {
-      q.answer = 'b';
+    if (_fixes[q.number] && q.answer !== _fixes[q.number]) {
+      q.answer = _fixes[q.number];
       changed = true;
     }
   });
