@@ -1450,7 +1450,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.05.04.01";
+const APP_VERSION = "v2026.05.05.01";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -6235,11 +6235,11 @@ function submitNumericAnswer() {
       </div>`;
   }
 
-  // 解説を全セクション表示で再レンダリング（studyModeで隠していた選択肢考察・ポイント等を表示）
+  // 解説を再レンダリング（選択肢考察・ポイントは選択肢理解チェックに表示済みのため引き続き非表示）
   const expEl = document.getElementById('qm-exp');
   const expEditWrap = document.getElementById('qm-exp-edit-wrap');
   if (expEl && !(expEditWrap && expEditWrap.style.display !== 'none')) {
-    expEl.innerHTML = renderExplanationStructured(q.explanation, { studyMode: false });
+    expEl.innerHTML = renderExplanationStructured(q.explanation, { studyMode: true });
   }
   // 大分野・中分野バッジを表示
   const catBadgeEl = document.getElementById('qm-category-reveal');
@@ -6287,11 +6287,11 @@ function revealAnswer() {
   document.getElementById('ans-revealed').style.display = 'block';
   // 前回の理解メモを解説確認後に表示（問題解答中はヒントになるので非表示）
   const q = queue[qIdx];
-  // 解説を全セクション表示で再レンダリング（studyMode:trueで隠していた選択肢考察・ポイント等を表示）
+  // 解説を再レンダリング（選択肢考察・ポイントは選択肢理解チェックに表示済みのため引き続き非表示）
   const expEl = document.getElementById('qm-exp');
   const expEditWrap = document.getElementById('qm-exp-edit-wrap');
   if (expEl && !(expEditWrap && expEditWrap.style.display !== 'none')) {
-    expEl.innerHTML = renderExplanationStructured(q.explanation, { studyMode: false });
+    expEl.innerHTML = renderExplanationStructured(q.explanation, { studyMode: true });
   }
   const prevMemo = document.getElementById('prev-feynman-memo');
   if (prevMemo && q && q.feynmanNote) {
