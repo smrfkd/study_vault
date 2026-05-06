@@ -128,7 +128,7 @@ select.form-input { cursor: pointer; }
 .study-mode-right { flex:1; min-width:0; background:#f0f7ff; border:1.5px solid #bee3f8; border-radius:14px; padding:16px 18px 18px; }
 .question-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
 .question-number { font-size: 11px; font-weight: 700; color: #a0aec0; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-.question-text { font-size: 16px; line-height: 1.9; color: #2d3748; margin-bottom: 24px; white-space: pre-wrap; }
+.question-text { font-size: 16px; line-height: 2.4; color: #2d3748; margin-bottom: 24px; }
 .choices { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
 .choice-btn { padding: 13px 18px; border: 2px solid #e2e8f0; border-radius: 10px; text-align: left; font-size: 14px; cursor: pointer; transition: all 0.2s; background: white; color: #2d3748; font-family: inherit; line-height: 1.5; display: flex; align-items: flex-start; gap: 4px; }
 .choice-btn:hover:not(:disabled) { border-color: #2b6cb0; background: #ebf8ff; }
@@ -165,10 +165,10 @@ select.form-input { cursor: pointer; }
 .assess-sb-bg { color: #065f46; background: #a7f3d0; }
 .assess-sb-ba { color: #78350f; background: #fde68a; }
 .assess-sb-bb { color: #1e40af; background: #bfdbfe; }
-.assess-sb-panel { list-style: none; margin: 0; padding: .5rem .75rem; background: #f0fdf8; border: 1px solid #a7f3d0; border-radius: 8px; }
-.assess-sb-panel li { display: flex; align-items: flex-start; gap: 7px; padding: 6px 0; border-bottom: .5px solid #a7f3d0; font-size: 13px; line-height: 1.5; }
+.assess-sb-panel { list-style: none; margin: 0; padding: .5rem .75rem; background: #f8fafc; border: .5px solid #e2e8f0; border-radius: 8px; }
+.assess-sb-panel li { display: flex; align-items: flex-start; gap: 7px; padding: 6px 0; border-bottom: .5px solid #e2e8f0; font-size: 13px; line-height: 1.5; }
 .assess-sb-panel li:last-child { border-bottom: none; }
-.assess-sb-sum { font-size: 13.5px; line-height: 2; color: #374151; margin-top: 10px; background: #f0fdf8; border-radius: 6px; padding: 10px 12px; border: 1px solid #a7f3d0; }
+.assess-sb-sum { font-size: 13.5px; line-height: 2; color: #374151; margin-top: 10px; background: #f8fafc; border-radius: 6px; padding: 10px 12px; border: .5px solid #e2e8f0; }
 
 /* Choice rows */
 .choice-row { padding: 9px 12px 9px 10px; border-radius: 7px; margin-bottom: 6px; }
@@ -1464,7 +1464,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.05.06.02";
+const APP_VERSION = "v2026.05.06.03";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -5533,7 +5533,7 @@ function showQ() {
   const prevMemoEl = document.getElementById('prev-feynman-memo');
   if (prevMemoEl) prevMemoEl.style.display = 'none';
   set('qm-num', `問題 ${qIdx+1} / ${queue.length}`);
-  document.getElementById('qm-text').innerHTML = renderTextWithImages(q.question);
+  document.getElementById('qm-text').innerHTML = renderTextWithImages(q.question, getAssessmentItems(q.explanation));
   document.getElementById('qm-exp').innerHTML = renderExplanationStructured(q.explanation, { studyMode: true, answer: q.answer, question: q.question });
   cancelExpEdit(); // 問題が変わったら解説編集モードをリセット
   _choiceCheckState = {}; _choiceCheckAll = []; _choiceCheckPointLines = []; _choiceCheckAnswerCtx = null;
@@ -5581,9 +5581,9 @@ const EXP_SECTION_DEFS = [
   { key: '**選択肢考察**',  type: 'choices',  label: '選択肢考察',  icon: '📋',
     hBg: '#dbeafe', hColor: '#1e40af', bBg: '#f0f7ff', border: '#bfdbfe' },
   { key: '**Assessment**',  type: 'generic',  label: 'Assessment',  icon: '🩺',
-    hBg: '#d1fae5', hColor: '#065f46', bBg: '#f0fdf8', border: '#a7f3d0' },
+    hBg: '#d1fae5', hColor: '#065f46', bBg: 'white',   border: '#a7f3d0' },
   { key: '**アセスメント**',type: 'generic',  label: 'アセスメント',icon: '🩺',
-    hBg: '#d1fae5', hColor: '#065f46', bBg: '#f0fdf8', border: '#a7f3d0' },
+    hBg: '#d1fae5', hColor: '#065f46', bBg: 'white',   border: '#a7f3d0' },
   { key: '**画像診断**',    type: 'generic',  label: '画像診断',    icon: '🩻',
     hBg: '#e0f2fe', hColor: '#0c4a6e', bBg: '#f0f9ff', border: '#bae6fd' },
   { key: '**画像所見**',    type: 'generic',  label: '画像所見',    icon: '🩻',
@@ -5817,6 +5817,23 @@ function renderPointsLines(lines) {
 }
 
 
+
+function getAssessmentItems(expText) {
+  if (!expText) return [];
+  const lines = expText.split('\n');
+  let inAssess = false; const aLines = [];
+  for (const line of lines) {
+    const tr = line.trim();
+    const def = EXP_SECTION_DEFS.find(d => tr.toLowerCase().startsWith(d.key.toLowerCase()));
+    if (def) {
+      inAssess = (def.label === 'Assessment' || def.label === 'アセスメント');
+      continue;
+    }
+    if (inAssess) aLines.push(line);
+  }
+  return parseAssessmentItems(aLines).items;
+}
+
 function parseAssessmentItems(lines) {
   const RE = /^([①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳])\s*(.*?)\s*[⇒→]\s*(.+)$/;
   const items = []; const summaryLines = []; let inSummary = false;
@@ -5872,11 +5889,7 @@ function renderAssessmentSidebar(lines, questionText) {
     sumHtml = `<div class="assess-sb-sum">${s}</div>`;
   }
 
-  if (questionText) {
-    const qHtml = `<div class="assess-sb-q">${highlightQuestion(questionText, items)}</div>`;
-    return `<div class="assess-sb">${qHtml}<ul class="assess-sb-panel">${listItems}</ul></div>${sumHtml}`;
-  }
-  return renderGenericLines(lines) + sumHtml;
+  return `<ul class="assess-sb-panel">${listItems}</ul>${sumHtml}`;
 }
 
 function renderGenericLines(lines) {
@@ -5904,7 +5917,7 @@ function renderInlineText(text) {
   return h;
 }
 
-function renderTextWithImages(text) {
+function renderTextWithImages(text, highlightItems = null) {
   /**
    * テキストをHTMLに変換（Obsidian形式の画像参照を<img>タグに変換）
    * 対応フォーマット:
@@ -5915,6 +5928,18 @@ function renderTextWithImages(text) {
    */
   // Step1: HTMLエスケープ（XSS防止）
   let html = escapeHtml(text);
+
+  // Step1.5: Assessmentハイライト適用
+  if (highlightItems && highlightItems.length) {
+    const sorted = [...highlightItems].sort((a, b) => b.quote.length - a.quote.length);
+    for (const item of sorted) {
+      if (!item.quote) continue;
+      const c = assessColor(item.meaning);
+      const eq = escapeHtml(item.quote);
+      const badge = `<span class="assess-sb-badge assess-sb-b${c}">${item.num}</span>`;
+      html = html.replace(eq, `<span class="assess-sb-hl-${c}">${eq}</span>${badge}`);
+    }
+  }
 
   // Step2: ![[ファイル名.拡張子]] → <img>（Obsidian形式）
   html = html.replace(/!\[\[([^\]]+\.(?:png|jpg|jpeg|gif|webp|svg|bmp))\]\]/gi,
