@@ -1464,7 +1464,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.05.06.03";
+const APP_VERSION = "v2026.05.06.04";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -5533,7 +5533,7 @@ function showQ() {
   const prevMemoEl = document.getElementById('prev-feynman-memo');
   if (prevMemoEl) prevMemoEl.style.display = 'none';
   set('qm-num', `問題 ${qIdx+1} / ${queue.length}`);
-  document.getElementById('qm-text').innerHTML = renderTextWithImages(q.question, getAssessmentItems(q.explanation));
+  document.getElementById('qm-text').innerHTML = renderTextWithImages(q.question);
   document.getElementById('qm-exp').innerHTML = renderExplanationStructured(q.explanation, { studyMode: true, answer: q.answer, question: q.question });
   cancelExpEdit(); // 問題が変わったら解説編集モードをリセット
   _choiceCheckState = {}; _choiceCheckAll = []; _choiceCheckPointLines = []; _choiceCheckAnswerCtx = null;
@@ -6415,6 +6415,8 @@ function revealAnswer() {
   document.getElementById('ans-revealed').style.display = 'block';
   // 前回の理解メモを解説確認後に表示（問題解答中はヒントになるので非表示）
   const q = queue[qIdx];
+  // 回答後：問題文にAssessmentハイライトを適用
+  document.getElementById('qm-text').innerHTML = renderTextWithImages(q.question, getAssessmentItems(q.explanation));
   // 解説を再レンダリング（選択肢考察・ポイントは選択肢理解チェックに表示済みのため引き続き非表示）
   const expEl = document.getElementById('qm-exp');
   const expEditWrap = document.getElementById('qm-exp-edit-wrap');
