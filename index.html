@@ -22,6 +22,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<script>/* assess_colors.js (pre-computed assessment colors) */
+try { /* loaded below */ } catch(e) {}
+</script>
+<script src="assess_colors.js" onerror="window.ASSESS_COLORS={}"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif; background: #f0f4f8; color: #2d3748; min-height: 100vh; }
@@ -169,6 +173,9 @@ select.form-input { cursor: pointer; }
 .assess-sb-panel li { display: flex; align-items: flex-start; gap: 7px; padding: 6px 0; border-bottom: .5px solid #e2e8f0; font-size: 13px; line-height: 1.5; }
 .assess-sb-panel li:last-child { border-bottom: none; }
 .assess-sb-sum { font-size: 13.5px; line-height: 2; color: #374151; margin-top: 10px; background: #f8fafc; border-radius: 6px; padding: 10px 12px; border: .5px solid #e2e8f0; }
+.assess-src { font-size: 11px; color: #9ca3af; margin-top: 2px; line-height: 1.4; }
+.assess-src-fuzzy { font-size: 11px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
+.assess-src-miss { font-size: 11px; color: #d97706; margin-top: 2px; line-height: 1.4; }
 
 /* Choice rows */
 .choice-row { padding: 9px 12px 9px 10px; border-radius: 7px; margin-bottom: 6px; }
@@ -1464,7 +1471,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.05.06.04";
+const APP_VERSION = "v2026.05.06.07";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -5818,6 +5825,31 @@ function renderPointsLines(lines) {
 
 
 
+
+function getMatchType(quote, questionText) {
+  if (!quote || !questionText) return 'none';
+  if (questionText.includes(quote)) return 'exact';
+  const MIN_LEN = 10;
+  for (let len = Math.floor(quote.length * 0.85); len >= MIN_LEN; len--) {
+    if (questionText.includes(quote.slice(0, len))) return 'fuzzy';
+  }
+  return 'none';
+}
+
+function getNoneReason(quote, questionText) {
+  if (!questionText || !quote) return '言い換え';
+  const segs = getCompositeSegments(quote, questionText);
+  return segs.length >= 2 ? '合成引用' : '問題文と表現が異なりハイライト不可';
+}
+
+// 合成引用の各セグメントを返す（問題文中に存在するもの）
+function getCompositeSegments(quote, questionText) {
+  if (!quote || !questionText) return [];
+  const MIN_LEN = 6;
+  const segs = quote.split(/[，、。\s]+/).map(s => s.trim()).filter(s => s.length >= MIN_LEN);
+  return segs.filter(s => questionText.includes(s));
+}
+
 function getAssessmentItems(expText) {
   if (!expText) return [];
   const lines = expText.split('\n');
@@ -5850,9 +5882,18 @@ function parseAssessmentItems(lines) {
   return { items, summary: summaryLines.join('\n').trim() };
 }
 
-function assessColor(meaning) {
-  if (/特に問題なし|正常|良好|問題はない|問題ない|異常を認めない|緊急性はない|否定|陰性|問題なし/.test(meaning)) return 'g';
-  if (/疑われる|疑い|遷延|増大|上昇|リスク|可能性|異常|高値|機能低下|不全/.test(meaning)) return 'a';
+// 現在表示中の問題番号（revealAnswer 時にセット）
+let _currentQNumber = null;
+
+function assessColor(meaning, itemNum) {
+  // pre-computed カラーを優先使用
+  if (itemNum && _currentQNumber && window.ASSESS_COLORS) {
+    const qc = ASSESS_COLORS[_currentQNumber];
+    if (qc && qc[itemNum]) return qc[itemNum];
+  }
+  // フォールバック: キーワード正規表現
+  if (/正常|良好|問題な[いし]|問題はない|緊急性はな|否定|陰性|異常を認めな|異常はな|なし[。，]/.test(meaning)) return 'g';
+  if (/疑われ|疑い|異常[がをは]|高値|低値|上昇|低下|不全|機能低下|貧血|梗塞|癌|腫瘍|重症|悪化|遷延/.test(meaning)) return 'a';
   return 'b';
 }
 
@@ -5861,7 +5902,7 @@ function highlightQuestion(qText, items) {
   const sorted = [...items].sort((a, b) => b.quote.length - a.quote.length);
   for (const item of sorted) {
     if (!item.quote) continue;
-    const c = assessColor(item.meaning);
+    const c = assessColor(item.meaning, item.num);
     const eq = escapeHtml(item.quote);
     const badge = `<span class="assess-sb-badge assess-sb-b${c}">${item.num}</span>`;
     html = html.replace(eq, `<span class="assess-sb-hl-${c}">${eq}</span>${badge}`);
@@ -5874,15 +5915,34 @@ function renderAssessmentSidebar(lines, questionText) {
   if (items.length === 0) return renderGenericLines(lines);
 
   const listItems = items.map(it => {
-    const c = assessColor(it.meaning);
-    return `<li><span class="assess-sb-badge assess-sb-b${c}" style="flex-shrink:0;font-size:11px;padding:1px 4px">${it.num}</span><span>${escapeHtml(it.meaning)}</span></li>`;
+    const c = assessColor(it.meaning, it.num);
+    const mt = questionText ? getMatchType(it.quote, questionText) : null;
+    const short = s => s.length > 16 ? s.slice(0, 16) + '…' : s;
+    let srcHtml = '';
+    if (it.quote && questionText) {
+      if (mt === 'none') {
+        const compSegs = getCompositeSegments(it.quote, questionText);
+        if (compSegs.length >= 2) {
+          // 合成引用：見つかった各セグメントを表示
+          const segLabels = compSegs.map(s => `「${escapeHtml(short(s))}」`).join(' ');
+          srcHtml = `<div class="assess-src-fuzzy">${segLabels}（合成）</div>`;
+        } else {
+          srcHtml = `<div class="assess-src-miss">⚠ ${escapeHtml(getNoneReason(it.quote, questionText))}</div>`;
+        }
+      } else if (mt === 'fuzzy') {
+        srcHtml = `<div class="assess-src-fuzzy">「${escapeHtml(short(it.quote))}」（近似）</div>`;
+      } else {
+        srcHtml = `<div class="assess-src">「${escapeHtml(short(it.quote))}」</div>`;
+      }
+    }
+    return `<li><span class="assess-sb-badge assess-sb-b${c}" style="flex-shrink:0;font-size:11px;padding:1px 4px">${it.num}</span><span><div>${escapeHtml(it.meaning)}</div>${srcHtml}</span></li>`;
   }).join('');
 
   let sumHtml = '';
   if (summary) {
     let s = escapeHtml(summary).replace(/\n/g, '<br>');
     for (const it of items) {
-      const c = assessColor(it.meaning);
+      const c = assessColor(it.meaning, it.num);
       const badge = `<span class="assess-sb-badge assess-sb-b${c}">${it.num}</span>`;
       s = s.split(it.num).join(badge);
     }
@@ -5929,15 +5989,51 @@ function renderTextWithImages(text, highlightItems = null) {
   // Step1: HTMLエスケープ（XSS防止）
   let html = escapeHtml(text);
 
-  // Step1.5: Assessmentハイライト適用
+  // Step1.5: Assessmentハイライト適用（完全一致 → プレフィックス一致 → 合成引用 の順）
   if (highlightItems && highlightItems.length) {
     const sorted = [...highlightItems].sort((a, b) => b.quote.length - a.quote.length);
     for (const item of sorted) {
       if (!item.quote) continue;
-      const c = assessColor(item.meaning);
+      const c = assessColor(item.meaning, item.num);
       const eq = escapeHtml(item.quote);
+      const spanO = `<span class="assess-sb-hl-${c}">`;
       const badge = `<span class="assess-sb-badge assess-sb-b${c}">${item.num}</span>`;
-      html = html.replace(eq, `<span class="assess-sb-hl-${c}">${eq}</span>${badge}`);
+
+      if (html.includes(eq)) {
+        // 完全一致
+        html = html.replace(eq, spanO + eq + '</span>' + badge);
+      } else {
+        // プレフィックス一致: 85%以上 かつ最低10文字
+        const MIN_LEN = 10;
+        let applied = false;
+        for (let len = Math.floor(eq.length * 0.85); len >= MIN_LEN; len--) {
+          const prefix = eq.slice(0, len);
+          const idx = html.indexOf(prefix);
+          if (idx < 0) continue;
+          const STOPS = new Set(['。', '，', '、', '）', '・', '<']);
+          let end = idx + len;
+          let extra = 0;
+          while (end < html.length && !STOPS.has(html[end]) && extra < 15) { end++; extra++; }
+          const matched = html.slice(idx, end);
+          html = html.slice(0, idx) + spanO + matched + '</span>' + badge + html.slice(end);
+          applied = true;
+          break;
+        }
+        if (!applied) {
+          // 合成引用: 個別セグメントをそれぞれハイライト
+          const rawSegs = item.quote.split(/[，、。\s]+/).map(s => s.trim()).filter(s => s.length >= 6);
+          const foundSegs = rawSegs.filter(s => html.includes(escapeHtml(s)));
+          if (foundSegs.length >= 2) {
+            let firstDone = false;
+            for (const seg of foundSegs) {
+              const eseg = escapeHtml(seg);
+              const segBadge = firstDone ? '' : badge; // バッジは最初の1か所のみ
+              html = html.replace(eseg, spanO + eseg + '</span>' + segBadge);
+              firstDone = true;
+            }
+          }
+        }
+      }
     }
   }
 
@@ -6415,6 +6511,7 @@ function revealAnswer() {
   document.getElementById('ans-revealed').style.display = 'block';
   // 前回の理解メモを解説確認後に表示（問題解答中はヒントになるので非表示）
   const q = queue[qIdx];
+  _currentQNumber = q.number || null; // assessColor が pre-computed カラーを引けるようにセット
   // 回答後：問題文にAssessmentハイライトを適用
   document.getElementById('qm-text').innerHTML = renderTextWithImages(q.question, getAssessmentItems(q.explanation));
   // 解説を再レンダリング（選択肢考察・ポイントは選択肢理解チェックに表示済みのため引き続き非表示）
