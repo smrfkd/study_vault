@@ -177,6 +177,9 @@ select.form-input { cursor: pointer; }
 .assess-src-fuzzy { font-size: 11px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
 .assess-src-miss { font-size: 11px; color: #c8cfd8; margin-left: 4px; }
 .assess-sum-num { font-weight: 600; font-size: 13px; padding: 0 1px; border-radius: 3px; }
+.assess-legend { display: flex; gap: 8px; margin-bottom: 6px; }
+.assess-legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 3px; vertical-align: middle; }
+.assess-legend-item { font-size: 10px; color: #9ca3af; display: flex; align-items: center; }
 .assess-sum-ng { color: #065f46; background: #d1fae5; }
 .assess-sum-na { color: #78350f; background: #fef3c7; }
 .assess-sum-nb { color: #1e40af; background: #dbeafe; }
@@ -1475,7 +1478,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.05.06.10";
+const APP_VERSION = "v2026.05.06.12";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -1947,10 +1950,39 @@ async function syncFromCloud() {
     }
     if (_seeded) await saveMoshiToCloud();
     await loadAnkiSRSFromCloud();
+    _applyDataPatches(); // 既知の誤データを自動修正
     _updateSyncStatus('同期済み ☁️', '#9ae6b4');
   } catch(e) {
     console.warn('[Firebase] 同期失敗:', e);
     _updateSyncStatus('同期エラー', '#feb2b2');
+  }
+}
+
+// ===== 既知の誤データを自動修正するパッチ =====
+function _applyDataPatches() {
+  // 「適切でないのはどれか」型問題で ○/× から正解が逆推定されていたもの
+  // MD に **正解** 行を追加済みだが、再インポートなしでも自動修正するためここで補正する
+  const PATCHES = {
+    '118E8':  'a',
+    '117B42': 'a',
+    '115E46': 'b',
+    '115B48': 'b',
+    '119B41': 'b',
+    '119C71': 'a',
+    '118F29': 'c',
+  };
+  let changed = false;
+  for (const q of questions) {
+    const num = (q.number || '').replace(/[\s　｜|].*/, '').trim();
+    if (num in PATCHES && q.answer !== PATCHES[num]) {
+      console.log(`[Patch] ${num}: answer "${q.answer}" → "${PATCHES[num]}"`);
+      q.answer = PATCHES[num];
+      changed = true;
+    }
+  }
+  if (changed) {
+    saveToCloud(); // デバウンス付き保存（3秒後）
+    console.log('[Patch] データ修正を保存します');
   }
 }
 
@@ -1974,7 +2006,7 @@ function getAnkiSRS() { return ankiCardSRS; }
 function updateAnkiSRS(data) { Object.assign(ankiCardSRS, data); saveAnkiSRSToCloud(); }
 
 // Firestoreの1MBドキュメント制限対策：150問ずつチャンクに分割して保存
-const CLOUD_CHUNK_SIZE = 150;
+const CLOUD_CHUNK_SIZE = 50;
 
 async function saveToCloudNow() {
   if (!_cloudSyncEnabled || !_db || !_userId) return;
@@ -1983,28 +2015,55 @@ async function saveToCloudNow() {
     for (let i = 0; i < questions.length; i += CLOUD_CHUNK_SIZE) {
       chunks.push(questions.slice(i, i + CLOUD_CHUNK_SIZE));
     }
-    const batch = _db.batch();
+
+    // 古いチャンク数を meta から取得（チャンク数が減った場合の余剰チャンクを削除するため）
+    let prevTotalChunks = 0;
+    try {
+      const metaSnap = await _db.collection('users').doc(_userId)
+        .collection('data').doc('meta').get();
+      if (metaSnap.exists) prevTotalChunks = metaSnap.data().totalChunks || 0;
+    } catch(e) { /* 取得失敗は無視 */ }
+
+    // Firestoreバッチ上限(500)を超えないよう分割コミット
+    const BATCH_LIMIT = 490;
+    let batchOps = [];
+
     chunks.forEach((chunk, i) => {
-      const ref = _db.collection('users').doc(_userId)
-        .collection('data').doc('questions_' + i);
-      batch.set(ref, { questions: chunk });
+      batchOps.push({ type: 'set', path: 'questions_' + i, data: { questions: chunk } });
     });
-    // metaドキュメントにチャンク数を記録（リアルタイム監視のトリガーにもなる）
-    const metaRef = _db.collection('users').doc(_userId)
-      .collection('data').doc('meta');
-    batch.set(metaRef, {
-      totalChunks: chunks.length,
-      totalQuestions: questions.length,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    // 余剰チャンクを削除
+    for (let i = chunks.length; i < prevTotalChunks; i++) {
+      batchOps.push({ type: 'delete', path: 'questions_' + i });
+    }
+    // meta 更新
+    batchOps.push({
+      type: 'set', path: 'meta', data: {
+        totalChunks: chunks.length,
+        totalQuestions: questions.length,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }
     });
-    await batch.commit();
+
+    // バッチを最大 BATCH_LIMIT 件ずつに分割してコミット
+    for (let start = 0; start < batchOps.length; start += BATCH_LIMIT) {
+      const batch = _db.batch();
+      batchOps.slice(start, start + BATCH_LIMIT).forEach(op => {
+        const ref = _db.collection('users').doc(_userId)
+          .collection('data').doc(op.path);
+        if (op.type === 'delete') batch.delete(ref);
+        else batch.set(ref, op.data);
+      });
+      await batch.commit();
+    }
+
     // Firestore書き込み完了 → ローカルバックアップは不要になるので削除
     try { localStorage.removeItem('kokushi_local_backup'); } catch(e) {}
     _updateSyncStatus('同期済み ☁️', '#9ae6b4');
     console.log('[Firebase] クラウドに', questions.length, '問を保存（', chunks.length, 'チャンク）');
   } catch(e) {
     console.warn('[Firebase] クラウド保存失敗:', e);
-    _updateSyncStatus('保存エラー', '#feb2b2');
+    _updateSyncStatus('保存エラー ⚠️', '#feb2b2');
+    throw e; // endStudy が適切にエラーを拾えるよう再スロー
   }
 }
 
@@ -5958,7 +6017,12 @@ function renderAssessmentSidebar(lines, questionText) {
     sumHtml = `<div class="assess-sb-sum">${s}</div>`;
   }
 
-  return `<ul class="assess-sb-panel">${listItems}</ul>${sumHtml}`;
+  const legend = `<div class="assess-legend">
+    <span class="assess-legend-item"><span class="assess-legend-dot" style="background:#6ee7b7"></span>正常</span>
+    <span class="assess-legend-item"><span class="assess-legend-dot" style="background:#fcd34d"></span>要注意</span>
+    <span class="assess-legend-item"><span class="assess-legend-dot" style="background:#93c5fd"></span>中立</span>
+  </div>`;
+  return legend + `<ul class="assess-sb-panel">${listItems}</ul>${sumHtml}`;
 }
 
 function renderGenericLines(lines) {
@@ -6722,16 +6786,17 @@ async function endStudy() {
   if (_cloudSyncEnabled && _db && _userId) {
     _updateSyncStatus('保存中...', '#fefcbf');
     try {
-      // 5秒でタイムアウト（ネットワーク不調時に永遠に待たないようにする）
+      // 10秒でタイムアウト（チャンク増加によりネットワーク時間が増えるため延長）
       await Promise.race([
         saveToCloudNow(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 10000))
       ]);
+      _updateSyncStatus('保存済み ✓', '#9ae6b4'); // 成功時に明示表示
     } catch(e) {
       console.warn('endStudy save error', e);
       // タイムアウト・エラーでもlocalStorageバックアップは保存済みなのでデータは安全
       _updateSyncStatus(
-        e.message === 'timeout' ? 'タイムアウト（ローカル保存済み）' : '保存エラー',
+        e.message === 'timeout' ? 'タイムアウト（ローカル保存済み）' : '保存エラー ⚠️',
         '#feb2b2'
       );
     }
