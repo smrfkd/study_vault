@@ -175,7 +175,7 @@ select.form-input { cursor: pointer; }
 .assess-sb-sum { font-size: 13.5px; line-height: 2; color: #374151; margin-top: 10px; background: #f8fafc; border-radius: 6px; padding: 10px 12px; border: .5px solid #e2e8f0; }
 .assess-src { font-size: 11px; color: #9ca3af; margin-top: 2px; line-height: 1.4; }
 .assess-src-fuzzy { font-size: 11px; color: #6b7280; margin-top: 2px; line-height: 1.4; }
-.assess-src-miss { font-size: 11px; color: #d97706; margin-top: 2px; line-height: 1.4; }
+.assess-src-miss { font-size: 11px; color: #c0c7d0; margin-top: 2px; line-height: 1.4; }
 
 /* Choice rows */
 .choice-row { padding: 9px 12px 9px 10px; border-radius: 7px; margin-bottom: 6px; }
@@ -1471,7 +1471,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.05.06.07";
+const APP_VERSION = "v2026.05.06.08";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -5919,20 +5919,11 @@ function renderAssessmentSidebar(lines, questionText) {
     const mt = questionText ? getMatchType(it.quote, questionText) : null;
     const short = s => s.length > 16 ? s.slice(0, 16) + '…' : s;
     let srcHtml = '';
-    if (it.quote && questionText) {
-      if (mt === 'none') {
-        const compSegs = getCompositeSegments(it.quote, questionText);
-        if (compSegs.length >= 2) {
-          // 合成引用：見つかった各セグメントを表示
-          const segLabels = compSegs.map(s => `「${escapeHtml(short(s))}」`).join(' ');
-          srcHtml = `<div class="assess-src-fuzzy">${segLabels}（合成）</div>`;
-        } else {
-          srcHtml = `<div class="assess-src-miss">⚠ ${escapeHtml(getNoneReason(it.quote, questionText))}</div>`;
-        }
-      } else if (mt === 'fuzzy') {
-        srcHtml = `<div class="assess-src-fuzzy">「${escapeHtml(short(it.quote))}」（近似）</div>`;
-      } else {
-        srcHtml = `<div class="assess-src">「${escapeHtml(short(it.quote))}」</div>`;
+    if (it.quote && questionText && mt === 'none') {
+      // 合成引用かどうか確認（合成ならハイライトされるので表示不要）
+      const compSegs = getCompositeSegments(it.quote, questionText);
+      if (compSegs.length < 2) {
+        srcHtml = `<div class="assess-src-miss">ハイライト不可</div>`;
       }
     }
     return `<li><span class="assess-sb-badge assess-sb-b${c}" style="flex-shrink:0;font-size:11px;padding:1px 4px">${it.num}</span><span><div>${escapeHtml(it.meaning)}</div>${srcHtml}</span></li>`;
