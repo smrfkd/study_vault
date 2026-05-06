@@ -156,6 +156,20 @@ select.form-input { cursor: pointer; }
 .exp-section-header { padding: 7px 14px; font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
 .exp-section-body { padding: 12px 14px; }
 .exp-fallback { padding: 14px; font-size: 14px; line-height: 1.9; color: #2d3748; white-space: pre-wrap; }
+.assess-sb { display: grid; grid-template-columns: minmax(0,1fr) 210px; gap: 1.25rem; align-items: start; }
+.assess-sb-q { font-size: 14px; line-height: 2.6; color: #374151; }
+.assess-sb-hl-g { background: #d1fae5; border-radius: 3px; padding: 0 2px; }
+.assess-sb-hl-a { background: #fef3c7; border-radius: 3px; padding: 0 2px; }
+.assess-sb-hl-b { background: #dbeafe; border-radius: 3px; padding: 0 2px; }
+.assess-sb-badge { font-size: 10px; font-weight: 600; padding: 1px 3px; border-radius: 3px; vertical-align: super; line-height: 1; display: inline-block; margin: 0 1px; }
+.assess-sb-bg { color: #065f46; background: #a7f3d0; }
+.assess-sb-ba { color: #78350f; background: #fde68a; }
+.assess-sb-bb { color: #1e40af; background: #bfdbfe; }
+.assess-sb-panel { list-style: none; margin: 0; padding: .5rem .75rem; background: #f0fdf8; border: 1px solid #a7f3d0; border-radius: 8px; }
+.assess-sb-panel li { display: flex; align-items: flex-start; gap: 7px; padding: 6px 0; border-bottom: .5px solid #a7f3d0; font-size: 13px; line-height: 1.5; }
+.assess-sb-panel li:last-child { border-bottom: none; }
+.assess-sb-sum { font-size: 13.5px; line-height: 2; color: #374151; margin-top: 10px; background: #f0fdf8; border-radius: 6px; padding: 10px 12px; border: 1px solid #a7f3d0; }
+
 /* Choice rows */
 .choice-row { padding: 9px 12px 9px 10px; border-radius: 7px; margin-bottom: 6px; }
 .choice-row:last-child { margin-bottom: 0; }
@@ -1450,7 +1464,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.05.05.02";
+const APP_VERSION = "v2026.05.06.02";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -3626,7 +3640,7 @@ function saveExpEdit() {
   // queue 内の同じ問題も更新
   questions.forEach(orig => { if (orig.id === q.id) orig.explanation = newExp; });
   // 解説表示を再レンダリング
-  document.getElementById('qm-exp').innerHTML = renderExplanationStructured(newExp, { studyMode: true });
+  document.getElementById('qm-exp').innerHTML = renderExplanationStructured(newExp, { studyMode: true, answer: q.answer, question: q.question });
   // 選択肢も再抽出
   const choices = extractChoicesFromExplanation(newExp);
   renderChoices(choices);
@@ -3795,7 +3809,12 @@ function _renderChoiceCheckPanel() {
       : state === 'unmatched'
       ? `<span style="color:#c53030;font-size:12px;font-weight:700;white-space:nowrap">✗ できなかった</span>`
       : '';
-    const correctMark = c.correct
+    // q.answer を使って「問題の正解かどうか」を判定（○/× マーカーの医学的正誤とは独立）
+    const _ansKey = (q.answer || '').toLowerCase();
+    const _isAnswerKey = /^[a-j]/.test(_ansKey)
+      ? (() => { const m = _ansKey.match(/[a-j]/g); return m ? new Set(m).has(c.key) : false; })()
+      : false;
+    const correctMark = _isAnswerKey
       ? `<span style="color:#276749;font-weight:700">✓ 正解選択肢</span>`
       : `<span style="color:#c53030;font-weight:700">✗ 不正解選択肢</span>`;
     const expContent = c.expLines.length > 0
@@ -5515,7 +5534,7 @@ function showQ() {
   if (prevMemoEl) prevMemoEl.style.display = 'none';
   set('qm-num', `問題 ${qIdx+1} / ${queue.length}`);
   document.getElementById('qm-text').innerHTML = renderTextWithImages(q.question);
-  document.getElementById('qm-exp').innerHTML = renderExplanationStructured(q.explanation, { studyMode: true });
+  document.getElementById('qm-exp').innerHTML = renderExplanationStructured(q.explanation, { studyMode: true, answer: q.answer, question: q.question });
   cancelExpEdit(); // 問題が変わったら解説編集モードをリセット
   _choiceCheckState = {}; _choiceCheckAll = []; _choiceCheckPointLines = []; _choiceCheckAnswerCtx = null;
   const _badge = document.getElementById('answer-result-badge'); if (_badge) _badge.innerHTML = '';
@@ -5606,7 +5625,7 @@ const EXP_SECTION_DEFS = [
 // 診断・臨床診断 → Assessment に内包されるため冗長
 const EXP_STUDY_HIDE = new Set(['選択肢考察', 'ポイント', '診断', '臨床診断']);
 
-function renderExplanationStructured(text, { studyMode = false } = {}) {
+function renderExplanationStructured(text, { studyMode = false, answer = null, question = null } = {}) {
   if (!text) return '';
 
   // 既インポート済みデータにも対応：表示時にも除去
@@ -5655,12 +5674,22 @@ function renderExplanationStructured(text, { studyMode = false } = {}) {
     }
   }
 
-  return visible.map(({ def, lines }) => renderExpSection(def, lines)).join('');
+  // answer から正解キーセットを計算（「適切でないのはどれか」でも正しく✅を表示するため）
+  const _expAnswerKeys = answer
+    ? (() => {
+        const a = answer.toLowerCase().trim();
+        if (/^[a-j][a-j・,、\s]*$/.test(a)) return new Set(a.match(/[a-j]/g));
+        const m = a.match(/^([a-j])(?:[・,、]\s*[a-j])*/);
+        return m ? new Set(m[0].match(/[a-j]/g)) : null;
+      })()
+    : null;
+  return visible.map(({ def, lines }) => renderExpSection(def, lines, _expAnswerKeys, question)).join('');
 }
 
-function renderExpSection(def, lines) {
-  let inner = def.type === 'choices' ? renderChoiceLines(lines)
+function renderExpSection(def, lines, answerKeys = null, questionText = null) {
+  let inner = def.type === 'choices' ? renderChoiceLines(lines, answerKeys)
             : def.type === 'points'  ? renderPointsLines(lines)
+            : (def.label === 'Assessment' || def.label === 'アセスメント') ? renderAssessmentSidebar(lines, questionText)
             : renderGenericLines(lines);
 
   // 中身が空（または空白のみ）の場合は「なし」を表示
@@ -5687,7 +5716,7 @@ function parseAnswerRates(text) {
   return rateMap;
 }
 
-function renderChoiceLines(lines) {
+function renderChoiceLines(lines, answerKeys = null) {
   const groups = [];   // [{correct, key, label, expLines:[]}]
   let cur = null;
   const pre = [];
@@ -5763,13 +5792,15 @@ function renderChoiceLines(lines) {
   }
 
   for (const g of groups) {
-    const cls = g.correct ? 'choice-row choice-row-correct' : 'choice-row choice-row-wrong';
-    const ico = g.correct ? '✅' : '❌';
+    // answerKeys が渡された場合はそれで正誤判定（「適切でないのはどれか」でも正しく表示）
+    const isAnswer = answerKeys ? answerKeys.has(g.key) : g.correct;
+    const cls = isAnswer ? 'choice-row choice-row-correct' : 'choice-row choice-row-wrong';
+    const ico = isAnswer ? '✅' : '❌';
     const expText = g.expLines.join('\n').trim();
     const rate = rateMap[g.key];
     // 解答率バッジ：正解選択肢は緑、不正解は灰
     const rateBadge = rate
-      ? `<span style="display:inline-block;margin-left:8px;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;vertical-align:middle;background:${g.correct?'#c6f6d5':'#edf2f7'};color:${g.correct?'#276749':'#4a5568'}">${rate}</span>`
+      ? `<span style="display:inline-block;margin-left:8px;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;vertical-align:middle;background:${isAnswer?'#c6f6d5':'#edf2f7'};color:${isAnswer?'#276749':'#4a5568'}">${rate}</span>`
       : '';
     html += `<div class="${cls}" data-choice-key="${g.key}">
       <div class="choice-row-label"><span>${ico}</span><strong>${g.key}．</strong>${renderInlineText(g.label)}${rateBadge}</div>
@@ -5783,6 +5814,69 @@ function renderPointsLines(lines) {
   const text = lines.join('\n').trim();
   if (!text) return '';
   return `<div style="font-size:14px;line-height:2;color:#3b1a00">${renderInlineText(text)}</div>`;
+}
+
+
+function parseAssessmentItems(lines) {
+  const RE = /^([①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳])\s*(.*?)\s*[⇒→]\s*(.+)$/;
+  const items = []; const summaryLines = []; let inSummary = false;
+  for (const line of lines) {
+    const tr = line.trim();
+    if (!tr) continue;
+    const m = tr.match(RE);
+    if (m && !inSummary) {
+      items.push({ num: m[1], quote: m[2].trim(), meaning: m[3].trim() });
+    } else if (items.length > 0) {
+      inSummary = true; summaryLines.push(line);
+    }
+  }
+  return { items, summary: summaryLines.join('\n').trim() };
+}
+
+function assessColor(meaning) {
+  if (/特に問題なし|正常|良好|問題はない|問題ない|異常を認めない|緊急性はない|否定|陰性|問題なし/.test(meaning)) return 'g';
+  if (/疑われる|疑い|遷延|増大|上昇|リスク|可能性|異常|高値|機能低下|不全/.test(meaning)) return 'a';
+  return 'b';
+}
+
+function highlightQuestion(qText, items) {
+  let html = escapeHtml(qText).replace(/\n/g, '<br>');
+  const sorted = [...items].sort((a, b) => b.quote.length - a.quote.length);
+  for (const item of sorted) {
+    if (!item.quote) continue;
+    const c = assessColor(item.meaning);
+    const eq = escapeHtml(item.quote);
+    const badge = `<span class="assess-sb-badge assess-sb-b${c}">${item.num}</span>`;
+    html = html.replace(eq, `<span class="assess-sb-hl-${c}">${eq}</span>${badge}`);
+  }
+  return html;
+}
+
+function renderAssessmentSidebar(lines, questionText) {
+  const { items, summary } = parseAssessmentItems(lines);
+  if (items.length === 0) return renderGenericLines(lines);
+
+  const listItems = items.map(it => {
+    const c = assessColor(it.meaning);
+    return `<li><span class="assess-sb-badge assess-sb-b${c}" style="flex-shrink:0;font-size:11px;padding:1px 4px">${it.num}</span><span>${escapeHtml(it.meaning)}</span></li>`;
+  }).join('');
+
+  let sumHtml = '';
+  if (summary) {
+    let s = escapeHtml(summary).replace(/\n/g, '<br>');
+    for (const it of items) {
+      const c = assessColor(it.meaning);
+      const badge = `<span class="assess-sb-badge assess-sb-b${c}">${it.num}</span>`;
+      s = s.split(it.num).join(badge);
+    }
+    sumHtml = `<div class="assess-sb-sum">${s}</div>`;
+  }
+
+  if (questionText) {
+    const qHtml = `<div class="assess-sb-q">${highlightQuestion(questionText, items)}</div>`;
+    return `<div class="assess-sb">${qHtml}<ul class="assess-sb-panel">${listItems}</ul></div>${sumHtml}`;
+  }
+  return renderGenericLines(lines) + sumHtml;
 }
 
 function renderGenericLines(lines) {
@@ -6248,7 +6342,7 @@ function submitNumericAnswer() {
   const expEl = document.getElementById('qm-exp');
   const expEditWrap = document.getElementById('qm-exp-edit-wrap');
   if (expEl && !(expEditWrap && expEditWrap.style.display !== 'none')) {
-    expEl.innerHTML = renderExplanationStructured(q.explanation, { studyMode: true });
+    expEl.innerHTML = renderExplanationStructured(q.explanation, { studyMode: true, answer: q.answer, question: q.question });
   }
   // 大分野・中分野バッジを表示
   const catBadgeEl = document.getElementById('qm-category-reveal');
@@ -6300,7 +6394,7 @@ function revealAnswer() {
   const expEl = document.getElementById('qm-exp');
   const expEditWrap = document.getElementById('qm-exp-edit-wrap');
   if (expEl && !(expEditWrap && expEditWrap.style.display !== 'none')) {
-    expEl.innerHTML = renderExplanationStructured(q.explanation, { studyMode: true });
+    expEl.innerHTML = renderExplanationStructured(q.explanation, { studyMode: true, answer: q.answer, question: q.question });
   }
   const prevMemo = document.getElementById('prev-feynman-memo');
   if (prevMemo && q && q.feynmanNote) {
