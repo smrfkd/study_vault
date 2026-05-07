@@ -1478,7 +1478,7 @@ select.form-input { cursor: pointer; }
 
 <script>
 // ========== DATA ==========
-const APP_VERSION = "v2026.05.06.12";
+const APP_VERSION = "v2026.05.07.01";
 let questions = [];
 let queue = [];
 let qIdx = 0;
@@ -2008,12 +2008,26 @@ function updateAnkiSRS(data) { Object.assign(ankiCardSRS, data); saveAnkiSRSToCl
 // Firestoreの1MBドキュメント制限対策：150問ずつチャンクに分割して保存
 const CLOUD_CHUNK_SIZE = 50;
 
+// Firestoreに保存できない undefined 値を null に置換するサニタイザー
+function sanitizeForFirestore(obj) {
+  if (Array.isArray(obj)) return obj.map(sanitizeForFirestore);
+  if (obj !== null && typeof obj === 'object') {
+    const result = {};
+    for (const key of Object.keys(obj)) {
+      const val = obj[key];
+      result[key] = val === undefined ? null : sanitizeForFirestore(val);
+    }
+    return result;
+  }
+  return obj;
+}
+
 async function saveToCloudNow() {
   if (!_cloudSyncEnabled || !_db || !_userId) return;
   try {
     const chunks = [];
     for (let i = 0; i < questions.length; i += CLOUD_CHUNK_SIZE) {
-      chunks.push(questions.slice(i, i + CLOUD_CHUNK_SIZE));
+      chunks.push(sanitizeForFirestore(questions.slice(i, i + CLOUD_CHUNK_SIZE)));
     }
 
     // 古いチャンク数を meta から取得（チャンク数が減った場合の余剰チャンクを削除するため）
